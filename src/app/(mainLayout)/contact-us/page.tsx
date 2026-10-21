@@ -1,3 +1,4 @@
+import AdBanner from "@/components/adsense/ad-banner";
 import ContactForm from "@/components/modules/contact/contact-form";
 import Container from "@/components/ui/container";
 import { Button } from "@nextui-org/button";
@@ -99,6 +100,10 @@ const ContactUsPage: React.FC<IProps> = () => {
               </div>
             </CardBody>
           </Card>
+        </div>
+
+        <div className="pb-10">
+          <AdBanner />
         </div>
       </Container>
     </>

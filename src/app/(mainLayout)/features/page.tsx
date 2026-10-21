@@ -1,3 +1,4 @@
+import AdBanner from "@/components/adsense/ad-banner";
 import Container from "@/components/ui/container";
 import { poppins } from "@/config/fonts";
 import { Button } from "@nextui-org/button";
@@ -157,6 +158,10 @@ const CommunityPage: React.FC<IProps> = () => {
                   </ul>
                 </div>
               </div>
+            </div>
+
+            <div className="my-16">
+              <AdBanner />
             </div>
 
             <div className="text-center mt-16 space-y-6">

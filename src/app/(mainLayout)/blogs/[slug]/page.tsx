@@ -251,6 +251,10 @@ const DynamicBlogPage = async ({ params }: { params: { slug: string } }) => {
                   </div>
                 </div>
 
+                <div className="print:hidden">
+                  <AdBanner />
+                </div>
+
                 <div className="prose dark:prose-invert max-w-full">
                   <div dangerouslySetInnerHTML={{ __html: content }} />
                 </div>
@@ -325,12 +329,8 @@ const DynamicBlogPage = async ({ params }: { params: { slug: string } }) => {
                   </div>
                 </div>
 
-                <div>
-                  <AdBanner
-                    dataAdFormat="auto"
-                    dataAdSlot="9749465109"
-                    dataFullWidthResponsive={true}
-                  />
+                <div className="print:hidden">
+                  <AdBanner />
                 </div>
 
                 {/* comments */}

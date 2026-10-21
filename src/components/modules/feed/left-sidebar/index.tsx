@@ -17,11 +17,7 @@ const LeftSideBar = ({}: IProps) => {
 
         {/* Ad banner at bottom */}
         <div className="mt-4 absolute bottom-0 left-0 right-0">
-          <AdBanner
-            dataAdFormat="auto"
-            dataAdSlot="9749465109"
-            dataFullWidthResponsive={true}
-          />
+          <AdBanner />
         </div>
       </div>
     </div>  

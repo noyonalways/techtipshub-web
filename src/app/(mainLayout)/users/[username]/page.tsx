@@ -231,11 +231,7 @@ const GetUserByIdPage = async ({
         </div>
 
         <div className="mt-8">
-          <AdBanner
-            dataAdFormat="auto"
-            dataAdSlot="9749465109"
-            dataFullWidthResponsive={true}
-          />
+          <AdBanner />
         </div>
       </Container>
     </section>

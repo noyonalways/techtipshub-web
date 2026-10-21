@@ -1,3 +1,4 @@
+import AdBanner from "@/components/adsense/ad-banner";
 import { getFollowingByUserId, getUserByUsername } from "@/services/user";
 import { IUFollowing, IUser } from "@/types";
 import { Avatar } from "@nextui-org/avatar";
@@ -63,6 +64,8 @@ const Following = async ({ params }: IProps) => {
           </Link>
         ))}
       </div>
+
+      <AdBanner />
     </div>
   );
 };

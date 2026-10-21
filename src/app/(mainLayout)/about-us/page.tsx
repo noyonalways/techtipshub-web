@@ -265,11 +265,7 @@ const AboutUs: React.FC<IProps> = () => {
 
         <Container>
           <div className="mb-10 mt-6">
-            <AdBanner
-              dataAdFormat="auto"
-              dataAdSlot="9749465109"
-              dataFullWidthResponsive={true}
-            />
+            <AdBanner />
           </div>
         </Container>
       </>

@@ -3,15 +3,15 @@
 import { useEffect } from "react";
 
 type AdBannerProps = {
-  dataAdSlot: string;
-  dataAdFormat: string;
-  dataFullWidthResponsive: boolean;
+  dataAdSlot?: string;
+  dataAdFormat?: string;
+  dataFullWidthResponsive?: boolean;
 };
 
 const AdBanner = ({
-  dataAdFormat,
-  dataAdSlot,
-  dataFullWidthResponsive,
+  dataAdFormat = "auto",
+  dataAdSlot = "9749465109",
+  dataFullWidthResponsive = true,
 }: AdBannerProps) => {
 
   useEffect(() => {

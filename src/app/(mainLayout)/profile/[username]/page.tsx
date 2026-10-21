@@ -256,11 +256,7 @@ const DynamicProfilePage = async () => {
           </div>
         )}
         <div>
-            <AdBanner
-              dataAdFormat="auto"
-              dataAdSlot="9749465109"
-              dataFullWidthResponsive={true}
-            />
+            <AdBanner />
           </div>
       </Container>
     </section>

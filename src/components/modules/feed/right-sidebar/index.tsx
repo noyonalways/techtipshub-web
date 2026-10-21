@@ -50,11 +50,7 @@ const RightSideBar = () => {
       <div className="space-y-4">
         <MiniFooter />
         {/* ad banner */}
-        <AdBanner
-          dataAdFormat="auto"
-          dataAdSlot="9749465109"
-          dataFullWidthResponsive={true}
-        />
+        <AdBanner />
       </div>
     </div>
   );

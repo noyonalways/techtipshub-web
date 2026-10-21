@@ -1,10 +1,11 @@
 "use client";
 
+import AdBanner from "@/components/adsense/ad-banner";
 import BlogCard from "@/components/blog-card";
 import { getFollowingUsersPosts } from "@/services/post";
 import { IPost } from "@/types";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 
 interface IProps {
@@ -63,8 +64,11 @@ const FollowingFeedPosts = ({ initialPosts }: IProps) => {
 
   return (
     <div className="space-y-6 flex-1 w-full">
-      {posts?.map((post) => (
-        <BlogCard key={post?._id} {...post} />
+      {posts?.map((post, index) => (
+        <Fragment key={post?._id}>
+          <BlogCard {...post} />
+          {(index + 1) % 4 === 0 && <AdBanner />}
+        </Fragment>
       ))}
       <div className="text-center" ref={ref}>
         {hasMore ? "Loading..." : "No more posts available."}
