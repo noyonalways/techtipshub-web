@@ -1,7 +1,6 @@
 import AdBanner from "@/components/adsense/ad-banner";
 import CommentCard from "@/components/comment-card";
 import CommentForm from "@/components/modules/post/comment-form";
-import ShowHTMLFormat from "@/components/modules/post/show-html-format";
 import BlogCommentButton from "@/components/ui/blog-comment-button";
 import BlogShareDropdown from "@/components/ui/blog-share-dropdown";
 import Container from "@/components/ui/container";
@@ -248,15 +247,6 @@ const DynamicBlogPage = async ({ params }: { params: Promise<{ slug: string }> }
                 <div className="prose dark:prose-invert max-w-full">
                   <div dangerouslySetInnerHTML={{ __html: content }} />
                 </div>
-
-                {/* {(contentType === "html" && (
-                  <ShowHTMLFormat content={content} />
-                )) ||
-                  (contentType === "text" && (
-                    <p className="text-default-600 text-base lg:text-lg whitespace-pre-line">
-                      {content}
-                    </p>
-                  ))} */}
 
                 <div className="space-y-10">
                   <div className="border border-default/50 py-2 px-2 rounded-full w-full max-w-fit mx-auto flex justify-center items-center print:hidden">

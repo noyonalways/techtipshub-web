@@ -16,11 +16,8 @@ import {
   SelectItem,
   useDisclosure,
 } from "@heroui/react";
-import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import "react-quill/dist/quill.snow.css";
-
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false }) as any;
+import RichTextEditor from "@/components/editor/rich-text-editor";
 
 interface IProps {
   post: IPost;
@@ -166,35 +163,9 @@ const UpdateBlogModal = ({ post, refetchPosts }: IProps) => {
                 />
 
                 {post.contentType === "html" && (
-                  <ReactQuill
-                    className="mb-4"
-                    value={content}
-                    onChange={setContent}
-                    required
-                    placeholder="Write your blog here..."
-                    modules={{
-                      toolbar: [
-                        [{ header: [1, 2, false] }],
-                        [
-                          "bold",
-                          "italic",
-                          "underline",
-                          "strike",
-                          "blockquote",
-                          "code-block",
-                        ],
-                        [
-                          { list: "ordered" },
-                          { list: "bullet" },
-                          { indent: "-1" },
-                          { indent: "+1" },
-                        ],
-                        ["link"],
-                        ["clean"],
-                      ],
-                    }}
-                    theme="snow"
-                  />
+                  <div className="mb-4">
+                    <RichTextEditor value={content} onChange={setContent} />
+                  </div>
                 )}
 
                 <div className="mb-4">

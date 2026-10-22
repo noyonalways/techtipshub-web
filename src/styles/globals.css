@@ -16,66 +16,75 @@
  * Theme tokens that the HeroUI JS plugin does not emit for Tailwind v4.
  * Without these, `text-default-500`, `bg-default-50`, `primary-500`, etc.
  * would not be generated as utilities.
+ *
+ * HeroUI stores every `--heroui-*` colour as raw HSL channels, e.g.
+ * `--heroui-default-200: 240 5.26% 26.08%`, because its own classes consume
+ * them as `hsl(var(--heroui-default-200))`. They must be wrapped the same way
+ * here: mapping one into `@theme` bare makes Tailwind emit
+ * `border-color: var(--color-default-200)`, which resolves to the invalid
+ * colour `240 5.26% 26.08%`. The declaration is then dropped and the border
+ * falls back to `currentColor`, producing the washed-out border that shows up
+ * in both themes.
  */
 @theme {
-  --color-default-50: var(--heroui-default-50);
-  --color-default-100: var(--heroui-default-100);
-  --color-default-200: var(--heroui-default-200);
-  --color-default-300: var(--heroui-default-300);
-  --color-default-400: var(--heroui-default-400);
-  --color-default-500: var(--heroui-default-500);
-  --color-default-600: var(--heroui-default-600);
-  --color-default-700: var(--heroui-default-700);
-  --color-default-800: var(--heroui-default-800);
-  --color-default-900: var(--heroui-default-900);
-  --color-default: var(--heroui-default);
+  --color-default-50: hsl(var(--heroui-default-50));
+  --color-default-100: hsl(var(--heroui-default-100));
+  --color-default-200: hsl(var(--heroui-default-200));
+  --color-default-300: hsl(var(--heroui-default-300));
+  --color-default-400: hsl(var(--heroui-default-400));
+  --color-default-500: hsl(var(--heroui-default-500));
+  --color-default-600: hsl(var(--heroui-default-600));
+  --color-default-700: hsl(var(--heroui-default-700));
+  --color-default-800: hsl(var(--heroui-default-800));
+  --color-default-900: hsl(var(--heroui-default-900));
+  --color-default: hsl(var(--heroui-default));
 
-  --color-background: var(--heroui-background);
-  --color-foreground: var(--heroui-foreground);
-  --color-content-1: var(--heroui-content1);
-  --color-content-2: var(--heroui-content2);
-  --color-content-3: var(--heroui-content3);
-  --color-content-4: var(--heroui-content4);
+  --color-background: hsl(var(--heroui-background));
+  --color-foreground: hsl(var(--heroui-foreground));
+  --color-content-1: hsl(var(--heroui-content1));
+  --color-content-2: hsl(var(--heroui-content2));
+  --color-content-3: hsl(var(--heroui-content3));
+  --color-content-4: hsl(var(--heroui-content4));
 
-  --color-primary-50: var(--heroui-primary-50);
-  --color-primary-100: var(--heroui-primary-100);
-  --color-primary-200: var(--heroui-primary-200);
-  --color-primary-300: var(--heroui-primary-300);
-  --color-primary-400: var(--heroui-primary-400);
-  --color-primary-500: var(--heroui-primary-500);
-  --color-primary: var(--heroui-primary);
+  --color-primary-50: hsl(var(--heroui-primary-50));
+  --color-primary-100: hsl(var(--heroui-primary-100));
+  --color-primary-200: hsl(var(--heroui-primary-200));
+  --color-primary-300: hsl(var(--heroui-primary-300));
+  --color-primary-400: hsl(var(--heroui-primary-400));
+  --color-primary-500: hsl(var(--heroui-primary-500));
+  --color-primary: hsl(var(--heroui-primary));
 
-  --color-secondary-50: var(--heroui-secondary-50);
-  --color-secondary-100: var(--heroui-secondary-100);
-  --color-secondary-200: var(--heroui-secondary-200);
-  --color-secondary-300: var(--heroui-secondary-300);
-  --color-secondary-400: var(--heroui-secondary-400);
-  --color-secondary-500: var(--heroui-secondary-500);
-  --color-secondary: var(--heroui-secondary);
+  --color-secondary-50: hsl(var(--heroui-secondary-50));
+  --color-secondary-100: hsl(var(--heroui-secondary-100));
+  --color-secondary-200: hsl(var(--heroui-secondary-200));
+  --color-secondary-300: hsl(var(--heroui-secondary-300));
+  --color-secondary-400: hsl(var(--heroui-secondary-400));
+  --color-secondary-500: hsl(var(--heroui-secondary-500));
+  --color-secondary: hsl(var(--heroui-secondary));
 
-  --color-success-50: var(--heroui-success-50);
-  --color-success-100: var(--heroui-success-100);
-  --color-success-200: var(--heroui-success-200);
-  --color-success-300: var(--heroui-success-300);
-  --color-success-400: var(--heroui-success-400);
-  --color-success-500: var(--heroui-success-500);
-  --color-success: var(--heroui-success);
+  --color-success-50: hsl(var(--heroui-success-50));
+  --color-success-100: hsl(var(--heroui-success-100));
+  --color-success-200: hsl(var(--heroui-success-200));
+  --color-success-300: hsl(var(--heroui-success-300));
+  --color-success-400: hsl(var(--heroui-success-400));
+  --color-success-500: hsl(var(--heroui-success-500));
+  --color-success: hsl(var(--heroui-success));
 
-  --color-warning-50: var(--heroui-warning-50);
-  --color-warning-100: var(--heroui-warning-100);
-  --color-warning-200: var(--heroui-warning-200);
-  --color-warning-300: var(--heroui-warning-300);
-  --color-warning-400: var(--heroui-warning-400);
-  --color-warning-500: var(--heroui-warning-500);
-  --color-warning: var(--heroui-warning);
+  --color-warning-50: hsl(var(--heroui-warning-50));
+  --color-warning-100: hsl(var(--heroui-warning-100));
+  --color-warning-200: hsl(var(--heroui-warning-200));
+  --color-warning-300: hsl(var(--heroui-warning-300));
+  --color-warning-400: hsl(var(--heroui-warning-400));
+  --color-warning-500: hsl(var(--heroui-warning-500));
+  --color-warning: hsl(var(--heroui-warning));
 
-  --color-danger-50: var(--heroui-danger-50);
-  --color-danger-100: var(--heroui-danger-100);
-  --color-danger-200: var(--heroui-danger-200);
-  --color-danger-300: var(--heroui-danger-300);
-  --color-danger-400: var(--heroui-danger-400);
-  --color-danger-500: var(--heroui-danger-500);
-  --color-danger: var(--heroui-danger);
+  --color-danger-50: hsl(var(--heroui-danger-50));
+  --color-danger-100: hsl(var(--heroui-danger-100));
+  --color-danger-200: hsl(var(--heroui-danger-200));
+  --color-danger-300: hsl(var(--heroui-danger-300));
+  --color-danger-400: hsl(var(--heroui-danger-400));
+  --color-danger-500: hsl(var(--heroui-danger-500));
+  --color-danger: hsl(var(--heroui-danger));
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
@@ -97,57 +106,69 @@ p {
   color: var(--color-gray-400);
 }
 
-/* react-quill editor, themed with HeroUI tokens */
-.ql-container {
-  background-color: var(--color-default-50);
-  border-radius: 0.25rem;
-  padding: 0.25rem;
+/* Blog editor (Tiptap). Replaced the react-quill block; post HTML is
+   unchanged.
+   The content area reuses Tailwind Typography so what authors see in the
+   composer matches the published article, which renders inside `prose`. */
+.tth-editor-content {
+  cursor: text;
+}
+
+.tth-editor-content .tth-prose {
+  min-height: 22rem;
+  padding: 1rem 1.25rem;
+  outline: none;
+  /* Writing comfort: the composer should not read like small print. */
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+
+.tth-editor-content .tth-prose > p {
+  margin: 0.5em 0;
+  color: inherit;
 }
 
 @media (min-width: 64rem) {
-  .ql-container {
-    padding: 0.5rem;
+  .tth-editor-content .tth-prose {
+    padding: 1.5rem 2rem;
   }
 }
 
-.ql-snow {
-  border: none;
+.tth-editor-content .tth-prose.tth-prose-edit > * + *,
+.tth-editor-content .tth-prose > * + * {
+  margin-top: 0.75em;
 }
 
-.dark .ql-snow {
-  color: white;
+/* Placeholder for an empty document and for the block the caret is in.
+   The editor ships with Placeholder; these style it. */
+.tth-editor-content .is-editor-empty::before,
+.tth-editor-content p.is-empty::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: var(--color-default-400);
 }
 
-.ql-toolbar {
-  border: none;
+/* The "/" that opened the command menu. */
+.tth-slash-query {
+  color: var(--color-default-400);
 }
 
-.dark .ql-toolbar {
-  background-color: transparent;
+/* Code blocks: keep long lines readable without breaking the layout. */
+.tth-editor-content pre {
+  overflow-x: auto;
+  tab-size: 2;
 }
 
-.ql-toolbar.ql-snow {
-  border: 1px solid color-mix(in oklab, var(--color-default) 50%, transparent) !important;
-  border-bottom: 0 !important;
-  border-radius: 0.25rem;
+.tth-editor-content pre code {
+  background: transparent;
+  padding: 0;
+  font-size: 0.875em;
 }
 
-.ql-container.ql-snow {
-  border: none !important;
-}
-
-.dark .ql-snow .ql-picker {
-  color: white !important;
-}
-
-.dark .ql-snow .ql-picker-options {
-  background-color: var(--color-default-50) !important;
-}
-
-.dark .ql-snow.ql-toolbar button {
-  color: white;
-}
-
-.dark .ql-container {
-  background-color: var(--color-default-100);
+.tth-editor-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
 }

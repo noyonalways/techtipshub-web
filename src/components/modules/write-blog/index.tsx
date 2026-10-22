@@ -15,9 +15,8 @@ import {
   Spinner,
   useDisclosure,
 } from "@heroui/react";
-import dynamic from "next/dynamic";
+import RichTextEditor from "@/components/editor/rich-text-editor";
 import { useState, useRef, useEffect } from "react";
-import "react-quill/dist/quill.snow.css";
 import { GoImage } from "react-icons/go";
 import { RiCloseLargeFill } from "react-icons/ri";
 import { useForm, Controller, FieldValues } from "react-hook-form";
@@ -26,8 +25,6 @@ import { ICategory, IUser } from "@/types";
 import { getProfileInfo } from "@/services/auth";
 import { useCreatePost } from "@/hooks/post.hook";
 import { useRouter } from "next/navigation";
-
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false }) as any;
 
 interface BlogFormData {
   title: string;
@@ -181,12 +178,6 @@ const WriteBlog = () => {
                 <div className="prose dark:prose-invert max-w-full">
                   <div dangerouslySetInnerHTML={{ __html: watch("content") }} />
                 </div>
-                {/* <ReactQuill
-                  readOnly
-                  modules={{ toolbar: false }}
-                  theme="snow"
-                  value={watch("content")}
-                /> */}
                 <div className="flex gap-2 flex-wrap">
                   {watch("tags")?.map((tag: string) => (
                     <span
@@ -303,33 +294,11 @@ const WriteBlog = () => {
                   rules={{ required: "Content is required" }}
                   render={({ field }) => (
                     <>
-                      <ReactQuill
-                        {...field}
-                        required
-                        className="s"
-                        placeholder="Write your blog here..."
-                        modules={{
-                          toolbar: [
-                            [{ header: [1, 2, false] }],
-                            [
-                              "bold",
-                              "italic",
-                              "underline",
-                              "strike",
-                              "blockquote",
-                              "code-block",
-                            ],
-                            [
-                              { list: "ordered" },
-                              { list: "bullet" },
-                              { indent: "-1" },
-                              { indent: "+1" },
-                            ],
-                            ["link"],
-                            ["clean"],
-                          ],
-                        }}
-                        theme="snow"
+                      <RichTextEditor
+                        value={field.value}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                        hasError={!!errors.content}
                       />
                       {errors.content?.message && (
                         <p className="text-red-500 text-sm mt-2">
