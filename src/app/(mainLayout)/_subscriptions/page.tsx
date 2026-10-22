@@ -2,8 +2,8 @@ import Container from "@/components/ui/container";
 import SubscribeButton from "@/components/ui/subscribe-button";
 import { poppins } from "@/config/fonts";
 import { Button } from "@heroui/button";
-import { button as buttonStyles } from "@heroui/theme";
 import { Metadata } from "next";
+import Link from "next/link";
 import { FaCheckCircle } from "react-icons/fa";
 import { MdRocketLaunch } from "react-icons/md";
 
@@ -94,15 +94,16 @@ const SubscriptionPage: React.FC<IProps> = () => {
                       <span className="text-3xl font-bold">Free</span>
                     </div>
 
-                    <Button
-                    radius="sm"
-                      color="primary"
-                      variant="flat"
-                      href="/"
-                      className="w-full"
-                    >
-                      Get Started
-                    </Button>
+                    <Link href="/">
+                      <Button
+                        radius="sm"
+                        color="primary"
+                        variant="flat"
+                        className="w-full"
+                      >
+                        Get Started
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               </>

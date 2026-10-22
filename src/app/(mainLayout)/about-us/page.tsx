@@ -4,6 +4,7 @@ import { Avatar } from "@heroui/avatar";
 import { Button } from "@heroui/button";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Metadata } from "next";
+import Link from "next/link";
 import {
   BiBookOpen,
   BiChevronRight,
@@ -99,16 +100,17 @@ const AboutUs: React.FC<IProps> = () => {
             <p className="text-xl mb-8 text-white dark:text-white">
               TechTips Hub: Where Innovation Meets Community
             </p>
-            <Button
-              href="/login"
-              radius="sm"
-              color="primary"
-              size="lg"
-              endContent={<BiChevronRight />}
-              className="font-semibold bg-white text-blue-600 hover:bg-blue-50"
-            >
-              Join Our Community
-            </Button>
+            <Link href="/login">
+              <Button
+                radius="sm"
+                color="primary"
+                size="lg"
+                endContent={<BiChevronRight />}
+                className="font-semibold bg-white text-blue-600 hover:bg-blue-50"
+              >
+                Join Our Community
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
@@ -237,24 +239,26 @@ const AboutUs: React.FC<IProps> = () => {
               technological advancements.
             </p>
             <div className="flex justify-center gap-4">
-              <Button
-                href="/signup"
-                radius="sm"
-                color="primary"
-                endContent={<FiZap />}
-                className="font-semibold bg-white text-blue-600 hover:bg-blue-50"
-              >
-                Sign Up Now
-              </Button>
-              <Button
-                href="/contact-us"
-                radius="sm"
-                variant="bordered"
-                endContent={<BiMailSend />}
-                className="font-semibold text-white border-white hover:bg-blue-700"
-              >
-                Contact Us
-              </Button>
+              <Link href="/signup">
+                <Button
+                  radius="sm"
+                  color="primary"
+                  endContent={<FiZap />}
+                  className="font-semibold bg-white text-blue-600 hover:bg-blue-50"
+                >
+                  Sign Up Now
+                </Button>
+              </Link>
+              <Link href="/contact-us">
+                <Button
+                  radius="sm"
+                  variant="bordered"
+                  endContent={<BiMailSend />}
+                  className="font-semibold text-white border-white hover:bg-blue-700"
+                >
+                  Contact Us
+                </Button>
+              </Link>
             </div>
           </div>
         </Container>

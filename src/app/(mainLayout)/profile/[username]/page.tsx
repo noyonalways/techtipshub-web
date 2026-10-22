@@ -27,13 +27,14 @@ import { PiCalendarDotsLight } from "react-icons/pi";
 import { TbArrowBadgeDown } from "react-icons/tb";
 
 type Props = {
-  params: { username: string };
+  params: Promise<{ username: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { username: routeUsername } = await params;
   const profileData = await getProfileInfo();
   const { fullName } = (profileData?.data as IUser) ?? {};
-  const actualUsername = params.username.split("40")[1];
+  const actualUsername = routeUsername.split("40")[1];
 
   if(!profileData?.success){
     return {
@@ -136,22 +137,16 @@ const DynamicProfilePage = async () => {
                   </div>
 
                   <div className="flex items-center space-x-4">
-                    <Button
-                      href={`/@${username}/following`}
-                      size="sm"
-                      variant="flat"
-                      radius="full"
-                    >
-                      {totalFollowing} Following
-                    </Button>
-                    <Button
-                      href={`/@${username}/followers`}
-                      size="sm"
-                      variant="flat"
-                      radius="full"
-                    >
-                      {totalFollowers} Followers
-                    </Button>
+                    <Link href={`/@${username}/following`}>
+                      <Button size="sm" variant="flat" radius="full">
+                        {totalFollowing} Following
+                      </Button>
+                    </Link>
+                    <Link href={`/@${username}/followers`}>
+                      <Button size="sm" variant="flat" radius="full">
+                        {totalFollowers} Followers
+                      </Button>
+                    </Link>
                     <Button size="sm" variant="flat" radius="full">
                       {totalPosts} Blog Posts
                     </Button>

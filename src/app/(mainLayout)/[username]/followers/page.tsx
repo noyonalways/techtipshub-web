@@ -6,11 +6,12 @@ import { Button } from "@heroui/button";
 import Link from "next/link";
 
 interface IProps {
-  params: { username: string };
+  params: Promise<{ username: string }>;
 }
 
 const Followers = async ({ params }: IProps) => {
-  const data = await getUserByUsername(params.username.split("40")[1]);
+  const { username: routeUsername } = await params;
+  const data = await getUserByUsername(routeUsername.split("40")[1]);
 
   const {
     username,
@@ -25,20 +26,16 @@ const Followers = async ({ params }: IProps) => {
   return (
     <div className="p-4 border border-default/50 rounded-lg flex-1 space-y-4">
       <div className="flex items-center space-x-1 border-b border-default/50">
-        <Button
-          variant="light"
-          radius="sm"
-          href={`/@${username}/followers`}
-        >
-          Followers ({totalFollowers})
-        </Button>
-        <Button
-          variant="light"
-          radius="sm"
-          href={`/@${username}/following`}
-        >
-          Following ({totalFollowing})
-        </Button>
+        <Link href={`/@${username}/followers`}>
+          <Button variant="light" radius="sm">
+            Followers ({totalFollowers})
+          </Button>
+        </Link>
+        <Link href={`/@${username}/following`}>
+          <Button variant="light" radius="sm">
+            Following ({totalFollowing})
+          </Button>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

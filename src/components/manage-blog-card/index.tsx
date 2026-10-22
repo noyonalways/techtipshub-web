@@ -94,14 +94,15 @@ const ManageBlogCard = ({ post }: IProps) => {
         </Button>
         <div className="flex items-center justify-end space-x-2">
           <UserDeleteBlogModal id={_id} />
-          <Button
-            href={`/settings/update/${slug}`}
-            size="sm"
-            variant="light"
-            startContent={<FiEdit className="text-lg text-gray-600" />}
-          >
-            Update
-          </Button>
+          <Link href={`/settings/update/${slug}`}>
+            <Button
+              size="sm"
+              variant="light"
+              startContent={<FiEdit className="text-lg text-gray-600" />}
+            >
+              Update
+            </Button>
+          </Link>
         </div>
       </div>
     </div>

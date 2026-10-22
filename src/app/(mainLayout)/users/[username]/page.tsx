@@ -26,11 +26,12 @@ import ProfileShareDropdown from "@/components/ui/profile-share-dropdown";
 import AdBanner from "@/components/adsense/ad-banner";
 
 type Props = {
-  params: { username: string };
+  params: Promise<{ username: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const actualUsername = params.username.split("40")[1];
+  const { username: routeUsername } = await params;
+  const actualUsername = routeUsername.split("40")[1];
   const data = await getUserByUsername(actualUsername);
   const { fullName, profilePicture } = (data.data as IUser) ?? {};
 
@@ -50,9 +51,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 const GetUserByIdPage = async ({
   params,
 }: {
-  params: { username: string };
+  params: Promise<{ username: string }>;
 }) => {
-  const data = await getUserByUsername(params.username.split("40")[1]);
+  const { username: routeUsername } = await params;
+  const data = await getUserByUsername(routeUsername.split("40")[1]);
 
   const {
     username,
@@ -114,22 +116,16 @@ const GetUserByIdPage = async ({
                 </div>
 
                 <div className="flex items-center space-x-4">
-                  <Button
-                    href={`/@${username}/following`}
-                    size="sm"
-                    variant="flat"
-                    radius="full"
-                  >
-                    {totalFollowing} Following
-                  </Button>
-                  <Button
-                    href={`/@${username}/followers`}
-                    size="sm"
-                    variant="flat"
-                    radius="full"
-                  >
-                    {totalFollowers} Followers
-                  </Button>
+                  <Link href={`/@${username}/following`}>
+                    <Button size="sm" variant="flat" radius="full">
+                      {totalFollowing} Following
+                    </Button>
+                  </Link>
+                  <Link href={`/@${username}/followers`}>
+                    <Button size="sm" variant="flat" radius="full">
+                      {totalFollowers} Followers
+                    </Button>
+                  </Link>
                   <Button size="sm" variant="flat" radius="full">
                     {totalPosts} Blog Posts
                   </Button>

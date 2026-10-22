@@ -25,17 +25,18 @@ import { IoDiamondOutline } from "react-icons/io5";
 import Image from "next/image";
 
 type Props = {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 };
 
 export const revalidate = 43200; // Revalidate every 12 hours (43200 seconds)
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const data = await getPostBySlug(params?.slug);
+  const { slug } = await params;
+  const data = await getPostBySlug(slug);
   const { title, content, coverImage } = (data?.data as IPost) ?? {};
 
   const description = content?.substring(0, 150) + "...";
-  const blogUrl = `https://techtipshub.vercel.app/blogs/${params?.slug}`;
+  const blogUrl = `https://techtipshub.vercel.app/blogs/${slug}`;
 
   return {
     title: title,
@@ -76,8 +77,9 @@ export async function generateStaticParams() {
   }
 }
 
-const DynamicBlogPage = async ({ params }: { params: { slug: string } }) => {
-  const data = await getPostBySlug(params?.slug);
+const DynamicBlogPage = async ({ params }: { params: Promise<{ slug: string }> }) => {
+  const { slug: routeSlug } = await params;
+  const data = await getPostBySlug(routeSlug);
   const {
     _id,
     coverImage,
@@ -112,14 +114,11 @@ const DynamicBlogPage = async ({ params }: { params: { slug: string } }) => {
                   <p className="text-center text-default-600">
                     Accessing premium content requires logging in.
                   </p>
-                  <Button
-                    href={`/login?redirect=blogs/${params?.slug}`}
-                    radius="full"
-                    variant="solid"
-                    color="primary"
-                  >
-                    Login
-                  </Button>
+                  <Link href={`/login?redirect=blogs/${routeSlug}`}>
+                    <Button radius="full" variant="solid" color="primary">
+                      Login
+                    </Button>
+                  </Link>
                 </div>
               )}
               {data?.statusCode === 403 && (
@@ -127,27 +126,21 @@ const DynamicBlogPage = async ({ params }: { params: { slug: string } }) => {
                   <p className="text-center text-default-600">
                     {data?.message}
                   </p>
-                  <Button
-                    href="/subscriptions"
-                    radius="full"
-                    variant="solid"
-                    color="primary"
-                  >
-                    Get Premium
-                  </Button>
+                  <Link href="/subscriptions">
+                    <Button radius="full" variant="solid" color="primary">
+                      Get Premium
+                    </Button>
+                  </Link>
                 </div>
               )}
               {data?.statusCode === 404 && (
                 <div className="text center space-y-4 w-full flex flex-col items-center justify-center h-[calc(100vh-410px)]">
                   <p className="text-center text-default-600">Blog not found</p>
-                  <Button
-                    href={`/`}
-                    radius="full"
-                    variant="solid"
-                    color="primary"
-                  >
-                    Back to Feed
-                  </Button>
+                  <Link href={`/`}>
+                    <Button radius="full" variant="solid" color="primary">
+                      Back to Feed
+                    </Button>
+                  </Link>
                 </div>
               )}
             </>

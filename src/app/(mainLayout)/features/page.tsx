@@ -3,6 +3,7 @@ import Container from "@/components/ui/container";
 import { poppins } from "@/config/fonts";
 import { Button } from "@heroui/button";
 import { Metadata } from "next";
+import Link from "next/link";
 import { FaCheckCircle, FaLightbulb, FaRocket, FaUsers, FaPen } from "react-icons/fa";
 
 export const metadata: Metadata = {
@@ -43,25 +44,27 @@ const CommunityPage: React.FC<IProps> = () => {
               portfolio!&quot;
             </p>
             <div className="flex flex-col md:flex-row gap-3 md:gap-4 justify-center">
-              <Button
-                radius="full"
-                color="secondary"
-                href="/signup"
-                className="text-base md:text-lg md:px-8 md:py-6"
-                startContent={<FaPen className="text-xl" />}
-              >
-                Start Writing Today
-              </Button>
-              <Button
-                radius="full"
-                color="primary"
-                variant="bordered"
-                href="/"
-                className="text-base md:text-lg md:px-8 md:py-6"
-                startContent={<FaRocket className="text-xl" />}
-              >
-                Explore Articles
-              </Button>
+              <Link href="/signup">
+                <Button
+                  radius="full"
+                  color="secondary"
+                  className="text-base md:text-lg md:px-8 md:py-6"
+                  startContent={<FaPen className="text-xl" />}
+                >
+                  Start Writing Today
+                </Button>
+              </Link>
+              <Link href="/">
+                <Button
+                  radius="full"
+                  color="primary"
+                  variant="bordered"
+                  className="text-base md:text-lg md:px-8 md:py-6"
+                  startContent={<FaRocket className="text-xl" />}
+                >
+                  Explore Articles
+                </Button>
+              </Link>
             </div>
           </div>
 
@@ -169,16 +172,17 @@ const CommunityPage: React.FC<IProps> = () => {
                 Join our community today and start sharing your tech insights
                 with thousands of readers. Your expertise matters!
               </p>
-              <Button
-                href="/signup"
-                color="secondary"
-                size="lg"
-                className="text-lg px-8"
-                radius="sm"
-                startContent={<FaUsers />}
-              >
-                Join Our Community
-              </Button>
+              <Link href="/signup">
+                <Button
+                  color="secondary"
+                  size="lg"
+                  className="text-lg px-8"
+                  radius="sm"
+                  startContent={<FaUsers />}
+                >
+                  Join Our Community
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

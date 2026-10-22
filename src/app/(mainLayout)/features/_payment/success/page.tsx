@@ -124,7 +124,6 @@ const PaymentSuccessPage = async ({ searchParams }: IProps) => {
                   color: "primary",
                   radius: "sm",
                   size: "md",
-                  ...buttonStyles,
                 })} w-full`}
               >
                 Go to Dashboard
