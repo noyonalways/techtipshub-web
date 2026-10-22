@@ -1,47 +1,70 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-
-
+@import "tailwindcss";
+@config "../tailwind.config.js";
+@plugin "@tailwindcss/typography";
+@custom-variant dark (&:is(.dark *));
 
 * {
   scrollbar-width: thin;
 }
 
 p {
-  @apply text-gray-500 dark:text-gray-400
+  color: var(--color-gray-500);
 }
 
+.dark p {
+  color: var(--color-gray-400);
+}
 
 .ql-container {
-  @apply bg-default-50 dark:bg-default-100 rounded p-1 lg:p-2;
+  background-color: var(--color-default-50);
+  border-radius: 0.25rem;
+  padding: 0.25rem;
+}
+
+@media (min-width: 64rem) {
+  .ql-container {
+    padding: 0.5rem;
+  }
 }
 
 .ql-snow {
-  @apply dark:text-white border-none;
+  border: none;
+}
+
+.dark .ql-snow {
+  color: white;
 }
 
 .ql-toolbar {
-  @apply dark:bg-transparent border-none;
+  border: none;
+}
+
+.dark .ql-toolbar {
+  background-color: transparent;
 }
 
 .ql-toolbar.ql-snow {
-  @apply !border-default/50 rounded !border-b-0;
+  border: 1px solid color-mix(in oklab, var(--color-default) 50%, transparent) !important;
+  border-bottom: 0 !important;
+  border-radius: 0.25rem;
 }
 
 .ql-container.ql-snow {
-  @apply !border-none;
+  border: none !important;
 }
 
-.ql-snow .ql-picker {
-  @apply dark:!text-white;
+.dark .ql-snow .ql-picker {
+  color: white !important;
 }
 
-.ql-snow .ql-picker-options {
-  @apply dark:!bg-default-50;
+.dark .ql-snow .ql-picker-options {
+  background-color: var(--color-default-50) !important;
 }
 
-.ql-snow.ql-toolbar button {
-  @apply dark:text-white;
+.dark .ql-snow.ql-toolbar button {
+  color: white;
+}
+
+.dark .ql-container {
+  background-color: var(--color-default-100);
 }
