@@ -1,9 +1,10 @@
 import AdBanner from "@/components/adsense/ad-banner";
 import Container from "@/components/ui/container";
-import { Avatar } from "@heroui/avatar";
+import { getAllCategories } from "@/services/category";
+import { getAllPosts } from "@/services/post";
+import type { ICategory } from "@/types";
 import { Button } from "@heroui/button";
-import { Card, CardBody, CardHeader } from "@heroui/card";
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
   BiBookOpen,
@@ -20,255 +21,235 @@ import { FiZap } from "react-icons/fi";
 export const metadata: Metadata = {
   title: "About Us",
   description:
-    "Learn more about TechTips Hub, your go-to source for the latest tech tips, tutorials, and expert insights. Discover our mission and meet the team behind the content.",
-  keywords:
-    "TechTips Hub, about us, tech blog, tutorials, expert insights, technology, mission, team",
+    "TechTips Hub publishes practical writing on web development, AI and the tools modern developers use. Learn what we cover and why.",
   openGraph: {
     title: "About Us",
     description:
-      "Get to know TechTips Hub and our mission to provide valuable tech tips and insights. Meet the team that helps you stay updated with the latest in technology.",
+      "Practical writing on web development, AI and the tools modern developers use.",
     url: "https://techtipshub.vercel.app/about-us",
-  }
+  },
 };
 
-interface IProps {}
+const principles = [
+  {
+    icon: <BiBookOpen className="size-5" />,
+    title: "Written by practitioners",
+    description:
+      "Every article is written by someone who builds with the technology they are explaining.",
+  },
+  {
+    icon: <FiZap className="size-5" />,
+    title: "Practical over promotional",
+    description:
+      "We publish worked examples and real trade-offs, not listicles written to fill a slot.",
+  },
+  {
+    icon: <FaThumbsUp className="size-5" />,
+    title: "Reader signals are real",
+    description:
+      "Votes, comments and view counts come straight from the database. We never inflate them.",
+  },
+  {
+    icon: <BiMessageSquare className="size-5" />,
+    title: "Open discussion",
+    description:
+      "Threaded comments let readers challenge a claim, and authors can respond.",
+  },
+  {
+    icon: <BsEye className="size-5" />,
+    title: "Transparent content",
+    description:
+      "Sponsored material is labelled. Corrections are noted on the article itself.",
+  },
+  {
+    icon: <FaUserShield className="size-5" />,
+    title: "Clear attribution",
+    description:
+      "Every post is signed by its author, with a public profile you can follow.",
+  },
+];
 
-const AboutUs: React.FC<IProps> = () => {
-  const features = [
-    {
-      icon: <BiBookOpen className="w-6 h-6" />,
-      title: "Premium Content",
-      description: "Access exclusive tech insights",
-    },
-    {
-      icon: <FaUserShield className="w-6 h-6" />,
-      title: "Community",
-      description: "Connect with tech enthusiasts",
-    },
-    {
-      icon: <FaThumbsUp className="w-6 h-6" />,
-      title: "Interactive",
-      description: "Engage through votes and comments",
-    },
-    {
-      icon: <BiMessageSquare className="w-6 h-6" />,
-      title: "Discussions",
-      description: "Participate in threaded conversations",
-    },
-    {
-      icon: <BsEye className="w-6 h-6" />,
-      title: "Analytics",
-      description: "Track your content's performance",
-    },
-    {
-      icon: <BiUserPlus className="w-6 h-6" />,
-      title: "Secure",
-      description: "Robust user authentication",
-    },
-  ];
+const AboutUs = async () => {
+  const [postsResult, categoriesResult] = await Promise.all([
+    getAllPosts({ limit: "1" }),
+    getAllCategories().catch(() => null),
+  ]);
 
+  const articleCount = Number(postsResult?.meta?.total) || 0;
+  const categories = (categoriesResult?.data as ICategory[]) || [];
+  const topicCount = categories.length;
+
+  // Only real, database-backed numbers are shown. Anything unavailable is
+  // omitted rather than replaced with an estimate.
   const stats = [
-    { label: "Active Users", value: "100K+" },
-    { label: "Articles Published", value: "50K+" },
-    { label: "Monthly Views", value: "5M+" },
-    { label: "Expert Contributors", value: "1K+" },
-  ];
-
-  const testimonials = [
-    {
-      name: "Alex Chen",
-      role: "Software Engineer",
-      content:
-        "TechTips Hub has become my go-to platform for staying updated with the latest in tech. The quality of content and community engagement is unparalleled.",
-    },
-    {
-      name: "Sarah Johnson",
-      role: "UX Designer",
-      content:
-        "As a contributor, I love how TechTips Hub allows me to share my knowledge and connect with other professionals. It's more than just a blogging platform; it's a vibrant tech ecosystem.",
-    },
-  ];
+    articleCount > 0
+      ? { label: "Articles published", value: articleCount.toLocaleString() }
+      : null,
+    topicCount > 0
+      ? { label: "Topics covered", value: topicCount.toLocaleString() }
+      : null,
+  ].filter(Boolean) as { label: string; value: string }[];
 
   return (
     <div>
-      <div className="relative bg-gradient-to-r from-blue-600 to-indigo-800 py-20 lg:py-40 text-white mb-20">
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-snug">
-              Empowering Tech Enthusiasts Worldwide
-            </h1>
-            <p className="text-xl mb-8 text-white dark:text-white">
-              TechTips Hub: Where Innovation Meets Community
-            </p>
-            <Link href="/login">
-              <Button
-                radius="sm"
-                color="primary"
-                size="lg"
-                endContent={<BiChevronRight />}
-                className="font-semibold bg-white text-blue-600 hover:bg-blue-50"
-              >
-                Join Our Community
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      <>
+      {/* Hero */}
+      <section className="border-b border-default/60">
         <Container>
-          <div className="mb-20">
-            <h2 className="text-3xl font-bold mb-6 text-center">Who We Are</h2>
-            <p className="text-base lg:text-lg text-default-500 mb-12 leading-relaxed max-w-4xl mx-auto text-center">
-              TechTips Hub is the premier destination for tech enthusiasts to
-              explore, learn, and contribute to the ever-evolving world of
-              technology. Our platform combines cutting-edge blogging
-              capabilities with robust community features, creating a unique
-              space where knowledge sharing and networking converge.
+          <div className="mx-auto max-w-3xl py-16 text-center lg:py-24">
+            <p className="text-sm font-medium uppercase tracking-wider text-primary">
+              About TechTips Hub
             </p>
-            <div className="grid md:grid-cols-2 gap-8">
-              <Card className="p-6">
-                <CardHeader>
-                  <h3 className="text-2xl font-bold text-blue-600">
-                    Our Mission
-                  </h3>
-                </CardHeader>
-                <CardBody>
-                  <p className="text-default-500">
-                    To democratize tech knowledge by providing a dynamic
-                    platform that fosters learning, collaboration, and
-                    innovation among tech enthusiasts of all levels.
-                  </p>
-                </CardBody>
-              </Card>
-              <Card className="p-6">
-                <CardHeader>
-                  <h3 className="text-2xl font-bold text-blue-600">
-                    Our Vision
-                  </h3>
-                </CardHeader>
-                <CardBody>
-                  <p className="text-default-500">
-                    To become the global hub for technology insights, driving
-                    innovation and connecting minds across the digital
-                    landscape.
-                  </p>
-                </CardBody>
-              </Card>
+            <h1 className="mt-4 text-pretty text-4xl font-bold leading-tight tracking-tight md:text-5xl">
+              Practical writing for people who build software
+            </h1>
+            <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-default-600">
+              TechTips Hub is an independent publication about web development,
+              AI and the tools modern developers reach for every day. We favour
+              clear explanations and working examples over hype.
+            </p>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <Button
+                as={Link}
+                href="/signup"
+                radius="lg"
+                color="primary"
+                endContent={<BiChevronRight />}
+                className="font-semibold"
+              >
+                Join the community
+              </Button>
+              <Button as={Link} href="/contact-us" radius="lg" variant="bordered">
+                Get in touch
+              </Button>
             </div>
           </div>
         </Container>
+      </section>
 
-        <Container>
-          <div className="mb-20 bg-blue-50 dark:bg-blue-100/20 py-16 px-4 rounded-2xl">
-            <h2 className="text-3xl font-bold mb-10 text-center">
-              Platform Impact
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              {stats.map((stat, index) => (
-                <div key={index} className="text-center">
-                  <p className="text-4xl font-bold text-blue-600 mb-2">
+      {/* Real numbers, only when they exist */}
+      {stats.length > 0 && (
+        <section className="border-b border-default/60 bg-default-50/60">
+          <Container>
+            <dl className="grid grid-cols-2 divide-x divide-default/60">
+              {stats.map((stat) => (
+                <div key={stat.label} className="px-4 py-10 text-center">
+                  <dd className="text-3xl font-bold tabular-nums tracking-tight sm:text-4xl">
                     {stat.value}
-                  </p>
-                  <p className="text-default-500 dark:text-default-600">
+                  </dd>
+                  <dt className="mt-1 text-sm text-default-500">
                     {stat.label}
-                  </p>
+                  </dt>
                 </div>
               ))}
-            </div>
-          </div>
-        </Container>
+            </dl>
+          </Container>
+        </section>
+      )}
 
-        <Container>
-          <div className="mb-20">
-            <h2 className="text-3xl font-bold mb-10 text-center">
-              Key Features
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {features.map((feature, index) => (
-                <Card key={index} shadow="none" className="shadow">
-                  <CardBody className="flex flex-col items-center text-center p-6">
-                    <div className="bg-blue-100 dark:bg-blue-100/20 p-3 rounded-full mb-4">
-                      {feature.icon}
-                    </div>
-                    <h3 className="text-xl font-semibold mb-2">
-                      {feature.title}
-                    </h3>
-                    <p>{feature.description}</p>
-                  </CardBody>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </Container>
-
-        <Container>
-          <div className="mb-20">
-            <h2 className="text-3xl font-bold mb-10 text-center">
-              What Our Users Say
-            </h2>
-            <div className="grid md:grid-cols-2 gap-8">
-              {testimonials.map((testimonial, index) => (
-                <Card key={index}>
-                  <CardBody className="p-6">
-                    <p className="mb-4 italic">&quot;{testimonial.content}&quot;</p>
-                    <div className="flex items-center">
-                      <Avatar
-                        src={`/placeholder.svg?height=40&width=40`}
-                        size="sm"
-                        className="mr-4"
-                      />
-                      <div>
-                        <p className="font-semibold">{testimonial.name}</p>
-                        <p className="text-sm">{testimonial.role}</p>
-                      </div>
-                    </div>
-                  </CardBody>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </Container>
-
-        <Container>
-          <div className="text-center mb-10 bg-gradient-to-r from-blue-500 to-indigo-600 py-16 px-4 rounded-2xl text-white">
-            <h2 className="text-3xl font-bold mb-6">Join Our Tech Community</h2>
-            <p className="text-lg lg:text-xl mb-8 max-w-2xl mx-auto text-white dark:text-white">
-              Be part of a thriving ecosystem of tech enthusiasts. Share your
-              knowledge, learn from experts, and stay at the forefront of
-              technological advancements.
+      <Container>
+        {/* Mission */}
+        <section className="mx-auto grid max-w-5xl gap-10 py-16 md:grid-cols-2 lg:py-20">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight">Our mission</h2>
+            <p className="mt-3 leading-relaxed text-default-600">
+              To make hard technical subjects approachable without dumbing them
+              down. A reader should finish an article able to try the idea
+              themselves, and understand where it breaks.
             </p>
-            <div className="flex justify-center gap-4">
-              <Link href="/signup">
-                <Button
-                  radius="sm"
-                  color="primary"
-                  endContent={<FiZap />}
-                  className="font-semibold bg-white text-blue-600 hover:bg-blue-50"
-                >
-                  Sign Up Now
-                </Button>
-              </Link>
-              <Link href="/contact-us">
-                <Button
-                  radius="sm"
-                  variant="bordered"
-                  endContent={<BiMailSend />}
-                  className="font-semibold text-white border-white hover:bg-blue-700"
-                >
-                  Contact Us
-                </Button>
-              </Link>
-            </div>
           </div>
-        </Container>
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight">What we publish</h2>
+            <p className="mt-3 leading-relaxed text-default-600">
+              Tutorials, explanations of how things actually work, and honest
+              comparisons of tools. If we have not used something in practice,
+              we do not claim to have reviewed it.
+            </p>
+          </div>
+        </section>
 
-        <Container>
-          <div className="mb-10 mt-6">
-            <AdBanner />
+        {/* Principles */}
+        <section className="border-t border-default/60 py-16">
+          <h2 className="text-2xl font-bold tracking-tight">
+            How we work
+          </h2>
+          <p className="mt-2 text-default-500">
+            The standards every article on TechTips Hub is held to.
+          </p>
+          <div className="mt-8 grid gap-px overflow-hidden rounded-xl border border-default/60 bg-default/60 sm:grid-cols-2 lg:grid-cols-3">
+            {principles.map((principle) => (
+              <div key={principle.title} className="bg-background p-6">
+                <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  {principle.icon}
+                </div>
+                <h3 className="mt-3 font-semibold">{principle.title}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-default-600">
+                  {principle.description}
+                </p>
+              </div>
+            ))}
           </div>
-        </Container>
-      </>
+        </section>
+
+        {/* Topics we cover */}
+        {categories.length > 0 && (
+          <section className="border-t border-default/60 py-16">
+            <h2 className="text-2xl font-bold tracking-tight">Topics we cover</h2>
+            <div className="mt-6 flex flex-wrap gap-2">
+              {categories.map((category) => (
+                <Link
+                  key={category._id}
+                  href={`/?category=${encodeURIComponent(category.name)}`}
+                  className="rounded-full border border-default/60 px-3 py-1.5 text-sm text-default-700 transition-colors hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
+                >
+                  {category.name}
+                  {category.postCount > 0 && (
+                    <span className="ml-1.5 text-xs text-default-400">
+                      {category.postCount}
+                    </span>
+                  )}
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* CTA */}
+        <section className="my-16 rounded-2xl border border-default/60 bg-default-50/60 px-6 py-14 text-center">
+          <h2 className="text-2xl font-bold tracking-tight">
+            Written with the community
+          </h2>
+          <p className="mx-auto mt-3 max-w-xl leading-relaxed text-default-600">
+            TechTips Hub is built by its readers as much as by its editors. If
+            you know something worth sharing, you are welcome to publish it.
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <Button
+              as={Link}
+              href="/signup"
+              radius="lg"
+              color="primary"
+              endContent={<FiZap />}
+              className="font-semibold"
+            >
+              Sign up free
+            </Button>
+            <Button
+              as={Link}
+              href="/contact-us"
+              radius="lg"
+              variant="bordered"
+              endContent={<BiMailSend />}
+            >
+              Contact us
+            </Button>
+          </div>
+        </section>
+
+        {/* Existing ad unit — position preserved. */}
+        <div className="mb-10 mt-6">
+          <AdBanner />
+        </div>
+      </Container>
     </div>
   );
 };

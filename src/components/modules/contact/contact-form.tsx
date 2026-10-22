@@ -1,68 +1,132 @@
 "use client";
 
-import THForm from "@/components/form/th-from";
+import { useState } from "react";
 import THInput from "@/components/form/th-input";
 import THTextarea from "@/components/form/th-textarea";
 import { contactFormValidationSchema } from "@/schemas";
+import { submitContactForm } from "@/services/contact";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@heroui/react";
-import { FieldValues } from "react-hook-form";
+import { FieldValues, FormProvider, useForm } from "react-hook-form";
+import { BiCheckCircle, BiErrorCircle } from "react-icons/bi";
 import { BsArrowRight } from "react-icons/bs";
 
+type TStatus = { type: "success" | "error"; message: string } | null;
 
-interface IProps {}
+const ContactForm = () => {
+  const methods = useForm({
+    resolver: zodResolver(contactFormValidationSchema),
+  });
+  const {
+    reset,
+    formState: { isSubmitting },
+  } = methods;
+  const [status, setStatus] = useState<TStatus>(null);
 
-const ContactForm = ({}: IProps) => {
-  const onSubmit = (data: FieldValues) => {
-    console.log(data);
+  const handleSubmit = async (data: FieldValues) => {
+    setStatus(null);
+
+    const result = await submitContactForm({
+      firstName: String(data.firstName ?? ""),
+      lastName: String(data.lastName ?? ""),
+      email: String(data.email ?? ""),
+      subject: String(data.subject ?? ""),
+      message: String(data.message ?? ""),
+    });
+
+    if (result.success) {
+      // Clear the form only once the message is genuinely accepted.
+      reset();
+    }
+
+    setStatus({
+      type: result.success ? "success" : "error",
+      message: result.message,
+    });
   };
+
   return (
-    <THForm onSubmit={onSubmit} resolver={zodResolver(contactFormValidationSchema)}>
-      <div className="space-y-6">
-        <div className="grid grid-cols-2 gap-4">
+    <FormProvider {...methods}>
+      <form onSubmit={methods.handleSubmit(handleSubmit)} noValidate>
+        <div className="space-y-5">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <THInput
+              name="firstName"
+              label="First name"
+              placeholder="Ada"
+              variant="bordered"
+              isRequired
+            />
+            <THInput
+              name="lastName"
+              label="Last name"
+              placeholder="Lovelace"
+              variant="bordered"
+              isRequired
+            />
+          </div>
           <THInput
-            name="firstName"
-            label="First name"
-            placeholder="Enter your first name"
+            name="email"
+            label="Email"
+            type="email"
+            placeholder="you@example.com"
             variant="bordered"
+            isRequired
           />
           <THInput
-            name="lastName"
-            label="Last name"
-            placeholder="Enter your last name"
+            name="subject"
+            label="Subject"
+            placeholder="What is this about?"
             variant="bordered"
+            isRequired
           />
+          <THTextarea
+            name="message"
+            label="Message"
+            placeholder="Tell us what you need — the more detail, the better we can help."
+            variant="bordered"
+            minRows={5}
+            isRequired
+          />
+
+          {status && (
+            <p
+              role="status"
+              aria-live="polite"
+              className={`flex items-start gap-2 rounded-lg border px-3.5 py-3 text-sm ${
+                status.type === "success"
+                  ? "border-success/40 bg-success/10 text-success"
+                  : "border-danger/40 bg-danger/10 text-danger"
+              }`}
+            >
+              {status.type === "success" ? (
+                <BiCheckCircle className="mt-0.5 size-4 shrink-0" aria-hidden />
+              ) : (
+                <BiErrorCircle className="mt-0.5 size-4 shrink-0" aria-hidden />
+              )}
+              {status.message}
+            </p>
+          )}
+
+          <div className="flex flex-wrap items-center gap-3">
+            <Button
+              type="submit"
+              color="primary"
+              radius="lg"
+              className="font-semibold"
+              isLoading={isSubmitting}
+              isDisabled={isSubmitting}
+              endContent={!isSubmitting && <BsArrowRight size={16} aria-hidden />}
+            >
+              {isSubmitting ? "Sending…" : "Send message"}
+            </Button>
+            <p className="text-xs text-default-500">
+              A real person reads every message.
+            </p>
+          </div>
         </div>
-        <THInput
-          name="email"
-          label="Email"
-          type="email"
-          placeholder="Enter your email address"
-          variant="bordered"
-        />
-        <THInput
-          name="subject"
-          label="Subject"
-          placeholder="What is your inquiry about?"
-          variant="bordered"
-        />
-        <THTextarea
-          name="message"
-          label="Message"
-          placeholder="Please provide details about your inquiry"
-          variant="bordered"
-          minRows={4}
-        />
-        <Button
-          type="submit"
-          color="primary"
-          radius="sm"
-          endContent={<BsArrowRight size={16} />}
-        >
-          Send Message
-        </Button>
-      </div>
-    </THForm>
+      </form>
+    </FormProvider>
   );
 };
 

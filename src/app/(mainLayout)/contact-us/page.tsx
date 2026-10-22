@@ -1,112 +1,138 @@
 import AdBanner from "@/components/adsense/ad-banner";
 import ContactForm from "@/components/modules/contact/contact-form";
 import Container from "@/components/ui/container";
-import { Button } from "@heroui/button";
-import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Metadata } from "next";
-import { BiMapPin, BiPhone } from "react-icons/bi";
-import { BsMailbox } from "react-icons/bs";
-import { FiMessageCircle } from "react-icons/fi";
+import Link from "next/link";
+import { BiEnvelope } from "react-icons/bi";
+import { BsChatSquareText } from "react-icons/bs";
+import { FiBookOpen } from "react-icons/fi";
 
 export const metadata: Metadata = {
   title: "Contact Us",
   description:
-    "Get in touch with the TechTips Hub team for any inquiries, feedback, or support. We’re here to assist you with all your tech-related queries.",
-  keywords:
-    "TechTips Hub, contact us, tech support, inquiries, feedback, tech questions, help",
+    "Get in touch with TechTips Hub about feedback, corrections, writing, or advertising.",
   openGraph: {
     title: "Contact Us",
     description:
-      "Have questions or need support? Contact the TechTips Hub team and let us help you with your tech-related inquiries.",
-    url: "https://techtipshub.vercel.app/contact-us"
+      "Get in touch with TechTips Hub about feedback, corrections, writing, or advertising.",
+    url: "https://techtipshub.vercel.app/contact-us",
   },
 };
 
-interface IProps {}
+// Real inbox the contact endpoint delivers to (CONTACT_INBOX, falling back to
+// the configured sending address). Override with NEXT_PUBLIC_CONTACT_EMAIL.
+const CONTACT_EMAIL =
+  process.env.NEXT_PUBLIC_CONTACT_EMAIL || "noyonrahman2003@gmail.com";
 
-const ContactUsPage: React.FC<IProps> = () => {
+const reasons = [
+  {
+    icon: <BsChatSquareText className="size-5" />,
+    title: "Feedback and corrections",
+    description:
+      "Spotted an error in an article? Tell us and we will fix it on the page.",
+  },
+  {
+    icon: <FiBookOpen className="size-5" />,
+    title: "Write with us",
+    description:
+      "Pitch a tutorial or explainer. We are always looking for practitioners.",
+  },
+  {
+    icon: <BiEnvelope className="size-5" />,
+    title: "Advertising",
+    description:
+      "Sponsored placements are labelled. Ask for the current options.",
+  },
+];
+
+const ContactUsPage = () => {
   return (
-    <>
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-24 lg:py-32">
+    <div>
+      {/* Hero */}
+      <section className="border-b border-default/60">
         <Container>
-          <div className="flex flex-col md:flex-row items-center text-center lg:text-start lg:justify-between">
-            <div className="mb-8 md:mb-0 md:mr-8">
-              <h1 className="text-4xl font-bold mb-4">Get in Touch</h1>
-              <p className="text-xl text-white dark:text-white">
-                We&apos;re here to help and answer any question you might have.
-              </p>
-            </div>
-            <Button
-              className="flex items-center bg-white text-blue-800 rounded-full py-2 px-4"
-              startContent={<FiMessageCircle size={20} />}
+          <div className="mx-auto max-w-3xl py-16 lg:py-20">
+            <p className="text-sm font-medium uppercase tracking-wider text-primary">
+              Contact
+            </p>
+            <h1 className="mt-4 text-pretty text-4xl font-bold leading-tight tracking-tight md:text-5xl">
+              Say hello
+            </h1>
+            <p className="mt-5 max-w-2xl text-lg leading-relaxed text-default-600">
+              Questions, corrections and pitches all land in the same inbox. Use
+              the form below, or email us directly — whichever is easier.
+            </p>
+            <a
+              href={`mailto:${CONTACT_EMAIL}`}
+              className="mt-6 inline-flex items-center gap-2 rounded-lg border border-default/60 px-3.5 py-2 text-sm font-medium transition-colors hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
             >
-              24/7 Support Available
-            </Button>
+              <BiEnvelope className="size-4" aria-hidden />
+              {CONTACT_EMAIL}
+            </a>
           </div>
         </Container>
-      </div>
+      </section>
 
       <Container>
-        <div className="grid md:grid-cols-5 gap-8 w-full py-14">
-          <Card className="md:col-span-3 bg-transparent" shadow="none">
-            <CardHeader>
-              <div className="flex flex-col">
-                <h2 className="text-md text-xl font-semibold">Contact Form</h2>
-                <p className="text-small text-default-500">
-                  Fill out the form and we&apos;ll be in touch as soon as possible.
-                </p>
-              </div>
-            </CardHeader>
-
-            <CardBody>
+        <div className="grid gap-12 py-14 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-16">
+          {/* Form */}
+          <section aria-labelledby="contact-form-heading">
+            <h2
+              id="contact-form-heading"
+              className="text-xl font-bold tracking-tight"
+            >
+              Send a message
+            </h2>
+            <p className="mt-1.5 text-sm text-default-500">
+              Every field is required. We reply from the address you enter here.
+            </p>
+            <div className="mt-7">
               <ContactForm />
-            </CardBody>
-          </Card>
+            </div>
+          </section>
 
-          <Card className="md:col-span-2 bg-transparent" shadow="none">
-            <CardHeader>
-              <h2 className="text-xl font-semibold">Contact Information</h2>
-            </CardHeader>
-            <CardBody className="space-y-6">
-              <div className="flex items-start space-x-4">
-                <BiMapPin className="text-primary mt-1" size={20} />
-                <div>
-                  <h3 className="font-semibold">Our Office</h3>
-                  <p className="text-sm text-default-500">
-                    123 Business Avenue, Suite 100
-                  </p>
-                  <p className="text-sm text-default-500">New York, NY 10001</p>
-                </div>
-              </div>
-              <div className="flex items-start space-x-4">
-                <BiPhone className="text-primary mt-1" size={20} />
-                <div>
-                  <h3 className="font-semibold">Phone</h3>
-                  <p className="text-sm text-default-500">+1 (555) 123-4567</p>
-                  <p className="text-sm text-default-500">
-                    Mon-Fri, 9am-6pm EST
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start space-x-4">
-                <BsMailbox className="text-primary mt-1" size={20} />
-                <div>
-                  <h3 className="font-semibold">Email</h3>
-                  <p className="text-sm text-default-500">
-                    support@example.com
-                  </p>
-                  <p className="text-sm text-default-500">sales@example.com</p>
-                </div>
-              </div>
-            </CardBody>
-          </Card>
+          {/* What we handle */}
+          <aside className="lg:pt-1">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-default-500">
+              What we can help with
+            </h2>
+            <ul className="mt-4 space-y-5">
+              {reasons.map((reason) => (
+                <li key={reason.title} className="flex gap-3">
+                  <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    {reason.icon}
+                  </span>
+                  <div>
+                    <h3 className="text-sm font-semibold">{reason.title}</h3>
+                    <p className="mt-1 text-sm leading-relaxed text-default-600">
+                      {reason.description}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-8 border-t border-default/60 pt-5">
+              <p className="text-sm leading-relaxed text-default-600">
+                Looking for something you can answer yourself? Check the{" "}
+                <Link
+                  href="/"
+                  className="font-medium text-primary underline-offset-4 hover:underline"
+                >
+                  published articles
+                </Link>{" "}
+                first — most questions are covered there.
+              </p>
+            </div>
+          </aside>
         </div>
 
+        {/* Existing ad unit — position preserved. */}
         <div className="pb-10">
           <AdBanner />
         </div>
       </Container>
-    </>
+    </div>
   );
 };
 
