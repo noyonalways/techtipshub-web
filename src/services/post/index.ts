@@ -2,6 +2,7 @@
 
 import envConfig from "@/config/env.config";
 import axiosInstance from "@/lib/AxiosInstance";
+import { getAccessToken } from "@/lib/fetch-with-auth";
 import { revalidatePath, updateTag } from "next/cache";
 import { cookies } from "next/headers";
 
@@ -97,8 +98,6 @@ export const getPostBySlug = async (slug: string) => {
 export const getLoggedInUserPosts = async (
   params?: Record<string, string | undefined>
 ) => {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("tth_access_token")?.value;
   try {
     const url = new URL(`${envConfig.baseApi}/posts/my-posts`);
 
@@ -112,20 +111,23 @@ export const getLoggedInUserPosts = async (
       });
     }
 
+    // Renews an expired (or about-to-expire) access token instead of reporting
+    // the member as signed out, which would empty the list.
+    const accessToken = await getAccessToken();
+
     const res = await fetch(url.toString(), {
       next: {
         tags: ["myPosts"],
       },
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
     });
 
     const data = await res.json();
 
-    // A signed-out visitor (or an expired token) gets `{ success: false }` with
-    // no `data`. Callers treat `data` as a list, so normalise it here rather
-    // than spreading `undefined` and crashing the page.
+    // A visitor with no usable session still gets `{ success: false }` with no
+    // `data`. Callers treat `data` as a list, so normalise it here rather than
+    // spreading `undefined` and crashing the page — and keep the reason, so the
+    // page can say "sign in again" instead of "you have no articles".
     if (!res.ok || data?.success === false || !Array.isArray(data?.data)) {
       return { ...data, success: false, data: [] as unknown[] };
     }

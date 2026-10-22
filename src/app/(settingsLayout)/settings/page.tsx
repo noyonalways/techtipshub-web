@@ -48,11 +48,22 @@ const SettingsPage = async () => {
       {!user?._id && (
         <div
           role="alert"
-          className="rounded-xl border border-default/60 bg-default-50/60 px-4 py-3 text-sm text-default-600"
+          className="flex flex-col items-start gap-3 rounded-xl border border-default/60 bg-default-50/60 px-4 py-3 text-sm text-default-600 dark:bg-default-100/5"
         >
-          We could not load your account details.{" "}
-          {profileData?.message ||
-            "The fields below start empty — reload the page to try again."}
+          <p>
+            We could not load your account details.{" "}
+            {profileData?.message ||
+              "The fields below start empty — reload the page to try again."}
+          </p>
+          {profileData?.statusCode === 401 && (
+            <Link
+              href="/login?redirect=%2Fsettings"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary underline-offset-4 hover:underline"
+            >
+              Sign in again
+              <HiOutlineArrowRight aria-hidden className="size-3.5" />
+            </Link>
+          )}
         </div>
       )}
 

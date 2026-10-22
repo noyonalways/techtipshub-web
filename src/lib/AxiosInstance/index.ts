@@ -1,9 +1,6 @@
 import envConfig from "@/config/env.config";
+import { getAccessToken } from "@/lib/fetch-with-auth";
 import axios from "axios";
-import { cookies } from "next/headers";
-
-const ACCESS_TOKEN_COOKIE = "tth_access_token";
-const REFRESH_TOKEN_COOKIE = "tth_refresh_token";
 
 const axiosInstance = axios.create({
   baseURL: envConfig.baseApi,
@@ -11,11 +8,13 @@ const axiosInstance = axios.create({
 });
 
 // Add a request interceptor
+//
+// The token is already valid by the time a request leaves the app: the proxy
+// renews an expired access token at the request boundary, where cookies can be
+// written. This only reads it.
 axiosInstance.interceptors.request.use(
   async function (config) {
-    // Do something before request is sent
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get(ACCESS_TOKEN_COOKIE)?.value;
+    const accessToken = await getAccessToken();
 
     if (accessToken) {
       config.headers["Authorization"] = `Bearer ${accessToken}`;
@@ -24,33 +23,9 @@ axiosInstance.interceptors.request.use(
     return config;
   },
   function (error) {
-    // Do something with request error
     return Promise.reject(error);
   }
 );
-
-// Refresh the access token using the stored refresh token.
-// Defined here (instead of importing from "@/services/auth") to avoid a
-// circular import between the auth service and this Axios instance.
-const refreshAccessToken = async () => {
-  try {
-    const cookieStore = await cookies();
-    const refreshToken = cookieStore.get(REFRESH_TOKEN_COOKIE)?.value;
-
-    const res = await axiosInstance({
-      url: "/auth/refresh-token",
-      method: "POST",
-      withCredentials: true,
-      headers: {
-        cookie: `refreshToken=${refreshToken}`,
-      },
-    });
-
-    return res?.data;
-  } catch (err: any) {
-    return err?.response?.data;
-  }
-};
 
 // Add a response interceptor
 axiosInstance.interceptors.response.use(
@@ -59,37 +34,9 @@ axiosInstance.interceptors.response.use(
     // Do something with response data
     return response;
   },
-  async function (error) {
-    // Any status codes that falls outside the range of 2xx cause this function to trigger
-    // Do something with response error
-    if (
-      error?.response?.data?.statusCode === 401 &&
-      error?.response?.data?.message === "TokenExpiredError"
-    ) {
-      const config = error.config;
-
-      console.log("sending refresh token...");
-
-      const res = await refreshAccessToken();
-      const accessToken = res?.data?.accessToken;
-
-      if (!accessToken) {
-        return Promise.reject(error);
-      }
-
-      config.headers["Authorization"] = `Bearer ${accessToken}`;
-
-      const cookieStore = await cookies();
-
-      cookieStore.set(ACCESS_TOKEN_COOKIE, accessToken, {
-        secure: envConfig.NODE_ENV === "production",
-        httpOnly: true,
-        maxAge: 1000 * 60 * 60 * 24 * 60 * 365,
-      });
-
-      return axiosInstance(config);
-    }
-
+  function (error) {
+    // 401s are handled before they are sent (see the request interceptor), so
+    // there is nothing to retry here; callers get the API's own answer.
     return Promise.reject(error);
   }
 );

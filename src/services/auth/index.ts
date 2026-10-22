@@ -2,6 +2,7 @@
 
 import envConfig from "@/config/env.config";
 import axiosInstance from "@/lib/AxiosInstance";
+import { getAccessToken } from "@/lib/fetch-with-auth";
 import { TLoggedInUser, TLogin } from "@/types";
 import { jwtDecode } from "jwt-decode";
 import { cookies } from "next/headers";
@@ -96,15 +97,14 @@ export const getCurrentUser = async () => {
 
 // get user profile info
 export const getProfileInfo = async () => {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get(ACCESS_TOKEN_COOKIE)?.value;
-
   try {
+    // Recovers from an expired access token so the account fields are not
+    // shown empty to a member who is still signed in.
+    const accessToken = await getAccessToken();
+
     const res = await fetch(`${envConfig.baseApi}/auth/me`, {
       cache: "no-store",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
     });
 
     return res.json();
@@ -144,21 +144,11 @@ export const resetPassword = async (payload: {
 };
 
 export const getNewAccessToken = async () => {
-  try {
-    const cookieStore = await cookies();
-    const refreshToken = cookieStore.get(REFRESH_TOKEN_COOKIE)?.value;
+  // Same renewal rules as every other server-side call: the refresh token is
+  // only used while it is still valid, and the result is written to the cookie.
+  const accessToken = await getAccessToken();
 
-    const res = await axiosInstance({
-      url: "/auth/refresh-token",
-      method: "POST",
-      withCredentials: true,
-      headers: {
-        cookie: `refreshToken=${refreshToken}`,
-      },
-    });
-
-    return res?.data;
-  } catch (err: any) {
-    return err?.response?.data;
-  }
+  return accessToken
+    ? { success: true, data: { accessToken } }
+    : { success: false, message: "Session expired" };
 };

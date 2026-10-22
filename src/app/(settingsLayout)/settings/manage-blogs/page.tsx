@@ -4,6 +4,8 @@ import { getAllCategories } from "@/services/category";
 import { getLoggedInUserPosts } from "@/services/post";
 import { IPost } from "@/types";
 import { Metadata } from "next";
+import Link from "next/link";
+import { HiOutlineArrowRight } from "react-icons/hi2";
 
 export const metadata: Metadata = {
   title: "Manage Blogs",
@@ -50,6 +52,16 @@ const ManageBlogs = async ({ searchParams }: IProps) => {
   const blogs = Array.isArray(data?.data) ? (data.data as IPost[]) : [];
   const total = Number(data?.meta?.total);
 
+  // A failed session is not the same thing as an account with no articles, and
+  // must not be shown as one.
+  const sessionError =
+    data?.success === false
+      ? data?.statusCode === 401 || data?.message === "Unauthorized Access"
+        ? "Your session has expired. Sign in again to see and manage your articles."
+        : data?.message ||
+          "Your articles could not be loaded. Reload the page to try again."
+      : null;
+
   const categories = Array.isArray(categoryData?.data)
     ? (categoryData.data as { name: string }[])
         .map((item) => item.name)
@@ -64,11 +76,27 @@ const ManageBlogs = async ({ searchParams }: IProps) => {
         description="Edit, review or remove anything you have published."
       />
 
-      <MyPosts
-        initialPosts={blogs}
-        total={Number.isFinite(total) ? total : undefined}
-        categories={categories}
-      />
+      {sessionError ? (
+        <div
+          role="alert"
+          className="flex flex-col items-start gap-3 rounded-xl border border-default/60 bg-default-50/60 px-5 py-4 dark:bg-default-100/5"
+        >
+          <p className="text-sm text-default-600">{sessionError}</p>
+          <Link
+            href={`/login?redirect=${encodeURIComponent("/settings/manage-blogs")}`}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+          >
+            Sign in again
+            <HiOutlineArrowRight aria-hidden className="size-3.5" />
+          </Link>
+        </div>
+      ) : (
+        <MyPosts
+          initialPosts={blogs}
+          total={Number.isFinite(total) ? total : undefined}
+          categories={categories}
+        />
+      )}
     </div>
   );
 };
