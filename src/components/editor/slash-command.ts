@@ -1,6 +1,6 @@
 "use client";
 
-import { Extension, type Editor, type Range } from "@tiptap/core";
+import { Extension, type ChainedCommands, type Editor, type Range } from "@tiptap/core";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
 import { Decoration, DecorationSet } from "@tiptap/pm/view";
 import { useEffect, useState } from "react";
@@ -77,9 +77,19 @@ export const SlashCommand = Extension.create({
   },
 });
 
-/** Deletes the "/query" text the menu was opened from. */
-export const clearSlashText = (editor: Editor, range: Range) => {
-  editor.chain().focus().deleteRange(range).run();
+/**
+ * Deletes the "/query" text the menu was opened from, then applies the block.
+ *
+ * Both steps run as one chain so the document is never rendered in the
+ * intermediate states that ProseMirror's trailing-node plugin reacts to.
+ */
+export const clearSlashText = (
+  editor: Editor,
+  range: Range,
+  apply?: (chain: ChainedCommands) => ChainedCommands,
+) => {
+  const chain = apply?.(editor.chain().focus().deleteRange(range));
+  (chain ?? editor.chain().focus().deleteRange(range)).run();
 };
 
 /**

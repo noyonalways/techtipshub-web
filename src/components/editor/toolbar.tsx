@@ -95,7 +95,9 @@ const BlockStyleMenu = ({ editor }: { editor: Editor | null }) => {
                 type="button"
                 onMouseDown={(event) => event.preventDefault()}
                 onClick={() => {
-                  item.run(editor!);
+                  // No "/query" text to remove here: apply the block directly.
+                  if (item.chain) item.chain(editor!.chain().focus()).run();
+                  else item.run?.(editor!);
                   setOpen(false);
                 }}
                 className={`flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm ${
@@ -128,14 +130,14 @@ const Toolbar = ({ editor, onOpenMenu }: IProps) => {
   const chain = () => editor.chain().focus();
 
   return (
-    <div className="flex flex-wrap items-center gap-1 border-b border-default-200 px-2 py-1.5">
+    <div className="tth-toolbar flex flex-wrap items-center gap-0.5 border-b border-default-200 px-2 py-1.5">
       <ToolbarButton label="Insert block" onClick={onOpenMenu}>
         <LuPlus className="size-4" />
       </ToolbarButton>
 
       <BlockStyleMenu editor={editor} />
 
-      <span className="mx-1 h-5 w-px bg-default-200" />
+      <span className="mx-1 hidden h-5 w-px bg-default-200 sm:block" />
 
       <ToolbarButton
         label="Bold"
@@ -173,12 +175,12 @@ const Toolbar = ({ editor, onOpenMenu }: IProps) => {
         <LuCode className="size-4" />
       </ToolbarButton>
 
-      <span className="mx-1 h-5 w-px bg-default-200" />
+      <span className="mx-1 hidden h-5 w-px bg-default-200 sm:block" />
 
       <ToolbarButton
         label={editor.isActive("link") ? "Edit link" : "Add link"}
         active={editor.isActive("link")}
-        onClick={() => slashItems.find((item) => item.title === "Link")!.run(editor)}
+        onClick={() => slashItems.find((item) => item.title === "Link")?.run?.(editor)}
       >
         <LuLink className="size-4" />
       </ToolbarButton>
@@ -189,7 +191,7 @@ const Toolbar = ({ editor, onOpenMenu }: IProps) => {
         <LuMinus className="size-4" />
       </ToolbarButton>
 
-      <span className="ml-auto flex items-center gap-1">
+      <span className="ml-auto hidden items-center gap-1 sm:flex">
         <ToolbarButton
           label="Undo"
           disabled={!editor.can().undo()}

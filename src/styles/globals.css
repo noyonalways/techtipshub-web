@@ -172,3 +172,79 @@ p {
   height: auto;
   border-radius: 0.5rem;
 }
+
+/* --------------------------------------------------------------------------
+   Full-page composer surface (/write-blog).
+
+   The page supplies the column, so the editor has no card of its own: no
+   border, no background, generous vertical space, and type sized for writing
+   rather than for reading small controls.
+   -------------------------------------------------------------------------- */
+.tth-writing-surface .tth-editor-content .tth-prose {
+  min-height: 50vh;
+  padding: 1.25rem 0 2rem;
+  font-size: 1.125rem;
+  line-height: 1.8;
+}
+
+.tth-writing-surface .tth-editor-content .tth-prose:focus {
+  outline: none;
+}
+
+.tth-writing-surface .tth-editor-content .tth-prose > * + * {
+  margin-top: 0.9em;
+}
+
+.tth-writing-surface .tth-editor-content h1 {
+  font-size: 1.75rem;
+  line-height: 1.25;
+  font-weight: 650;
+  margin-top: 1.6em;
+}
+
+.tth-writing-surface .tth-editor-content h2 {
+  font-size: 1.4rem;
+  line-height: 1.3;
+  font-weight: 650;
+  margin-top: 1.5em;
+}
+
+.tth-writing-surface .tth-editor-content h3 {
+  font-size: 1.2rem;
+  font-weight: 650;
+  margin-top: 1.4em;
+}
+
+.tth-writing-surface .tth-editor-content .tth-prose > :first-child {
+  margin-top: 0;
+}
+
+/* The composer has no card border, so an error is shown by the page, not here. */
+.tth-editor-invalid .tth-prose {
+  box-shadow: inset 2px 0 0 var(--color-danger);
+  padding-left: 1rem !important;
+  border-radius: 2px;
+}
+
+/* On the composer the toolbar is compact: no divider, tight controls. */
+.tth-toolbar {
+  row-gap: 0.25rem;
+}
+
+/* Phones: one row that scrolls sideways instead of wrapping onto several
+   rows, which would push the title below the fold. */
+@media (max-width: 40rem) {
+  .tth-toolbar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .tth-toolbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tth-toolbar > * {
+    flex: 0 0 auto;
+  }
+}

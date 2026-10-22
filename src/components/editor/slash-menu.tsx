@@ -69,8 +69,16 @@ const SlashMenu = ({ editor }: IProps) => {
       if (!editor || !slash.open) return;
       const item = items[index];
       if (!item) return;
+      // Deleting the "/query" text and applying the block must happen in one
+      // transaction. Done as two chains, ProseMirror's trailing-node plugin
+      // sees an empty document in between, appends a paragraph, and the caret
+      // lands after the new list instead of inside it.
+      if (item.chain) {
+        clearSlashText(editor, slash.range, item.chain);
+        return;
+      }
       clearSlashText(editor, slash.range);
-      item.run(editor);
+      item.run?.(editor);
     },
     [editor, items, slash.open, slash.range],
   );

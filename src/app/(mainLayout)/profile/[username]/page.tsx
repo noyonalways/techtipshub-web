@@ -74,11 +74,12 @@ const DynamicProfilePage = async () => {
   } = (profileData?.data as IUser) ?? {};
 
   let postsData;
-  if (profileData?.success){
+  if (profileData?.success) {
     postsData = await getLoggedInUserPosts();
-  } 
+  }
 
-  const posts = postsData?.data as IPost[];
+  // Includes the signed-out case, where the service returns an empty list.
+  const posts = (postsData?.data as IPost[] | undefined) ?? [];
 
 
   return (

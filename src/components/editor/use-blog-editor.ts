@@ -1,6 +1,7 @@
 "use client";
 
 import { useEditor } from "@tiptap/react";
+import type { Editor } from "@tiptap/core";
 import { editorExtensions } from "./editor-extensions";
 import { serializePostHTML } from "./extensions";
 
@@ -9,6 +10,16 @@ interface IProps {
   onChange: (html: string) => void;
   editable?: boolean;
 }
+
+/**
+ * What the editor reports for its current content.
+ *
+ * This is exactly the value passed to `onChange`, so callers comparing a form
+ * value against the editor must compare against this — `editor.getHTML()` is
+ * the un-serialised form and differs for lists and quotes.
+ */
+export const getPostHTML = (editor: Editor) =>
+  serializePostHTML(editor.getHTML());
 
 /**
  * Creates the blog editor.
@@ -74,7 +85,7 @@ export const useBlogEditor = ({ value, onChange, editable = true }: IProps) =>
       onUpdate: ({ editor }) => {
         // `getHTML()` is the schema's own output; `serializePostHTML` only
         // restores the paragraph/`<li>` shape the site has always stored.
-        onChange(serializePostHTML(editor.getHTML()));
+        onChange(getPostHTML(editor));
       },
     },
     [],

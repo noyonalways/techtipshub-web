@@ -121,9 +121,18 @@ export const getLoggedInUserPosts = async (
       },
     });
 
-    return res.json();
+    const data = await res.json();
+
+    // A signed-out visitor (or an expired token) gets `{ success: false }` with
+    // no `data`. Callers treat `data` as a list, so normalise it here rather
+    // than spreading `undefined` and crashing the page.
+    if (!res.ok || data?.success === false || !Array.isArray(data?.data)) {
+      return { ...data, success: false, data: [] as unknown[] };
+    }
+
+    return data;
   } catch (err: any) {
-    return err;
+    return { success: false, data: [] as unknown[], error: err?.message };
   }
 };
 

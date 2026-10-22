@@ -23,6 +23,13 @@ const MyPosts = ({ initialPosts }: IProps) => {
   const loadMorePosts = async () => {
     if (!hasMore) return;
 
+    // The first page is server-rendered; this only runs after a scroll. A
+    // failed request must not take the whole page down with it.
+    if (!Array.isArray(initialPosts)) {
+      setHasMore(false);
+      return;
+    }
+
     const params: { page: string; limit: string; [key: string]: string } = {
       page: page.toString(),
       limit: "5",
@@ -35,7 +42,7 @@ const MyPosts = ({ initialPosts }: IProps) => {
     if (category) params.category = category;
 
     const data = await getLoggedInUserPosts(params);
-    const newBlogs = data?.data || [];
+    const newBlogs = Array.isArray(data?.data) ? (data.data as IPost[]) : [];
 
     setBlogs((prevBlogs) => [...prevBlogs, ...newBlogs]);
     setPage((prevPage) => prevPage + 1);

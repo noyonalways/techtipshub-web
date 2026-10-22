@@ -1,4 +1,4 @@
-import type { Editor } from "@tiptap/core";
+import type { ChainedCommands, Editor } from "@tiptap/core";
 import {
   LuCode,
   LuHeading1,
@@ -16,15 +16,24 @@ import {
 /**
  * The block palette for the "/" menu.
  *
- * Each entry performs the action itself so the menu stays declarative; the
- * toolbar reuses the same helpers from `commands.ts`.
+ * An entry either contributes a step to the menu's chain, or handles itself
+ * when it needs to ask the writer something first (a URL, a dialog).
  */
 export interface SlashItem {
   title: string;
   hint: string;
   keywords: string[];
   icon: React.ComponentType<{ className?: string }>;
-  run: (editor: Editor) => void;
+  /**
+   * Adds the block to an existing chain.
+   *
+   * It receives the chain that has already deleted the "/query" text, so the
+   * deletion and the block change commit as one transaction — see
+   * `clearSlashText` for why that matters.
+   */
+  chain?: (chain: ChainedCommands) => ChainedCommands;
+  /** Runs the command itself, for entries that need input before acting. */
+  run?: (editor: Editor) => void;
   /** Extra check used to highlight the active block. */
   isActive?: (editor: Editor) => boolean;
 }
@@ -35,7 +44,7 @@ export const slashItems: SlashItem[] = [
     hint: "Plain paragraph",
     keywords: ["text", "paragraph", "p"],
     icon: LuText,
-    run: (editor) => editor.chain().focus().setParagraph().run(),
+    chain: (chain) => chain.setParagraph(),
     isActive: (editor) => editor.isActive("paragraph"),
   },
   {
@@ -43,7 +52,7 @@ export const slashItems: SlashItem[] = [
     hint: "Big section title",
     keywords: ["h1", "title", "heading"],
     icon: LuHeading1,
-    run: (editor) => editor.chain().focus().setHeading({ level: 1 }).run(),
+    chain: (chain) => chain.setHeading({ level: 1 }),
     isActive: (editor) => editor.isActive("heading", { level: 1 }),
   },
   {
@@ -51,7 +60,7 @@ export const slashItems: SlashItem[] = [
     hint: "Section heading",
     keywords: ["h2", "subtitle", "heading"],
     icon: LuHeading2,
-    run: (editor) => editor.chain().focus().setHeading({ level: 2 }).run(),
+    chain: (chain) => chain.setHeading({ level: 2 }),
     isActive: (editor) => editor.isActive("heading", { level: 2 }),
   },
   {
@@ -59,7 +68,7 @@ export const slashItems: SlashItem[] = [
     hint: "Small section heading",
     keywords: ["h3", "heading"],
     icon: LuHeading3,
-    run: (editor) => editor.chain().focus().setHeading({ level: 3 }).run(),
+    chain: (chain) => chain.setHeading({ level: 3 }),
     isActive: (editor) => editor.isActive("heading", { level: 3 }),
   },
   {
@@ -67,7 +76,7 @@ export const slashItems: SlashItem[] = [
     hint: "Simple list",
     keywords: ["ul", "bullet", "unordered", "list"],
     icon: LuList,
-    run: (editor) => editor.chain().focus().toggleBulletList().run(),
+    chain: (chain) => chain.toggleBulletList(),
     isActive: (editor) => editor.isActive("bulletList"),
   },
   {
@@ -75,7 +84,7 @@ export const slashItems: SlashItem[] = [
     hint: "List with numbers",
     keywords: ["ol", "ordered", "number", "list"],
     icon: LuListOrdered,
-    run: (editor) => editor.chain().focus().toggleOrderedList().run(),
+    chain: (chain) => chain.toggleOrderedList(),
     isActive: (editor) => editor.isActive("orderedList"),
   },
   {
@@ -83,7 +92,7 @@ export const slashItems: SlashItem[] = [
     hint: "Capture a quotation",
     keywords: ["blockquote", "quote", "citation"],
     icon: LuQuote,
-    run: (editor) => editor.chain().focus().toggleBlockquote().run(),
+    chain: (chain) => chain.toggleBlockquote(),
     isActive: (editor) => editor.isActive("blockquote"),
   },
   {
@@ -91,7 +100,7 @@ export const slashItems: SlashItem[] = [
     hint: "Code with syntax highlighting",
     keywords: ["code", "pre", "snippet", "```"],
     icon: LuCode,
-    run: (editor) => editor.chain().focus().toggleCodeBlock().run(),
+    chain: (chain) => chain.toggleCodeBlock(),
     isActive: (editor) => editor.isActive("codeBlock"),
   },
   {
@@ -99,7 +108,7 @@ export const slashItems: SlashItem[] = [
     hint: "Visual separator",
     keywords: ["hr", "divider", "separator", "line", "---"],
     icon: LuMinus,
-    run: (editor) => editor.chain().focus().setHorizontalRule().run(),
+    chain: (chain) => chain.setHorizontalRule(),
   },
   {
     title: "Image from URL",

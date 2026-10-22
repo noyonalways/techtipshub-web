@@ -1,35 +1,23 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import EditorView from "./editor-view";
 import Toolbar from "./toolbar";
-import { useBlogEditor } from "./use-blog-editor";
+import { useBlogEditor, getPostHTML } from "./use-blog-editor";
 
-interface IProps {
-  value: string;
-  onChange: (html: string) => void;
-  onBlur?: () => void;
-  placeholder?: string;
-  hasError?: boolean;
-  /** Read-only posts still use the editor's typography, without a toolbar. */
-  editable?: boolean;
-}
+export type BlogEditor = ReturnType<typeof useBlogEditor>;
+
+/* -------------------------------------------------------------------------- */
+/* Building blocks used by each composer layout                               */
+/* -------------------------------------------------------------------------- */
 
 /**
- * The blog composer.
+ * The toolbar with a working "insert block" button.
  *
- * Writes the same HTML the site already stores, so it replaces the old editor
- * without touching the API or existing posts.
+ * The page decides where it sits (above a card, or sticky at the top of the
+ * composer), but the "/" action belongs to the editor.
  */
-const RichTextEditor = ({
-  value,
-  onChange,
-  onBlur,
-  hasError,
-  editable = true,
-}: IProps) => {
-  const editor = useBlogEditor({ value, onChange, editable });
-
+export const EditorToolbar = ({ editor }: { editor: BlogEditor }) => {
   const openMenu = useCallback(() => {
     if (!editor) return;
     const { empty } = editor.state.selection;
@@ -43,10 +31,93 @@ const RichTextEditor = ({
     editor.chain().focus().insertContent("/").run();
   }, [editor]);
 
+  return <Toolbar editor={editor} onOpenMenu={openMenu} />;
+};
+
+interface ISurfaceProps {
+  editor: BlogEditor;
+  hasError?: boolean;
+  /** `surface` drops the inner card so the page provides the column. */
+  variant?: "card" | "surface";
+}
+
+/** The writing area itself. */
+export const EditorSurface = ({
+  editor,
+  hasError,
+  variant = "surface",
+}: ISurfaceProps) => (
+  <EditorView editor={editor} hasError={hasError} variant={variant} />
+);
+
+/**
+ * Creates the editor and keeps the form value in sync without re-creating it.
+ *
+ * `useBlogEditor` takes the value once (the initial content). When the value
+ * changes from outside the editor — restoring a draft, or resetting after a
+ * publish — the content is replaced too.
+ */
+export const useComposerEditor = ({
+  value,
+  onChange,
+  editable,
+}: {
+  value: string;
+  onChange: (html: string) => void;
+  editable?: boolean;
+}) => {
+  const editor = useBlogEditor({ value, onChange, editable });
+  const initial = useRef(value);
+
+  useEffect(() => {
+    if (!editor) return;
+    if (value === initial.current) return;
+    // Compare against what the editor reports, not its raw HTML: the two differ
+    // for lists and quotes, and an unequal compare would reset the document the
+    // editor just produced (losing the caret position).
+    if (value === getPostHTML(editor)) return;
+
+    initial.current = value;
+    editor.commands.setContent(value, { emitUpdate: false });
+  }, [editor, value]);
+
+  return editor;
+};
+
+/* -------------------------------------------------------------------------- */
+/* Composer used by forms and modals                                          */
+/* -------------------------------------------------------------------------- */
+
+interface IProps {
+  value: string;
+  onChange: (html: string) => void;
+  onBlur?: () => void;
+  hasError?: boolean;
+  /** Read-only posts still use the editor's typography, without a toolbar. */
+  editable?: boolean;
+}
+
+/**
+ * The boxed editor with its own toolbar: update page and the admin modal.
+ *
+ * These callers already hold the content in form state, so the editor owns it
+ * after mount and reports every change through `onChange`. Syncing back from
+ * `value` is deliberately not done here — see `useComposerEditor` for the
+ * composer, which needs it to restore drafts.
+ */
+const RichTextEditor = ({
+  value,
+  onChange,
+  onBlur,
+  hasError,
+  editable = true,
+}: IProps) => {
+  const editor = useBlogEditor({ value, onChange, editable });
+
   return (
     <div onBlur={onBlur}>
-      {editable && <Toolbar editor={editor} onOpenMenu={openMenu} />}
-      <EditorView editor={editor} hasError={hasError} />
+      {editable && <EditorToolbar editor={editor} />}
+      <EditorSurface editor={editor} hasError={hasError} variant="card" />
     </div>
   );
 };
