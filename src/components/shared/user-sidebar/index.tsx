@@ -7,7 +7,31 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { FiEdit3, FiMenu, FiX } from "react-icons/fi";
 import { HiOutlineArrowLeft, HiOutlineArrowRight } from "react-icons/hi2";
-import { userLinks } from "./user-links";
+import { sectionPages, userLinks } from "./user-links";
+
+/**
+ * Which settings page the path belongs to.
+ *
+ * The article editor lives under `manage-blogs` (`/settings/edit/<slug>`), so
+ * it keeps that section's nav entry highlighted, but it names itself in the
+ * header and the "On this page" note rather than the parent's copy.
+ */
+const resolvePage = (pathname: string | null) => {
+  const section =
+    userLinks
+      .filter(
+        (link) =>
+          pathname === link.href || pathname?.startsWith(`${link.href}/`),
+      )
+      .at(-1) ?? null;
+
+  const isArticleEditor = Boolean(pathname?.startsWith("/settings/edit/"));
+
+  return {
+    section,
+    page: (isArticleEditor && sectionPages.editor) || section,
+  };
+};
 
 /**
  * Settings navigation. A sticky column on desktop, a disclosure panel on
@@ -33,9 +57,9 @@ const UserSidebar = () => {
     setOpenForPath(next ? pathname : null);
   };
 
-  const current =
-    userLinks.find((link) => link.href === pathname) ??
-    userLinks.filter((link) => pathname?.startsWith(`${link.href}/`)).at(-1);  return (
+  const { section: current, page } = resolvePage(pathname);
+
+  return (
     <>
       {/* Mobile trigger */}
       <div className="border-b border-default/60 lg:hidden">
@@ -55,7 +79,7 @@ const UserSidebar = () => {
             Settings
           </button>
           <span className="truncate text-sm text-default-500">
-            {current?.label ?? "Profile"}
+            {page?.label ?? "Profile"}
           </span>
         </div>
       </div>
@@ -120,13 +144,13 @@ const UserSidebar = () => {
             </ul>
           </div>
 
-          {current?.description && (
+          {page?.description && (
             <div className="rounded-lg bg-default-50 px-3 py-2.5 dark:bg-default-100/10">
               <p className="text-[0.6875rem] font-semibold uppercase tracking-wider text-default-400">
                 On this page
               </p>
               <p className="mt-1 text-xs leading-relaxed text-default-600">
-                {current.description}
+                {page.description}
               </p>
             </div>
           )}

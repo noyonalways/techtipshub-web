@@ -42,7 +42,23 @@ const isStale = (token?: string) =>
  * render) means pages, route handlers and server actions all receive a valid
  * token from the first byte.
  */
+/**
+ * Old bookmarks and links to the article editor.
+ *
+ * The editor used to live at `/settings/update/<slug>`; it is now
+ * `/settings/edit/<slug>`. Redirecting keeps every existing link working.
+ */
+const LEGACY_EDIT_PATH = "/settings/update/";
+
 export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  if (pathname.startsWith(LEGACY_EDIT_PATH)) {
+    const url = request.nextUrl.clone();
+    url.pathname = pathname.replace(LEGACY_EDIT_PATH, "/settings/edit/");
+    return NextResponse.redirect(url, 308);
+  }
+
   const accessToken = request.cookies.get(ACCESS_TOKEN_COOKIE)?.value;
   if (!isStale(accessToken)) return NextResponse.next();
 

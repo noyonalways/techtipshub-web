@@ -11,13 +11,18 @@ interface IProps {
   suggestions?: string[];
   invalid?: boolean;
   id?: string;
+  /**
+   * Reports the raw text that was typed but not kept — because the list is
+   * full. The field decides what to say; the editor only knows the limit.
+   */
+  onTagsRejected?: (raw: string, rejected: string[]) => void;
 }
 
 const MAX_TAGS = 8;
 const MAX_TAG_LENGTH = 24;
 
 /** Lowercase, hyphenated, no duplicate separators. */
-const normaliseTag = (raw: string) =>
+export const normaliseTag = (raw: string) =>
   raw
     .trim()
     .toLowerCase()
@@ -25,6 +30,33 @@ const normaliseTag = (raw: string) =>
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "")
     .slice(0, MAX_TAG_LENGTH);
+
+/** Splits `"react, next, css"` into clean tags, dropping empties. */
+export const parseTags = (raw: string) =>
+  raw.split(",").map(normaliseTag).filter(Boolean);
+
+/**
+ * Adds tags to a list in its canonical form: normalised, de-duplicated, capped.
+ * Returns the new list and any suggestions that did not fit.
+ */
+export const addTags = (
+  current: string[],
+  raw: string,
+  limit = MAX_TAGS,
+): { tags: string[]; rejected: string[] } => {
+  const next = [...current];
+  const rejected: string[] = [];
+
+  for (const tag of parseTags(raw)) {
+    if (next.length >= limit || next.includes(tag)) {
+      if (!next.includes(tag)) rejected.push(tag);
+      continue;
+    }
+    next.push(tag);
+  }
+
+  return { tags: next, rejected };
+};
 
 /**
  * Tag editor.
@@ -41,20 +73,18 @@ const TagInput = ({
   suggestions = [],
   invalid,
   id,
+  onTagsRejected,
 }: IProps) => {
-  const addTags = (raw: string) => {
-    const candidates = raw
-      .split(",")
-      .map(normaliseTag)
-      .filter(Boolean);
-    if (!candidates.length) return;
+  const commitTags = (raw: string) => {
+    const { tags: next, rejected } = addTags(tags, raw);
 
-    const next = [...tags];
-    for (const tag of candidates) {
-      if (next.length >= MAX_TAGS) break;
-      if (!next.includes(tag)) next.push(tag);
-    }
+    // Keep the input's raw text (not the tag) so typing "AI Agent" in two
+    // words and pressing Enter cannot lose the first word.
     onChange(next);
+    if (rejected.length || parseTags(raw).every((tag) => tags.includes(tag))) {
+      onTagsRejected?.(raw, rejected);
+      return;
+    }
     onInputChange("");
   };
 
@@ -65,7 +95,7 @@ const TagInput = ({
     if (event.key === "Enter" || event.key === ",") {
       if (!input.trim()) return;
       event.preventDefault();
-      addTags(input);
+      commitTags(input);
       return;
     }
     if (event.key === "Backspace" && !input && tags.length) {
@@ -113,7 +143,7 @@ const TagInput = ({
           value={input}
           onChange={(event) => onInputChange(event.target.value)}
           onKeyDown={handleKeyDown}
-          onBlur={() => input.trim() && addTags(input)}
+          onBlur={() => input.trim() && commitTags(input)}
           disabled={full}
           placeholder={
             full
@@ -133,7 +163,7 @@ const TagInput = ({
             <button
               key={tag}
               type="button"
-              onClick={() => addTags(tag)}
+              onClick={() => commitTags(tag)}
               className="rounded-md border border-default-200 px-2 py-0.5 text-xs text-default-600 transition-colors hover:border-primary hover:text-primary"
             >
               {tag}

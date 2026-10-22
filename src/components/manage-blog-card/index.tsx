@@ -125,7 +125,7 @@ const ManageBlogCard = ({ post }: IProps) => {
             repeating the only author who can appear on this page. */}
         <div className="grid flex-1 grid-cols-3 items-center gap-1 sm:flex-none">
           <Link
-            href={`/settings/update/${slug}`}
+            href={`/settings/edit/${slug}`}
             className="inline-flex items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-sm font-medium text-default-700 transition-colors hover:bg-default-100 hover:text-primary sm:py-1.5"
           >
             <FiEdit3 aria-hidden className="size-4" />

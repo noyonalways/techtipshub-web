@@ -26,3 +26,16 @@ export const userLinks: ILink[] = [
     icon: <MdOutlineArticle size={18} />,
   },
 ];
+
+/**
+ * Pages that sit under a nav section without being in it — the article editor
+ * lives under "Manage Blogs". They keep the section highlighted but describe
+ * themselves in the header and the "On this page" note.
+ */
+export const sectionPages = {
+  editor: {
+    label: "Edit article",
+    description:
+      "Rewrite the piece, swap the cover or retune its category and tags",
+  },
+};

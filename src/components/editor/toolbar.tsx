@@ -22,6 +22,8 @@ interface IProps {
   editor: Editor | null;
   /** Opens the command palette. */
   onOpenMenu: () => void;
+  /** Toolbar status, e.g. the word count. Words count as a writer types. */
+  children?: React.ReactNode;
 }
 
 const ToolbarButton = ({
@@ -124,7 +126,7 @@ const BlockStyleMenu = ({ editor }: { editor: Editor | null }) => {
  * commands, so the toolbar only needs the inline formatting people reach for
  * constantly.
  */
-const Toolbar = ({ editor, onOpenMenu }: IProps) => {
+const Toolbar = ({ editor, onOpenMenu, children }: IProps) => {
   if (!editor) return null;
 
   const chain = () => editor.chain().focus();
@@ -192,6 +194,7 @@ const Toolbar = ({ editor, onOpenMenu }: IProps) => {
       </ToolbarButton>
 
       <span className="ml-auto hidden items-center gap-1 sm:flex">
+        {children}
         <ToolbarButton
           label="Undo"
           disabled={!editor.can().undo()}

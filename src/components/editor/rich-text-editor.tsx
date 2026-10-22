@@ -17,7 +17,13 @@ export type BlogEditor = ReturnType<typeof useBlogEditor>;
  * The page decides where it sits (above a card, or sticky at the top of the
  * composer), but the "/" action belongs to the editor.
  */
-export const EditorToolbar = ({ editor }: { editor: BlogEditor }) => {
+export const EditorToolbar = ({
+  editor,
+  children,
+}: {
+  editor: BlogEditor;
+  children?: React.ReactNode;
+}) => {
   const openMenu = useCallback(() => {
     if (!editor) return;
     const { empty } = editor.state.selection;
@@ -31,7 +37,11 @@ export const EditorToolbar = ({ editor }: { editor: BlogEditor }) => {
     editor.chain().focus().insertContent("/").run();
   }, [editor]);
 
-  return <Toolbar editor={editor} onOpenMenu={openMenu} />;
+  return (
+    <Toolbar editor={editor} onOpenMenu={openMenu}>
+      {children}
+    </Toolbar>
+  );
 };
 
 interface ISurfaceProps {
