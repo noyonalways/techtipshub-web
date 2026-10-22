@@ -39,12 +39,8 @@ export const siteConfig = {
       href: "/contact-us",
     },
     {
-      label: "Log In",
-      href: "/login",
-    },
-    {
-      label: "Sign Up",
-      href: "/signup",
+      label: "Premium",
+      href: "/subscriptions",
     },
   ],
   links: {

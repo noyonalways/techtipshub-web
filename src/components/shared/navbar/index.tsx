@@ -1,140 +1,173 @@
 "use client";
 
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Button } from "@heroui/react";
+import { AnimatePresence, motion } from "framer-motion";
+import { HiOutlinePencilSquare } from "react-icons/hi2";
+import { FiMenu, FiX } from "react-icons/fi";
+import { useUser } from "@/context/user.provider";
+import { siteConfig } from "@/config/site";
+import { poppins } from "@/config/fonts";
 import LoginLogoutSwitch from "@/components/ui/login-logout-switch";
 import { ThemeSwitch } from "@/components/ui/theme-switch";
-import WritePostButton from "@/components/ui/write-post-button";
-import { siteConfig } from "@/config/site";
-import { usePathname } from "next/navigation";
-import {
-  Button,
-  Image,
-  link as linkStyles,
-  Navbar as NextUINavbar,
-  NavbarBrand,
-  NavbarContent,
-  NavbarItem,
-  NavbarMenu,
-  NavbarMenuItem,
-  NavbarMenuToggle,
-} from "@heroui/react";
-import clsx from "clsx";
-import NextLink from "next/link";
 import NavbarSearchInput from "./navbar-search-input";
-import { GoPencil } from "react-icons/go";
-import { useUser } from "@/context/user.provider";
+import Image from "next/image";
+
+const isActivePath = (pathname: string | null, href: string) =>
+  href === "/" ? pathname === "/" : Boolean(pathname?.startsWith(href));
 
 export const Navbar = () => {
-  const pathName = usePathname();
+  const pathname = usePathname();
   const { user } = useUser();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <NextUINavbar
-      maxWidth="full"
-      position="sticky"
-      className="border border-default/50 z-50 print:hidden"
-    >
-      <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
-        <NavbarBrand as="li" className="gap-3 max-w-fit">
-          <NextLink href="/">
+    <header className="sticky top-0 z-50 border-b border-default/60 bg-background/80 backdrop-blur-md print:hidden">
+      <div className="mx-auto flex h-16 w-full max-w-[88rem] items-center gap-3 px-4 sm:gap-4 sm:px-6">
+        {/* Brand + mobile menu toggle */}
+        <div className="flex shrink-0 items-center gap-1">
+          <button
+            type="button"
+            aria-expanded={menuOpen}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            onClick={() => setMenuOpen((open) => !open)}
+            className="-ml-2 rounded-lg p-2 text-default-600 transition-colors hover:bg-default-100 hover:text-foreground lg:hidden"
+          >
+            {menuOpen ? (
+              <FiX className="size-5" aria-hidden />
+            ) : (
+              <FiMenu className="size-5" aria-hidden />
+            )}
+          </button>
+
+          <Link
+            href="/"
+            aria-label="TechTips Hub home"
+            className="flex items-center gap-2.5"
+          >
             <Image
-              className="size-10"
               src="/tech-tips-hub-logo.png"
-              alt="tech-tips-hub-logo"
+              alt=""
+              width={32}
+              height={32}
+              className="size-8 rounded-md"
+              priority
             />
-          </NextLink>
-          <div className="size-10 flex justify-center lg:hidden">
-            <NavbarMenuToggle />
-          </div>
-        </NavbarBrand>
-        <ul className="hidden lg:flex gap-10 justify-start ml-2">
-          {siteConfig.navItems.map((item) => (
-            <NavbarItem key={item.href}>
-              <NextLink
-                className={clsx(
-                  linkStyles({ color: "foreground" }),
-                  "data-[active=true]:text-primary data-[active=true]:font-medium",
-                  pathName === item.href ? "text-primary" : ""
-                )}
-                color="foreground"
-                href={item.href}
-              >
-                {item.label}
-              </NextLink>
-            </NavbarItem>
-          ))}
-        </ul>
-      </NavbarContent>
-
-      <NavbarContent
-        className="hidden sm:flex basis-1/5 sm:basis-full"
-        justify="end"
-      >
-        <NavbarItem className="hidden lg:flex">
-          {<NavbarSearchInput />}
-        </NavbarItem>
-
-        <NavbarItem className="hidden sm:flex gap-2">
-          <ThemeSwitch className="hidden lg:inline-block" />
-        </NavbarItem>
-
-        {user && (
-          <NavbarItem>
-            <Button
-              as={NextLink}
-              size="sm"
-              radius="full"
-              variant="solid"
-              color="primary"
-              startContent={<GoPencil className="text-lg" />}
-              href="/write-blog"
+            <span
+              className={`${poppins.className} hidden text-[0.9375rem] font-semibold tracking-tight sm:block`}
             >
-              Write Blog
-            </Button>
-          </NavbarItem>
-        )}
-
-        <LoginLogoutSwitch />
-      </NavbarContent>
-
-      <NavbarContent className="md:hidden basis-1 pl-4" justify="end">
-        <ThemeSwitch />
-        {user && (
-          <NavbarItem>
-            <Button
-              as={NextLink}
-              size="sm"
-              radius="full"
-              variant="solid"
-              color="primary"
-              startContent={<GoPencil className="text-lg" />}
-              href="/write-blog"
-            >
-              Write Blog
-            </Button>
-          </NavbarItem>
-        )}
-        <LoginLogoutSwitch />
-      </NavbarContent>
-
-      <NavbarMenu className="z-50">
-        <NavbarSearchInput />
-        <div className="mx-4 mt-2 flex flex-col gap-2">
-          {siteConfig.navMenuItems.map((item, index) => (
-            <NavbarMenuItem key={`${item}-${index}`}>
-              <NextLink
-                className={clsx(
-                  linkStyles({ color: "foreground" }),
-                  "data-[active=true]:text-primary data-[active=true]:font-medium",
-                  pathName === item.href ? "text-primary" : ""
-                )}
-                href={item.href}
-              >
-                {item.label}
-              </NextLink>
-            </NavbarMenuItem>
-          ))}
+              TechTips Hub
+            </span>
+          </Link>
         </div>
-      </NavbarMenu>
-    </NextUINavbar>
+
+        {/* Primary navigation */}
+        <nav aria-label="Main" className="hidden lg:block">
+          <ul className="flex items-center gap-1">
+            {siteConfig.navItems.map((item) => {
+              const active = isActivePath(pathname, item.href);
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    aria-current={active ? "page" : undefined}
+                    className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                      active
+                        ? "text-primary"
+                        : "text-default-600 hover:bg-default-100 hover:text-foreground"
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
+        {/* Search grows to fill the middle */}
+        <div className="ml-auto hidden min-w-0 max-w-sm flex-1 lg:block">
+          <NavbarSearchInput />
+        </div>
+
+        {/* Actions */}
+        <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2 lg:ml-0">
+          <ThemeSwitch />
+
+          {user ? (
+            <Button
+              as={Link}
+              href="/write-blog"
+              size="sm"
+              radius="full"
+              color="primary"
+              startContent={<HiOutlinePencilSquare className="text-base" />}
+              className="hidden font-medium sm:inline-flex"
+            >
+              Write
+            </Button>
+          ) : null}
+
+          <LoginLogoutSwitch />
+        </div>
+      </div>
+
+      {/* Mobile navigation drawer */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className="overflow-hidden border-t border-default/60 bg-background lg:hidden"
+          >
+            <div className="space-y-4 px-4 py-4">
+              <NavbarSearchInput />
+
+              <nav aria-label="Main (mobile)">
+                <ul className="space-y-1">
+                  {siteConfig.navMenuItems.map((item) => {
+                    const active = isActivePath(pathname, item.href);
+                    return (
+                      <li key={item.href}>
+                        <Link
+                          href={item.href}
+                          onClick={() => setMenuOpen(false)}
+                          aria-current={active ? "page" : undefined}
+                          className={`block rounded-lg px-3 py-2.5 text-sm font-medium ${
+                            active
+                              ? "bg-primary/10 text-primary"
+                              : "text-default-700 hover:bg-default-100"
+                          }`}
+                        >
+                          {item.label}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </nav>
+
+              {user && (
+                <Button
+                  as={Link}
+                  href="/write-blog"
+                  onPress={() => setMenuOpen(false)}
+                  fullWidth
+                  radius="lg"
+                  color="primary"
+                  startContent={<HiOutlinePencilSquare className="text-base" />}
+                >
+                  Write a post
+                </Button>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </header>
   );
 };

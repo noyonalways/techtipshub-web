@@ -90,8 +90,8 @@ const LeftSideBar = () => {
     href === "/" ? pathname === "/" : pathname?.startsWith(href);
 
   return (
-    <aside className="sticky top-16 hidden h-[calc(100vh-4rem)] w-52 shrink-0 border-r border-default/50 px-3 py-4 lg:block xl:w-56">
-      <div className="flex h-full flex-col overflow-y-auto">
+    <aside className="tth-rail hidden w-56 shrink-0 border-r border-default/60 lg:block">
+      <div className="tth-rail-inner flex flex-col px-3 py-5">
         <nav aria-label="Feed navigation" className="space-y-6">
           {user && (
             <Link
@@ -125,10 +125,13 @@ const LeftSideBar = () => {
         </nav>
 
         {/* Keeps the sidebar ad inside the sticky column, where it has always
-            lived. `mt-auto` pins it to the bottom of the rail. */}
-        <div className="mt-auto space-y-4 pt-6">
+            lived. The block claims the space under the navigation and caps
+            itself so the rail never needs an internal scrollbar. */}
+        <div className="flex min-h-0 flex-1 flex-col justify-end gap-4 pt-6">
           <SubscriptionsStatus />
-          <AdBanner />
+          <div className="tth-rail-ad">
+            <AdBanner />
+          </div>
         </div>
       </div>
     </aside>

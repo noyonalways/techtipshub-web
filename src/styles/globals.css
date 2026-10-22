@@ -87,6 +87,10 @@
   --color-danger: hsl(var(--heroui-danger));
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* Single source of truth for the sticky header height: the 4rem bar plus
+     its 1px bottom border, which is the box the rails offset themselves by. */
+  --header-height: calc(4rem + 1px);
 }
 
 * {
@@ -109,6 +113,38 @@ body {
 
 .dark .tth-muted-prose p {
   color: var(--color-gray-400);
+}
+
+/* Sticky rails beside the feed.
+   Two things fight a viewport-pinned column here:
+
+   1. Tailwind cannot express `calc(100vh - var(--header-height))` as an
+      arbitrary value reliably.
+   2. The AdSense script stamps `height: auto !important` onto the page's
+      layout ancestors on first render, so a parent-relative `100%`/`auto`
+      chain cannot be trusted to stay viewport-bound.
+
+   The column therefore sizes itself from the viewport directly, and its
+   content is clamped so it can never overflow into a scrollbar. */
+.tth-rail {
+  position: sticky;
+  top: var(--header-height);
+  align-self: flex-start;
+  max-height: calc(100dvh - var(--header-height));
+}
+
+.tth-rail > .tth-rail-inner {
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - var(--header-height));
+  max-height: calc(100dvh - var(--header-height));
+  overflow: hidden;
+}
+
+/* Sidebar adverts keep their reserved space but never stretch the rail. */
+.tth-rail-ad {
+  max-height: 40vh;
+  overflow: hidden;
 }
 
 /* Blog editor (Tiptap). Replaced the react-quill block; post HTML is

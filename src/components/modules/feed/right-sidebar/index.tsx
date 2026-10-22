@@ -28,28 +28,32 @@ const RightSideBar = () => {
   }, []);
 
   return (
-    <aside className="sticky top-16 hidden h-[calc(100vh-4rem)] w-64 shrink-0 border-l border-default/50 px-4 py-6 xl:block xl:w-72">
-      <div className="h-full space-y-6 overflow-y-auto">
-        {isLoading ? (
-          <div className="space-y-3 rounded-xl border border-default/50 p-5">
-            <h2 className="text-sm font-semibold">Categories</h2>
-            <div className="flex flex-wrap gap-2">
-              <Skeleton className="h-7 w-20 rounded-full" />
-              <Skeleton className="h-7 w-24 rounded-full" />
-              <Skeleton className="h-7 w-20 rounded-full" />
-              <Skeleton className="h-7 w-24 rounded-full" />
-              <Skeleton className="h-7 w-20 rounded-full" />
-              <Skeleton className="h-7 w-20 rounded-full" />
+    <aside className="tth-rail hidden w-72 shrink-0 border-l border-default/60 xl:block">
+      <div className="tth-rail-inner flex flex-col gap-5 px-4 py-5">
+        <div className="shrink-0">
+          {isLoading ? (
+            <div className="space-y-3 rounded-xl border border-default/50 p-5">
+              <h2 className="text-sm font-semibold">Categories</h2>
+              <div className="flex flex-wrap gap-2">
+                <Skeleton className="h-7 w-20 rounded-full" />
+                <Skeleton className="h-7 w-24 rounded-full" />
+                <Skeleton className="h-7 w-20 rounded-full" />
+                <Skeleton className="h-7 w-24 rounded-full" />
+                <Skeleton className="h-7 w-20 rounded-full" />
+                <Skeleton className="h-7 w-20 rounded-full" />
+              </div>
             </div>
-          </div>
-        ) : (
-          <Categories categories={categories || []} />
-        )}
+          ) : (
+            <Categories categories={categories || []} />
+          )}
+        </div>
 
-        <div className="space-y-4">
+        <div className="flex min-h-0 flex-1 flex-col justify-end gap-4">
           <MiniFooter />
           {/* Existing sidebar ad unit — position frozen. */}
-          <AdBanner />
+          <div className="tth-rail-ad">
+            <AdBanner />
+          </div>
         </div>
       </div>
     </aside>
