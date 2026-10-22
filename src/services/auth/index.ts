@@ -124,6 +124,25 @@ export const forgetPassword = async (payload: { email: string }) => {
   }
 };
 
+// reset password
+export const resetPassword = async (payload: {
+  newPassword: string;
+  token: string;
+}) => {
+  const { token, ...body } = payload;
+
+  try {
+    // The token identifies the account; it is never written into the URL.
+    const res = await axiosInstance.post("/auth/reset-password", body, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    return res.data;
+  } catch (err: any) {
+    return err?.response?.data;
+  }
+};
+
 export const getNewAccessToken = async () => {
   try {
     const cookieStore = await cookies();

@@ -2,113 +2,197 @@
 
 import { useGetAllPosts } from "@/hooks/post.hook";
 import { IPost } from "@/types";
-import {
-  Avatar,
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from "@heroui/react";
-import { format } from "date-fns";
-import { toZonedTime } from "date-fns-tz";
+import { Avatar } from "@heroui/react";
 import Link from "next/link";
-import { CgSpinner } from "react-icons/cg";
-import { AdminDeleteBlogModal } from "../modals";
-import UpdateBlogModal from "../modals/update-blog-modal";
+import { FiArrowUpRight } from "react-icons/fi";
+import { MdOutlineArticle } from "react-icons/md";
+import { AdminDeleteBlogModal, UpdateBlogModal } from "../modals";
+import EmptyState from "../modules/admin/empty-state";
 
-interface IProps {}
+const formatDate = (value?: string) =>
+  value
+    ? new Date(value).toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })
+    : "—";
 
-const BlogsTable = ({}: IProps) => {
-  const {
-    data: res,
-    isLoading,
-    refetch: refetchPosts,
-  } = useGetAllPosts({ limit: "20" });
+const HEADINGS = [
+  "Author",
+  "Article",
+  "Engagement",
+  "Published",
+  "Actions",
+] as const;
+
+/**
+ * Article moderation table. Rows are compact and scannable; the long title is
+ * the only column allowed to wrap, everything numeric is tabular.
+ */
+const BlogsTable = () => {
+  const { data: res, isLoading, isError, refetch } = useGetAllPosts({
+    limit: "20",
+  });
+
+  const posts = Array.isArray(res?.data) ? (res.data as IPost[]) : [];
 
   return (
-    <Table radius="sm" aria-label="Blogs table with dummy data">
-      <TableHeader>
-        <TableColumn>AUTHOR</TableColumn>
-        <TableColumn>TITLE</TableColumn>
-        <TableColumn>PREMIUM</TableColumn>
-        <TableColumn>UPVOTES</TableColumn>
-        <TableColumn>DOWNVOTES</TableColumn>
-        <TableColumn>COMMENTS</TableColumn>
-        <TableColumn>VIEWS</TableColumn>
-        <TableColumn>ACTIONS</TableColumn>
-      </TableHeader>
-      <TableBody
-        isLoading={isLoading} // Set to true if simulating loading state
-        loadingContent={
-          <CgSpinner className="animate-spin text-primary text-3xl" />
-        }
-        emptyContent={"No blogs available"}
-      >
-        {res?.data?.map((blog: IPost) => (
-          <TableRow key={blog._id}>
-            <TableCell>
-              <div className="lg:w-auto w-56">
-                <Link
-                  href={`/users/@${blog.author.username}`}
-                  className="w-full flex space-x-2 items-center"
+    <div className="overflow-hidden rounded-xl border border-default/60">
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[52rem] text-left text-sm">
+          <thead>
+            <tr className="border-b border-default/60 bg-default-50/60 text-[0.6875rem] uppercase tracking-wider text-default-500">
+              {HEADINGS.map((heading) => (
+                <th
+                  key={heading}
+                  scope="col"
+                  className={`px-4 py-2.5 font-semibold ${
+                    heading === "Actions" ? "text-right" : ""
+                  }`}
                 >
-                  <Avatar
-                    src={blog.author.profilePicture}
-                    size="sm"
-                    className="object-cover"
-                  />
-                  <div className="space-y-1">
-                    <h3 className="font-medium">{blog.author.fullName}</h3>
-                    <span className="text-xs text-default-500">
-                      {format(
-                        toZonedTime(new Date(blog.createdAt), "Asia/Dhaka"),
-                        "dd-MM-yyyy hh:mm:ss a"
-                      )}
-                    </span>
-                  </div>
-                </Link>
-              </div>
-            </TableCell>
-            <TableCell>
-              <div className="lg:w-auto w-72">{blog.title}</div>
-            </TableCell>
-            <TableCell>
-              {blog.isPremium ? (
-                <span className="px-3 py-1 bg-secondary/80 text-white rounded-full text-xs">
-                  Yes
-                </span>
-              ) : (
-                <span className="px-3 py-1 bg-primary/80 text-white rounded-full text-xs">
-                  No
-                </span>
-              )}
-            </TableCell>
-            <TableCell>{blog.upVotes}</TableCell>
-            <TableCell>{blog.downVotes}</TableCell>
-            <TableCell>{blog.totalComments}</TableCell>
-            <TableCell>{blog.totalViews}</TableCell>
-            <TableCell className="flex items-center space-x-2">
-              <AdminDeleteBlogModal id={blog._id} refetchPosts={refetchPosts} />
+                  {heading}
+                </th>
+              ))}
+            </tr>
+          </thead>
 
-              <UpdateBlogModal post={blog} refetchPosts={refetchPosts} />
+          <tbody className="divide-y divide-default/60">
+            {isLoading &&
+              Array.from({ length: 5 }).map((_, index) => (
+                <tr key={index} className="animate-pulse">
+                  <td className="px-4 py-3.5" colSpan={HEADINGS.length}>
+                    <div className="h-4 w-full max-w-xl rounded bg-default-100" />
+                  </td>
+                </tr>
+              ))}
 
-              <Button
-                as={Link}
-                href={`/blogs/${blog.slug}`}
-                size="sm"
-                radius="sm"
-                variant="flat"
-              >
-                View
-              </Button>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+            {!isLoading &&
+              posts.map((blog) => (
+                <tr
+                  key={blog._id}
+                  className="align-middle transition-colors hover:bg-default-50/60"
+                >
+                  <td className="px-4 py-3">
+                    <Link
+                      href={`/users/@${blog.author?.username}`}
+                      className="flex items-center gap-2.5"
+                    >
+                      <Avatar
+                        src={blog.author?.profilePicture}
+                        size="sm"
+                        className="size-7 shrink-0 object-cover"
+                        name={(blog.author?.fullName || "?")
+                          .charAt(0)
+                          .toUpperCase()}
+                      />
+                      <span className="min-w-0">
+                        <span className="block max-w-[11rem] truncate font-medium">
+                          {blog.author?.fullName || "Unknown"}
+                        </span>
+                        <span className="block max-w-[11rem] truncate text-xs text-default-500">
+                          @{blog.author?.username}
+                        </span>
+                      </span>
+                    </Link>
+                  </td>
+
+                  <td className="max-w-[22rem] px-4 py-3">
+                    <Link
+                      href={`/blogs/${blog.slug}`}
+                      className="line-clamp-2 font-medium leading-snug transition-colors hover:text-primary"
+                    >
+                      {blog.title}
+                    </Link>
+                    {blog.category?.name && (
+                      <span className="mt-1 block text-xs text-default-500">
+                        {blog.category.name}
+                      </span>
+                    )}
+                  </td>
+
+                  <td className="whitespace-nowrap px-4 py-3">
+                    <div className="flex items-center gap-3 text-xs tabular-nums text-default-600">
+                      <span title="Views">{blog.totalViews ?? 0} views</span>
+                      <span title="Upvotes" className="text-success">
+                        {blog.upVotes ?? 0}↑
+                      </span>
+                      <span title="Downvotes" className="text-danger">
+                        {blog.downVotes ?? 0}↓
+                      </span>
+                      <span title="Comments">
+                        {blog.totalComments ?? 0} comments
+                      </span>
+                    </div>
+                  </td>
+
+                  <td className="whitespace-nowrap px-4 py-3 text-xs tabular-nums text-default-600">
+                    {formatDate(blog.createdAt)}
+                  </td>
+
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-end gap-1">
+                      <AdminDeleteBlogModal
+                        id={blog._id}
+                        refetchPosts={refetch}
+                      />
+                      <UpdateBlogModal
+                        post={blog}
+                        refetchPosts={refetch}
+                      />
+                      <Link
+                        href={`/blogs/${blog.slug}`}
+                        aria-label={`Open ${blog.title}`}
+                        className="inline-flex size-8 items-center justify-center rounded-lg text-default-500 transition-colors hover:bg-default-100 hover:text-foreground"
+                      >
+                        <FiArrowUpRight className="size-4" aria-hidden />
+                      </Link>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      </div>
+
+      {isLoading && (
+        <p className="sr-only" role="status">
+          Loading articles
+        </p>
+      )}
+
+      {!isLoading && posts.length === 0 && (
+        <EmptyState
+          variant="inline"
+          icon={<MdOutlineArticle className="size-5" />}
+          title={isError ? "Articles could not be loaded" : "No articles yet"}
+          description={
+            isError
+              ? "The request failed. Check that the API is running, then reload this page."
+              : "When members publish articles they will appear here for review."
+          }
+          action={
+            <Link
+              href="/"
+              className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+            >
+              Go to the feed
+            </Link>
+          }
+        />
+      )}
+
+      {!isLoading && posts.length > 0 && (
+        <div className="flex items-center justify-between border-t border-default/60 px-4 py-2.5 text-xs text-default-500">
+          <span className="tabular-nums">
+            Showing {posts.length}
+            {res?.meta?.total ? ` of ${res.meta.total}` : ""} articles
+          </span>
+          <span>Sourced from the live API</span>
+        </div>
+      )}
+
+    </div>
   );
 };
 

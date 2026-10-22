@@ -9,13 +9,14 @@ export const metadata: Metadata = {
   keywords: "admin, manage users, user management, access control, dashboard",
 };
 
-interface IProps {}
-
-const ManageUsersPage = async ({}: IProps) => {
+const ManageUsersPage = () => {
   return (
     <div>
-      <DashboardTitle title="Manage Users" />
-      <UsersTable/>
+      <DashboardTitle
+        title="Manage Users"
+        description="Search members, change roles and moderate accounts."
+      />
+      <UsersTable />
     </div>
   );
 };

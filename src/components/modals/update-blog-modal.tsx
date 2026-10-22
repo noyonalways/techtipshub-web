@@ -17,6 +17,7 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { useEffect, useState } from "react";
+import { FiEdit3 } from "react-icons/fi";
 import RichTextEditor from "@/components/editor/rich-text-editor";
 
 interface IProps {
@@ -106,14 +107,16 @@ const UpdateBlogModal = ({ post, refetchPosts }: IProps) => {
   return (
     <>
       <Button
+        isIconOnly
+        aria-label="Edit article"
         isLoading={isPending}
         color="primary"
         size="sm"
-        radius="sm"
+        radius="lg"
         variant="flat"
         onClick={handleOpen}
       >
-        {isPending ? "Updating...": "Update"}
+        {isPending ? null : <FiEdit3 className="size-4" aria-hidden />}
       </Button>
 
       <Modal

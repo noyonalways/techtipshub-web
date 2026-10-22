@@ -1,47 +1,59 @@
-'use client'
-
 import AdminSidebar from "@/components/shared/admin-sidebar";
 import NavarDropdown from "@/components/ui/navbar-dropdown";
-import { useParams, usePathname } from "next/navigation";
-import { BiChevronRight } from "react-icons/bi";
+import { adminLinks } from "@/components/shared/admin-sidebar/admin-links";
 
-interface IProps {
+/**
+ * Admin shell.
+ *
+ * Rendered on the server so the page title and date are stable on reload; the
+ * only interactive parts are the sidebar and the account menu in the top bar.
+ */
+const AdminLayout = async ({
+  children,
+}: {
   children: React.ReactNode;
-}
-
-const AdminLayout: React.FC<IProps> = ({ children }) => {
-  const pathname = usePathname()
+}) => {
+  const today = new Date().toLocaleDateString("en-GB", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 
   return (
-    <main>
-      <div className="flex flex-col lg:flex-row">
-        <>
-          <AdminSidebar />
-        </>
+    <div className="min-h-dvh lg:flex">
+      <AdminSidebar />
 
-        <div className="flex-1">
-          <div className="hidden lg:flex justify-between items-center border-b border-default/50 lg:px-8 sticky top-0 bg-background z-50">
-            <div className="flex items-center lg:py-6 space-x-2">
-              <span className="text-gray-500">Admin</span>
-              <span><BiChevronRight /></span>
-              <span className="text-gray-500 capitalize">
-                {/* manage-users */}
-                {pathname?.replace('/admin/', '')?.replace("-", " ") || 'Dashboard'}
-              </span>
-            </div>
+      <div className="min-w-0 flex-1">
+        <header className="sticky top-0 z-40 hidden h-16 items-center justify-between gap-4 border-b border-default/60 bg-background/90 px-6 backdrop-blur-md lg:flex xl:px-8">
+          <nav aria-label="Breadcrumb">
+            <ol className="flex items-center gap-2 text-sm">
+              <li className="text-default-500">Admin</li>
+              {adminLinks.map((link) => (
+                <li key={link.id} className="hidden items-center gap-2 xl:flex">
+                  <span aria-hidden className="text-default-300">
+                    /
+                  </span>
+                  <span className="text-default-700">{link.label}</span>
+                </li>
+              ))}
+            </ol>
+          </nav>
+
+          <div className="flex items-center gap-4">
+            <span className="text-xs uppercase tracking-wider text-default-400">
+              {today}
+            </span>
+            <div className="h-5 w-px bg-default/60" aria-hidden />
             <NavarDropdown />
           </div>
-          <div className="lg:px-8 pt-4 pb-6 px-4 mt-20 lg:mt-0">{children}</div>
-        </div>
+        </header>
 
-        {/* <div className="pt-20 px-2 pb-2 lg:p-6 flex-1">
-          <div className="hidden lg:justify-end lg:flex border-b">
-            <NavarDropdown />
-          </div>
+        <main className="mx-auto w-full max-w-[100rem] px-4 pb-16 pt-6 sm:px-6 lg:px-8 lg:pt-8">
           {children}
-        </div> */}
+        </main>
       </div>
-    </main>
+    </div>
   );
 };
 

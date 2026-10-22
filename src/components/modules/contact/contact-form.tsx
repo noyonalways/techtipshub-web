@@ -121,7 +121,7 @@ const ContactForm = () => {
               {isSubmitting ? "Sending…" : "Send message"}
             </Button>
             <p className="text-xs text-default-500">
-              A real person reads every message.
+              Redacted examples are fine — never paste credentials.
             </p>
           </div>
         </div>

@@ -5,14 +5,14 @@ import Link from "next/link";
 
 const siteLinks = [
   { label: "Feed", href: "/" },
-  { label: "Premium", href: "/subscriptions" },
+  { label: "Features", href: "/features" },
   { label: "About", href: "/about-us" },
   { label: "Contact", href: "/contact-us" },
 ];
 
 const supportLinks = [
   { label: "About the platform", href: "/about-us" },
-  { label: "Membership", href: "/subscriptions" },
+  { label: "Features", href: "/features" },
   { label: "Contact us", href: "/contact-us" },
 ];
 

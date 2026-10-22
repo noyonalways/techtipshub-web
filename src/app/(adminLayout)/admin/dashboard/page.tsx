@@ -9,12 +9,13 @@ export const metadata: Metadata = {
   keywords: "Admin Dashboard, TechTips Hub, admin panel, management, insights",
 };
 
-interface IProps {}
-
-const AdminDashboard: React.FC<IProps> = () => {
+const AdminDashboard = () => {
   return (
     <div>
-      <DashboardTitle title="Dashboard" />
+      <DashboardTitle
+        title="Dashboard"
+        description="Traffic, engagement and growth across the whole site."
+      />
       <DashboardContent />
     </div>
   );

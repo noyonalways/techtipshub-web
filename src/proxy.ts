@@ -3,7 +3,12 @@ import { getCurrentUser } from "./services/auth";
 
 type Role = keyof typeof roleBasedRoutes;
 
-const authRoutes = ["/login", "/signup", "/forget-password"];
+const authRoutes = [
+  "/login",
+  "/signup",
+  "/forget-password",
+  "/reset-password",
+];
 const roleBasedRoutes = {
   User: [
     "/profile",
@@ -16,7 +21,6 @@ const roleBasedRoutes = {
     "/profile",
     "/admin/dashboard",
     "/admin/manage-users",
-    "/admin/all-payments",
     "/admin/manage-blogs",
     "/settings",
     "/settings/manage-blogs",
@@ -66,12 +70,12 @@ export const config = {
     "/login",
     "/signup",
     "/forget-password",
+    "/reset-password",
     "/settings",
     "/settings/manage-blogs",
     "/admin/manage-blogs",
     "/admin/dashboard",
     "/admin/manage-users",
-    "/admin/all-payments",
     "/write-blog",
   ],
 };

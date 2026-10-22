@@ -1,8 +1,6 @@
 export * from "./auth.type";
 export * from "./category.type";
-export * from "./payment.type";
 export * from "./post.type";
-export * from "./subscription.type";
 export * from "./user.type";
 export * from "./follower.type"
 

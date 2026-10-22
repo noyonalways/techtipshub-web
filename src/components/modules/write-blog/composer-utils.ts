@@ -80,7 +80,6 @@ export const buildPostPayload = (
     category: values.category,
     tags: values.tags,
     contentType: "html",
-    isPremium: false,
   };
 
   formData.append("data", JSON.stringify(postData));

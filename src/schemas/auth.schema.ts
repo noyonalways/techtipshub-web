@@ -21,7 +21,7 @@ export const signUpValidationSchema = z.object({
     .string({
       error: "Password is required",
     })
-    .min(1, "Password is required"),
+    .min(6, "Use at least 6 characters"),
   dateOfBirth: z
     .object(
       { day: z.number(), month: z.number(), year: z.number() },
@@ -60,3 +60,16 @@ export const passwordResetValidationSchema = z.object({
     })
     .trim(),
 });
+
+/** Used by the in-app reset page: a new password and its confirmation. */
+export const newPasswordValidationSchema = z
+  .object({
+    newPassword: z
+      .string({ error: "Password is required" })
+      .min(6, "Use at least 6 characters"),
+    confirmPassword: z.string({ error: "Confirm your password" }),
+  })
+  .refine((values) => values.newPassword === values.confirmPassword, {
+    message: "The passwords do not match",
+    path: ["confirmPassword"],
+  });

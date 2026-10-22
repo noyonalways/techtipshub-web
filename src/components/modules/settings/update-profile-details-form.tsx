@@ -1,20 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import Loading from "@/components/loading";
 import THForm from "@/components/form/th-from";
 import THInput from "@/components/form/th-input";
 import THTextarea from "@/components/form/th-textarea";
+import { useUpdateProfile } from "@/hooks/user.hook";
 import { IUser } from "@/types";
-import {
-  Avatar,
-  Button,
-} from "@heroui/react";
+import { Avatar, Button } from "@heroui/react";
+import { useState } from "react";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 import { GoImage } from "react-icons/go";
-import { useUpdateProfile } from "@/hooks/user.hook";
-import Loading from "@/components/loading";
 
-interface IProps extends IUser {}
+interface IProps extends Partial<IUser> {}
+
+const fieldLabel =
+  "mb-1 block text-xs font-semibold uppercase tracking-wider text-default-500";
 
 const UpdateProfileDetailsForm = ({
   fullName,
@@ -44,9 +44,6 @@ const UpdateProfileDetailsForm = ({
     }
 
     updateProfile(formData);
-
-    //! this for development purpose just for checking the data
-    // console.log(Object.fromEntries(formData));
   };
 
   return (
@@ -56,29 +53,34 @@ const UpdateProfileDetailsForm = ({
         onSubmit={onSubmit}
         defaultValues={{ fullName, designation, location, phone, bio }}
       >
-        <div className="space-y-6">
-          <div className="space-y-1">
-            <label htmlFor="profilePicture" className="block font-medium">
-              Profile Image
-            </label>
-            <div className="border-default/70 p-4 rounded-xl border-2 flex items-center space-x-4">
+        <div className="space-y-8">
+          {/* Identity */}
+          <section aria-labelledby="profile-identity">
+            <h2 id="profile-identity" className="text-sm font-semibold">
+              Profile photo
+            </h2>
+            <p className="mt-1 text-sm text-default-500">
+              Shown beside your name on articles and comments.
+            </p>
+
+            <div className="mt-4 flex flex-col gap-4 border-b border-default/60 pb-8 sm:flex-row sm:items-center sm:gap-6">
               <Avatar
-                className="w-28 h-28 lg:size-28 object-cover text-3xl font-bold"
+                className="size-20 shrink-0 object-cover text-2xl font-bold"
                 radius="full"
                 src={previewImage}
-                color="primary"
+                name={(fullName || "?").charAt(0).toUpperCase()}
               />
-              <div className="flex flex-col space-y-2 items-center">
+              <div className="space-y-1.5">
                 <Button
                   as="label"
                   size="sm"
                   htmlFor="profilePicture"
-                  radius="full"
-                  variant="solid"
-                  color="primary"
-                  startContent={<GoImage size={18} />}
+                  radius="lg"
+                  variant="bordered"
+                  className="cursor-pointer font-medium"
+                  startContent={<GoImage size={16} />}
                 >
-                  Change Image
+                  Choose image
                   <input
                     type="file"
                     id="profilePicture"
@@ -88,77 +90,93 @@ const UpdateProfileDetailsForm = ({
                     onChange={handleImageChange}
                   />
                 </Button>
-                <p className="text-xs">PNG, JPEG: 500 x 500</p>
+                <p className="text-xs text-default-500">
+                  Square image, at least 500 × 500 px. PNG or JPEG.
+                </p>
               </div>
             </div>
-          </div>
-          <div className="space-y-1">
-            <label htmlFor="fullName" className="block font-medium">
-              Full Name
-            </label>
-            <THInput
-              name="fullName"
-              variant="bordered"
-              placeholder="Full Name"
-              size="lg"
-              radius="md"
-              id="fullName"
-            />
-          </div>
-          <div className="space-y-1">
-            <label htmlFor="designation" className="block font-medium">
-              Designation
-            </label>
-            <THInput
-              name="designation"
-              variant="bordered"
-              placeholder="Designation"
-              size="lg"
-              radius="md"
-              id="designation"
-            />
-          </div>
-          <div className="space-y-1">
-            <label htmlFor="location" className="block font-medium">
-              Location
-            </label>
-            <THInput
-              name="location"
-              variant="bordered"
-              placeholder="Location"
-              size="lg"
-              radius="md"
-              id="location"
-            />
-          </div>
-          <div className="space-y-1">
-            <label htmlFor="phone" className="block font-medium">
-              Phone
-            </label>
-            <THInput
-              name="phone"
-              variant="bordered"
-              placeholder="Phone"
-              size="lg"
-              radius="md"
-              id="phone"
-            />
-          </div>
-          <div className="space-y-1">
-            <label className="block font-medium">Profile Bio</label>
-            <THTextarea
-              name="bio"
-              variant="bordered"
-              placeholder="Bio..."
-              size="lg"
-              radius="md"
-            />
-          </div>
-          <div className="flex justify-end">
-            <Button radius="full" color="primary" variant="solid" type="submit">
-              Update Details
-            </Button>
-          </div>
+          </section>
+
+          {/* Details */}
+          <section aria-labelledby="profile-details">
+            <h2 id="profile-details" className="text-sm font-semibold">
+              Public details
+            </h2>
+            <p className="mt-1 text-sm text-default-500">
+              These appear on your profile and next to your articles.
+            </p>
+
+            <div className="mt-5 grid gap-5 sm:grid-cols-2">
+              <div className="sm:col-span-2">
+                <label htmlFor="fullName" className={fieldLabel}>
+                  Full name
+                </label>
+                <THInput
+                  name="fullName"
+                  variant="bordered"
+                  placeholder="Your name"
+                  radius="lg"
+                  id="fullName"
+                />
+              </div>
+              <div>
+                <label htmlFor="designation" className={fieldLabel}>
+                  Designation
+                </label>
+                <THInput
+                  name="designation"
+                  variant="bordered"
+                  placeholder="e.g. Full-stack developer"
+                  radius="lg"
+                  id="designation"
+                />
+              </div>
+              <div>
+                <label htmlFor="location" className={fieldLabel}>
+                  Location
+                </label>
+                <THInput
+                  name="location"
+                  variant="bordered"
+                  placeholder="City, country"
+                  radius="lg"
+                  id="location"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label htmlFor="phone" className={fieldLabel}>
+                  Phone
+                </label>
+                <THInput
+                  name="phone"
+                  variant="bordered"
+                  placeholder="Never shown publicly"
+                  radius="lg"
+                  id="phone"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className={fieldLabel}>Bio</label>
+                <THTextarea
+                  name="bio"
+                  variant="bordered"
+                  placeholder="A short introduction — what you work on, what you write about."
+                  radius="lg"
+                />
+              </div>
+            </div>
+
+            <div className="mt-6 flex items-center justify-end gap-3 border-t border-default/60 pt-5">
+              <Button
+                radius="lg"
+                color="primary"
+                className="font-semibold"
+                type="submit"
+              >
+                Save changes
+              </Button>
+            </div>
+          </section>
         </div>
       </THForm>
     </>

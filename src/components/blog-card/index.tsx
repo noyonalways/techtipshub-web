@@ -19,7 +19,6 @@ const BlogCard = ({
   totalComments,
   coverImage,
   createdAt,
-  isPremium,
   downVotes,
   upVotes,
   category,
@@ -48,11 +47,6 @@ const BlogCard = ({
               <span className="rounded-full bg-default-100 px-2 py-0.5 font-medium text-default-600 dark:bg-default-50">
                 {category?.name}
               </span>
-              {isPremium && (
-                <span className="rounded-full bg-primary-100 px-2 py-0.5 font-medium text-primary dark:bg-primary/20 dark:text-primary-200">
-                  Premium
-                </span>
-              )}
             </div>
 
             <h2 className="text-pretty text-xl font-bold leading-snug tracking-tight text-foreground transition-colors group-hover:text-primary sm:text-[1.375rem]">
@@ -97,14 +91,6 @@ const BlogCard = ({
           >
             {author?.fullName}
           </Link>
-          {author?.isPremiumUser && (
-            <span
-              title="Premium author"
-              className="rounded bg-default-100 px-1.5 py-0.5 text-[0.625rem] font-semibold uppercase tracking-wide text-default-600 dark:bg-default-50"
-            >
-              Pro
-            </span>
-          )}
           {publishedOn && (
             <>
               <span aria-hidden className="text-default-400">

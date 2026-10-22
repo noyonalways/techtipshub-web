@@ -7,10 +7,10 @@ import { ReactNode } from "react";
 interface IProps {
   redirect: string;
   buttonContent: ReactNode;
+  className?: string;
 }
 
-const AuthenticationModal = ({ redirect, buttonContent, ...props }: IProps) => {
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+const AuthenticationModal = ({ redirect, buttonContent, ...props }: IProps) => {  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   return (
     <>
       <Button onPress={onOpen} {...props} >

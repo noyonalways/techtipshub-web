@@ -68,7 +68,7 @@ const FollowUnFollowButton: React.FC<IProps> = ({ id }) => {
   const props = {
     size: "sm",
     radius: "full",
-    variant: "solid",
+    variant: "bordered",
     color: "primary",
     startContent: <GoPlus className="text-lg" />,
   };
@@ -81,6 +81,7 @@ const FollowUnFollowButton: React.FC<IProps> = ({ id }) => {
           radius="full"
           variant="solid"
           color="primary"
+          className="w-full"
           isLoading={isLoading}
          />
       ) : (
@@ -93,8 +94,9 @@ const FollowUnFollowButton: React.FC<IProps> = ({ id }) => {
                   isDisabled={loggedInUser?._id === id}
                   size="sm"
                   radius="full"
-                  variant="solid"
+                  variant="bordered"
                   color="primary"
+                  className="w-full"
                   startContent={<HiMinus className="text-lg" />}
                 >
                   Unfollow
@@ -107,8 +109,9 @@ const FollowUnFollowButton: React.FC<IProps> = ({ id }) => {
                   }
                   size="sm"
                   radius="full"
-                  variant="solid"
+                  variant="bordered"
                   color="primary"
+                  className="w-full"
                   startContent={<GoPlus className="text-lg" />}
                 >
                   Follow
@@ -120,6 +123,7 @@ const FollowUnFollowButton: React.FC<IProps> = ({ id }) => {
               redirect={redirectPath}
               buttonContent={"Follow"}
               {...props}
+              className="w-full"
             />
           )}
         </>

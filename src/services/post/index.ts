@@ -136,9 +136,24 @@ export const getLoggedInUserPosts = async (
   }
 };
 
-export const getPostsByUserId = async (userId: string) => {
+export const getPostsByUserId = async (
+  userId: string,
+  params?: Record<string, string | undefined>
+) => {
   try {
-    const res = await fetch(`${envConfig.baseApi}/posts/users/${userId}`, {
+    const url = new URL(`${envConfig.baseApi}/posts/users/${userId}`);
+
+    if (params) {
+      Object.keys(params).forEach((key) => {
+        const value = params[key];
+        if (value !== undefined) {
+          url.searchParams.append(key, value);
+        }
+      });
+    }
+
+    const res = await fetch(url.toString(), {
+      cache: "no-store",
       next: {
         tags: ["allPosts"],
       },
@@ -147,6 +162,39 @@ export const getPostsByUserId = async (userId: string) => {
     return res.json();
   } catch (err: any) {
     throw new Error(err?.message);
+  }
+};
+
+/**
+ * Record a read for a post and get its fresh view total.
+ *
+ * Called with the reader's token when they are signed in (so they count once
+ * per account) and with a pseudonymous `visitorId` for guests. Never throws, so
+ * a failed count can't break the article page.
+ */
+export const recordPostView = async (
+  slug: string,
+  visitorId?: string
+) => {
+  try {
+    const accessToken = (await cookies()).get("tth_access_token")?.value;
+
+    const res = await fetch(
+      `${envConfig.baseApi}/views/${encodeURIComponent(slug)}`,
+      {
+        method: "POST",
+        cache: "no-store",
+        headers: {
+          "Content-Type": "application/json",
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        },
+        body: JSON.stringify(visitorId ? { visitorId } : {}),
+      }
+    );
+
+    return await res.json();
+  } catch (err: any) {
+    return { success: false, error: err?.message };
   }
 };
 
@@ -175,6 +223,8 @@ export const commentOnPost = async (postId: string, payload: FormData) => {
     const res = await axiosInstance.post(`/posts/${postId}/comments`, payload);
 
     updateTag("comments");
+    // The article's comment total is shown next to the counter, so refresh it.
+    updateTag("singlePost");
 
     return await res?.data;
   } catch (err: any) {
@@ -185,11 +235,15 @@ export const commentOnPost = async (postId: string, payload: FormData) => {
 // get all comments by post id
 export const getCommentsByPostId = async (postId: string) => {
   try {
-    const res = await fetch(`${envConfig.baseApi}/posts/${postId}/comments?limit=20`, {
-      next: {
-        tags: ["comments"],
-      },
-    });
+    const res = await fetch(
+      `${envConfig.baseApi}/posts/${postId}/comments?limit=100`,
+      {
+        cache: "no-store",
+        next: {
+          tags: ["comments"],
+        },
+      }
+    );
 
     return res?.json();
   } catch (err: any) {

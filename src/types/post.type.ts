@@ -7,12 +7,14 @@ export interface IPost {
   title: string;
   slug: string;
   contentType: string;
+  /** Absent for guests — the API returns a preview without the body. */
   content: string;
+  /** True when the API withheld the body because the visitor is a guest. */
+  isLocked?: boolean;
   coverImage: string;
   category: ICategory;
   images: any[];
   tags: string[];
-  isPremium: boolean;
   upVotes: number;
   downVotes: number;
   totalComments: number;

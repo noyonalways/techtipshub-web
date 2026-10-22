@@ -4,7 +4,7 @@ import THDatePicker from "@/components/form/th-date-picker";
 import THForm from "@/components/form/th-from";
 import THInput from "@/components/form/th-input";
 import THSelect from "@/components/form/th-select";
-import Loading from "@/components/loading";
+import SignupAvatarPicker from "@/components/modules/auth/signup-avatar-picker";
 import { useUserRegister } from "@/hooks/auth.hook";
 import { signUpValidationSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,43 +15,36 @@ import { FieldValues, SubmitHandler } from "react-hook-form";
 import { PiEyeLight, PiEyeSlashLight } from "react-icons/pi";
 
 const options = [
-  {
-    key: "Male",
-    label: "Male",
-  },
-  {
-    key: "Female",
-    label: "Female",
-  },
-  {
-    key: "Other",
-    label: "Other",
-  },
+  { key: "Male", label: "Male" },
+  { key: "Female", label: "Female" },
+  { key: "Other", label: "Other" },
 ];
 
-interface IProps {}
+const label =
+  "mb-1 block text-xs font-semibold uppercase tracking-wider text-default-500";
 
-const SignUpForm: React.FC<IProps> = () => {
+const SignUpForm = () => {
   const [isPassword, setIsPassword] = useState(true);
   const router = useRouter();
-  const { mutate: registerUser, isPending, data } = useUserRegister();
+  const { mutate: registerUser, isPending, data, isError, error } =
+    useUserRegister();
 
-  const onSubmit: SubmitHandler<FieldValues> = (data) => {
+  const onSubmit: SubmitHandler<FieldValues> = (values) => {
     const formData = new FormData();
 
     const registerData = {
-      fullName: data.fullName,
-      username: data.username,
-      email: data.email,
-      password: data.password,
-      gender: data.gender,
-      dateOfBirth: data.dateOfBirth,
+      fullName: values.fullName,
+      username: values.username,
+      email: values.email,
+      password: values.password,
+      gender: values.gender,
+      dateOfBirth: values.dateOfBirth,
     };
 
     formData.append("data", JSON.stringify(registerData));
 
-    if (data.image.length > 0) {
-      formData.append("image", data.image[0]);
+    if (values.image?.length > 0) {
+      formData.append("image", values.image[0]);
     }
 
     registerUser(formData);
@@ -63,6 +56,10 @@ const SignUpForm: React.FC<IProps> = () => {
     }
   }, [isPending, data, router]);
 
+  const errorMessage =
+    (data && !data.success && data.message) ||
+    (isError ? error?.message : undefined);
+
   return (
     <Suspense>
       <THForm
@@ -70,81 +67,120 @@ const SignUpForm: React.FC<IProps> = () => {
         resolver={zodResolver(signUpValidationSchema)}
         key={JSON.stringify("default_key")}
       >
-        <div className="space-y-2 mb-6">
-          <THInput
-            variant="faded"
-            radius="sm"
-            name="image"
-            label="Profile Image"
-            type="file"
-            accept="image/jpeg, image/png, image/jpg"
-          />
-          <THInput
-            variant="faded"
-            radius="sm"
-            name="fullName"
-            label="Full Name"
-            isRequired
-          />
-          <THInput
-            variant="faded"
-            radius="sm"
-            name="email"
-            label="Email Address"
-            isRequired
-          />
-          <THInput
-            variant="faded"
-            radius="sm"
-            name="username"
-            label="Username"
-            isRequired
-          />
-          <div className="relative">
-            <THInput
-              variant="faded"
-              radius="sm"
-              name="password"
-              label="Password"
-              isRequired
-              type={isPassword ? "password" : "text"}
-            />
-            <Button
-              variant="light"
-              size="sm"
-              radius="full"
-              isIconOnly
-              onClick={() => setIsPassword(!isPassword)}
-              type="button"
-              className="absolute top-3 right-2 text-lg"
-            >
-              {isPassword ? <PiEyeLight /> : <PiEyeSlashLight />}
-            </Button>
+        <div className="space-y-4">
+          <SignupAvatarPicker />
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <label htmlFor="fullName" className={label}>
+                Full name
+              </label>
+              <THInput
+                variant="bordered"
+                radius="lg"
+                name="fullName"
+                id="fullName"
+                placeholder="Your name"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="username" className={label}>
+                Username
+              </label>
+              <THInput
+                variant="bordered"
+                radius="lg"
+                name="username"
+                id="username"
+                placeholder="e.g. noyon"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="email" className={label}>
+                Email
+              </label>
+              <THInput
+                variant="bordered"
+                radius="lg"
+                name="email"
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+              />
+            </div>
+
+            <div className="sm:col-span-2">
+              <label htmlFor="password" className={label}>
+                Password
+              </label>
+              <div className="relative">
+                <THInput
+                  variant="bordered"
+                  radius="lg"
+                  name="password"
+                  id="password"
+                  placeholder="At least 6 characters"
+                  type={isPassword ? "password" : "text"}
+                />
+                <Button
+                  variant="light"
+                  size="sm"
+                  radius="full"
+                  isIconOnly
+                  onClick={() => setIsPassword(!isPassword)}
+                  type="button"
+                  aria-label={isPassword ? "Show password" : "Hide password"}
+                  className="absolute right-1 top-1/2 -translate-y-1/2 text-lg"
+                >
+                  {isPassword ? <PiEyeLight /> : <PiEyeSlashLight />}
+                </Button>
+              </div>
+            </div>
+
+            <div>
+              <label className={label}>Gender</label>
+              <THSelect
+                radius="lg"
+                size="md"
+                variant="bordered"
+                name="gender"
+                options={options}
+                placeholder="Select gender"
+                aria-label="Gender"
+              />
+            </div>
+
+            <div>
+              <label className={label}>Date of birth</label>
+              <THDatePicker
+                variant="bordered"
+                radius="lg"
+                name="dateOfBirth"
+                aria-label="Date of birth"
+              />
+            </div>
           </div>
-          <THSelect
-            label="Select Gender"
-            radius="sm"
-            size="md"
-            variant="faded"
-            name="gender"
-            options={options}
-            isRequired
-          />
-          <THDatePicker
-            variant="faded"
-            name="dateOfBirth"
-            label="Date of Birth"
-            isRequired
-          />
+
+          {errorMessage && (
+            <p
+              role="alert"
+              className="rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger"
+            >
+              {errorMessage}
+            </p>
+          )}
+
           <Button
             isLoading={isPending}
             type="submit"
             color="primary"
             variant="solid"
-            radius="sm"
-            className="w-full"
+            radius="lg"
+            className="w-full font-semibold"
           >
-            {isPending ? "Signing UP..." : "Sign Up"}
+            {isPending ? "Creating account…" : "Create account"}
           </Button>
         </div>
       </THForm>

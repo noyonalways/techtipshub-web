@@ -2,12 +2,9 @@
 
 import CommentUpdateModal from "@/components/modals/update-comment-modal";
 import { useUser } from "@/context/user.provider";
-import {
-  useDeleteCommentByUser,
-  useUpdateCommentByUser,
-} from "@/hooks/post.hook";
+import { useDeleteCommentByUser } from "@/hooks/post.hook";
 import { Button } from "@heroui/react";
-import { MdDelete, MdModeEdit } from "react-icons/md";
+import { MdDelete } from "react-icons/md";
 
 interface IProps {
   commentUserEmail: string;

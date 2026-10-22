@@ -6,6 +6,7 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useDeletePostByAdminUsingId, useUpdatePostByUserUsingId } from "@/hooks/post.hook";
+import { FiTrash2 } from "react-icons/fi";
 
 interface IProps {
   id: string;
@@ -39,14 +40,16 @@ const AdminDeleteBlogModal = ({ id, refetchPosts }: IProps) => {
   return (
     <>
       <Button
+        isIconOnly
         isLoading={isPending}
         color="danger"
         size="sm"
-        radius="sm"
+        radius="lg"
         variant="flat"
         onPress={onOpen}
+        aria-label="Delete article"
       >
-        {isPending ? "Deleting..." : "Delete"}
+        {isPending ? null : <FiTrash2 className="size-4" aria-hidden />}
       </Button>
 
       <Modal size="md" isOpen={isOpen} onOpenChange={onOpenChange}>

@@ -1,6 +1,7 @@
 import { useDeleteUserAccount } from "@/hooks/user.hook";
 import { Button } from "@heroui/button";
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@heroui/modal";
+import { FiTrash2 } from "react-icons/fi";
 
 interface IProps {
   id: string;
@@ -27,12 +28,14 @@ const DeleteUserAccountConfirmationModal = ({ id, role, reFetchUsers }: IProps) 
         isDisabled={role === "Admin"}
         onClick={onOpen}
         size="sm"
-        radius="sm"
+        radius="lg"
         variant="flat"
         color="danger"
         isLoading={isPending}
+        isIconOnly
+        aria-label="Delete account"
       >
-        Delete Account
+        {isPending ? null : <FiTrash2 className="size-4" aria-hidden />}
       </Button>
 
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>

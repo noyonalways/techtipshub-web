@@ -38,10 +38,6 @@ export const siteConfig = {
       label: "Contact Us",
       href: "/contact-us",
     },
-    {
-      label: "Premium",
-      href: "/subscriptions",
-    },
   ],
   links: {
     github: "https://github.com/nextui-org/nextui",

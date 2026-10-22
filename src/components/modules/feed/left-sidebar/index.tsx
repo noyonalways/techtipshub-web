@@ -5,10 +5,8 @@ import Link from "next/link";
 import { useUser } from "@/context/user.provider";
 import { PiMagicWandLight, PiUsers } from "react-icons/pi";
 import { HiOutlinePencilSquare } from "react-icons/hi2";
-import { GoDiamond } from "react-icons/go";
 import { FiBookOpen, FiInfo, FiMail } from "react-icons/fi";
 import AdBanner from "@/components/adsense/ad-banner";
-import SubscriptionsStatus from "../subscriptions-status";
 
 interface NavItem {
   href: string;
@@ -42,11 +40,6 @@ const exploreItems: NavItem[] = [
     href: "/contact-us",
     label: "Contact",
     icon: <FiMail className="text-lg" />,
-  },
-  {
-    href: "/subscriptions",
-    label: "Go Premium",
-    icon: <GoDiamond className="text-lg" />,
   },
 ];
 
@@ -128,7 +121,6 @@ const LeftSideBar = () => {
             lived. The block claims the space under the navigation and caps
             itself so the rail never needs an internal scrollbar. */}
         <div className="flex min-h-0 flex-1 flex-col justify-end gap-4 pt-6">
-          <SubscriptionsStatus />
           <div className="tth-rail-ad">
             <AdBanner />
           </div>

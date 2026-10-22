@@ -1,570 +1,290 @@
 "use client";
 
+import ActivityChart, {
+  activitySeries as series,
+  type ActivityPoint,
+} from "@/components/modules/admin/dashboard/activity-chart";
+import EmptyState from "@/components/modules/admin/empty-state";
+import MetricTile from "@/components/modules/admin/metric-tile";
+import SectionCard from "@/components/modules/admin/section-card";
 import { useDashboardMetrics } from "@/hooks/metrics";
+import { Skeleton } from "@heroui/react";
+import Link from "next/link";
 import {
-  Avatar,
-  Card,
-  CardBody,
-  CardHeader,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from "@heroui/react";
-import React from "react";
-import {
-  RiArrowUpLine,
+  RiArrowRightLine,
+  RiArticleLine,
   RiChat1Line,
   RiEyeLine,
-  RiThumbUpLine,
-  RiThumbDownLine,
-  RiMoneyDollarCircleLine,
   RiFileList3Line,
+  RiThumbDownLine,
+  RiThumbUpLine,
   RiUser3Line,
-  RiArrowDownLine,
 } from "react-icons/ri";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-import DashboardContentSkeleton from "./loading-skeleton";
+
+interface MetricBucket {
+  total?: number;
+  currentMonth?: number;
+  lastMonthDiff?: string;
+  type?: string;
+}
+
+interface DashboardMetrics {
+  users?: MetricBucket;
+  views?: MetricBucket;
+  upvotes?: MetricBucket;
+  downvotes?: MetricBucket;
+  comments?: MetricBucket;
+  posts?: MetricBucket;
+  chartData?: ActivityPoint[];
+}
+
+const number = (value?: number) => (value ?? 0).toLocaleString();
+
+/** "N/A" is what the API returns when there is no previous period. */
+const deltaOf = (bucket?: MetricBucket) =>
+  bucket?.lastMonthDiff && bucket.lastMonthDiff !== "N/A"
+    ? bucket.lastMonthDiff
+    : undefined;
+
+const QuickLink = ({
+  href,
+  title,
+  description,
+}: {
+  href: string;
+  title: string;
+  description: string;
+}) => (
+  <Link
+    href={href}
+    className="group flex items-start justify-between gap-3 rounded-xl border border-default/60 px-4 py-3 transition-colors hover:border-primary/40 hover:bg-primary/5"
+  >
+    <span>
+      <span className="block text-sm font-semibold">{title}</span>
+      <span className="mt-0.5 block text-xs text-default-500">
+        {description}
+      </span>
+    </span>
+    <RiArrowRightLine
+      aria-hidden
+      className="mt-0.5 size-4 shrink-0 text-default-300 transition-colors group-hover:text-primary"
+    />
+  </Link>
+);
+
+const DashboardSkeleton = () => (
+  <div className="space-y-6">
+    <div className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-default/60 bg-default/60 lg:grid-cols-4">
+      {Array.from({ length: 4 }).map((_, index) => (
+        <div key={index} className="space-y-3 bg-background p-4">
+          <Skeleton className="h-3 w-20 rounded" />
+          <Skeleton className="h-7 w-16 rounded" />
+          <Skeleton className="h-3 w-24 rounded" />
+        </div>
+      ))}
+    </div>
+    <section className="rounded-xl border border-default/60">
+      <div className="border-b border-default/60 px-5 py-3.5">
+        <Skeleton className="h-4 w-28 rounded" />
+      </div>
+      <div className="p-5">
+        <Skeleton className="h-56 w-full rounded-lg" />
+      </div>
+    </section>
+  </div>
+);
 
 export default function AdminDashboard() {
-  const recentActivity = [
+  const { data: res, isLoading, isError } = useDashboardMetrics();
+  const data = (res?.data ?? {}) as DashboardMetrics;
+
+  if (isLoading) return <DashboardSkeleton />;
+
+  if (isError || !res?.data) {
+    return (
+      <EmptyState
+        title="Metrics are unavailable"
+        description={
+          res?.message ||
+          "The dashboard could not reach the metrics API. Reload the page, or check that the server is running."
+        }
+      />
+    );
+  }
+
+  const chartData = Array.isArray(data.chartData) ? data.chartData : [];
+  const hasSignal = chartData.some(
+    (month) =>
+      month.views + month.posts + month.users + month.comments > 0
+  );
+
+  const headline = [
     {
-      id: 1,
-      type: "Comment",
-      content: "Great article!",
-      user: "John Doe",
-      avatar: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
-      timestamp: "2 mins ago",
+      label: "Total views",
+      value: number(data.views?.total),
+      icon: <RiEyeLine className="size-4" />,
+      bucket: data.views,
     },
     {
-      id: 2,
-      type: "Upvote",
-      content: "How to optimize React apps",
-      user: "Jane Smith",
-      avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704d",
-      timestamp: "5 mins ago",
+      label: "Articles",
+      value: number(data.posts?.total),
+      icon: <RiFileList3Line className="size-4" />,
+      bucket: data.posts,
     },
     {
-      id: 3,
-      type: "Blog Post",
-      content: "10 Tips for Better Code",
-      user: "Alice Johnson",
-      avatar: "https://i.pravatar.cc/150?u=a04258114e29026702d",
-      timestamp: "10 mins ago",
+      label: "Members",
+      value: number(data.users?.total),
+      icon: <RiUser3Line className="size-4" />,
+      bucket: data.users,
     },
     {
-      id: 4,
-      type: "Review",
-      content: "5 stars - Excellent tutorial",
-      user: "Bob Wilson",
-      avatar: "https://i.pravatar.cc/150?u=a048581f4e29026701d",
-      timestamp: "15 mins ago",
-    },
-    {
-      id: 5,
-      type: "Downvote",
-      content: "Common coding mistakes",
-      user: "Charlie Brown",
-      avatar: "https://i.pravatar.cc/150?u=a092581f4e29026700d",
-      timestamp: "20 mins ago",
+      label: "Comments",
+      value: number(data.comments?.total),
+      icon: <RiChat1Line className="size-4" />,
+      bucket: data.comments,
     },
   ];
 
-  const { data: metricsData, isLoading } = useDashboardMetrics();
+  const engagement = [
+    {
+      label: "Upvotes",
+      value: number(data.upvotes?.total),
+      icon: <RiThumbUpLine className="size-4" />,
+      bucket: data.upvotes,
+    },
+    {
+      label: "Downvotes",
+      value: number(data.downvotes?.total),
+      icon: <RiThumbDownLine className="size-4" />,
+      bucket: data.downvotes,
+    },
+    {
+      label: "New views this month",
+      value: number(data.views?.currentMonth),
+      icon: <RiArticleLine className="size-4" />,
+      bucket: data.views,
+    },
+    {
+      label: "New articles this month",
+      value: number(data.posts?.currentMonth),
+      icon: <RiArticleLine className="size-4" />,
+      bucket: data.posts,
+    },
+  ];
+
+  const approvalRate = (() => {
+    const up = data.upvotes?.total ?? 0;
+    const down = data.downvotes?.total ?? 0;
+    const votes = up + down;
+    if (votes === 0) return null;
+    return Math.round((up / votes) * 100);
+  })();
 
   return (
-    <>
-      {isLoading ? (
-        <DashboardContentSkeleton />
-      ) : (
-        <div className="flex flex-col">
-          <div className="flex-grow space-y-4">
-            <div className="space-y-2">
-              <h2 className="text-lg font-medium">Current Month</h2>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                <Card shadow="sm" radius="sm">
-                  <CardBody>
-                    <div className="flex items-center gap-2">
-                      <RiUser3Line className="text-2xl text-primary" />
-                      <div>
-                        <p className="text-small text-default-500">
-                          Total Users
-                        </p>
-                        <p className="text-2xl font-bold">
-                          {metricsData?.data?.users?.currentMonth}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1 mt-2">
-                      {(metricsData?.data?.users?.type === "increase" && (
-                        <RiArrowUpLine className="text-success" />
-                      )) ||
-                        (metricsData?.data?.users.type === "decrease" && (
-                          <RiArrowDownLine className="text-danger" />
-                        ))}
-                      <p
-                        className={`text-small ${
-                          (metricsData?.data?.users?.type === "increase" &&
-                            "text-success") ||
-                          (metricsData?.data?.users?.type === "decrease" &&
-                            "text-danger") ||
-                          (metricsData?.data?.users?.type === "no change" &&
-                            "text-primary")
-                        }`}
-                      >
-                        {metricsData?.data?.users?.lastMonthDiff}
-                      </p>
-                      <p className="text-small text-default-500">
-                        from last month
-                      </p>
-                    </div>
-                  </CardBody>
-                </Card>
-                <Card shadow="sm" radius="sm">
-                  <CardBody>
-                    <div className="flex items-center gap-2">
-                      <RiEyeLine className="text-2xl text-primary" />
-                      <div>
-                        <p className="text-small text-default-500">
-                          Total Views
-                        </p>
-                        <p className="text-2xl font-bold">
-                          {metricsData?.data?.views?.currentMonth}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1 mt-2">
-                      {(metricsData?.data?.views?.type === "increase" && (
-                        <RiArrowUpLine className="text-success" />
-                      )) ||
-                        (metricsData?.data?.views.type === "decrease" && (
-                          <RiArrowDownLine className="text-danger" />
-                        ))}
-                      <p
-                        className={`text-small ${
-                          (metricsData?.data?.views?.type === "increase" &&
-                            "text-success") ||
-                          (metricsData?.data?.views?.type === "decrease" &&
-                            "text-danger") ||
-                          (metricsData?.data?.views?.type === "no change" &&
-                            "text-primary")
-                        }`}
-                      >
-                        {metricsData?.data?.views?.lastMonthDiff}
-                      </p>
-                      <p className="text-small text-default-500">
-                        from last month
-                      </p>
-                    </div>
-                  </CardBody>
-                </Card>
-                <Card shadow="sm" radius="sm">
-                  <CardBody>
-                    <div className="flex items-center gap-2">
-                      <RiThumbUpLine className="text-2xl text-primary" />
-                      <div>
-                        <p className="text-small text-default-500">
-                          Total Upvotes
-                        </p>
-                        <p className="text-2xl font-bold">
-                          {metricsData?.data?.upvotes?.currentMonth}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1 mt-2">
-                      {(metricsData?.data?.upvotes?.type === "increase" && (
-                        <RiArrowUpLine className="text-success" />
-                      )) ||
-                        (metricsData?.data?.upvotes.type === "decrease" && (
-                          <RiArrowDownLine className="text-danger" />
-                        ))}
-                      <p
-                        className={`text-small ${
-                          (metricsData?.data?.upvotes?.type === "increase" &&
-                            "text-success") ||
-                          (metricsData?.data?.upvotes?.type === "decrease" &&
-                            "text-danger") ||
-                          (metricsData?.data?.upvotes?.type === "no change" &&
-                            "text-primary")
-                        }`}
-                      >
-                        {metricsData?.data?.upvotes?.lastMonthDiff}
-                      </p>
-                      <p className="text-small text-default-500">
-                        from last month
-                      </p>
-                    </div>
-                  </CardBody>
-                </Card>
-                <Card shadow="sm" radius="sm">
-                  <CardBody>
-                    <div className="flex items-center gap-2">
-                      <RiThumbDownLine className="text-2xl text-primary" />
-                      <div>
-                        <p className="text-small text-default-500">
-                          Total Downvotes
-                        </p>
-                        <p className="text-2xl font-bold">
-                          {metricsData?.data?.downvotes?.currentMonth}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1 mt-2">
-                      {(metricsData?.data?.downvotes?.type === "increase" && (
-                        <RiArrowUpLine className="text-success" />
-                      )) ||
-                        (metricsData?.data?.downvotes?.type === "decrease" && (
-                          <RiArrowDownLine className="text-danger" />
-                        ))}
-                      <p
-                        className={`text-small ${
-                          (metricsData?.data?.downvotes?.type === "increase" &&
-                            "text-success") ||
-                          (metricsData?.data?.downvotes?.type === "decrease" &&
-                            "text-danger") ||
-                          (metricsData?.data?.downvotes?.type === "no change" &&
-                            "text-primary")
-                        }`}
-                      >
-                        {metricsData?.data?.downvotes?.lastMonthDiff}
-                      </p>
-                      <p className="text-small text-default-500">
-                        from last month
-                      </p>
-                    </div>
-                  </CardBody>
-                </Card>
-                <Card shadow="sm" radius="sm">
-                  <CardBody>
-                    <div className="flex items-center gap-2">
-                      <RiChat1Line className="text-2xl text-primary" />
-                      <div>
-                        <p className="text-small text-default-500">
-                          Total Comments
-                        </p>
-                        <p className="text-2xl font-bold">
-                          {metricsData?.data?.comments?.currentMonth}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1 mt-2">
-                      {(metricsData?.data?.comments?.type === "increase" && (
-                        <RiArrowUpLine className="text-success" />
-                      )) ||
-                        (metricsData?.data?.comments?.type === "decrease" && (
-                          <RiArrowDownLine className="text-danger" />
-                        ))}
-                      <p
-                        className={`text-small ${
-                          (metricsData?.data?.comments?.type === "increase" &&
-                            "text-success") ||
-                          (metricsData?.data?.comments?.type === "decrease" &&
-                            "text-danger") ||
-                          (metricsData?.data?.comments?.type === "no change" &&
-                            "text-primary")
-                        }`}
-                      >
-                        {metricsData?.data?.comments?.lastMonthDiff}
-                      </p>
-                      <p className="text-small text-default-500">
-                        from last month
-                      </p>
-                    </div>
-                  </CardBody>
-                </Card>
-                <Card shadow="sm" radius="sm">
-                  <CardBody>
-                    <div className="flex items-center gap-2">
-                      <RiFileList3Line className="text-2xl text-primary" />
-                      <div>
-                        <p className="text-small text-default-500">
-                          Total Blogs
-                        </p>
-                        <p className="text-2xl font-bold">
-                          {metricsData?.data?.posts?.currentMonth}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1 mt-2">
-                      {(metricsData?.data?.posts?.type === "increase" && (
-                        <RiArrowUpLine className="text-success" />
-                      )) ||
-                        (metricsData?.data?.posts?.type === "decrease" && (
-                          <RiArrowDownLine className="text-danger" />
-                        ))}
-                      <p
-                        className={`text-small ${
-                          (metricsData?.data?.posts?.type === "increase" &&
-                            "text-success") ||
-                          (metricsData?.data?.posts?.type === "decrease" &&
-                            "text-danger") ||
-                          (metricsData?.data?.posts?.type === "no change" &&
-                            "text-primary")
-                        }`}
-                      >
-                        {metricsData?.data?.posts?.lastMonthDiff}
-                      </p>
-                      <p className="text-small text-default-500">
-                        from last month
-                      </p>
-                    </div>
-                  </CardBody>
-                </Card>
-                <Card shadow="sm" radius="sm">
-                  <CardBody>
-                    <div className="flex items-center gap-2">
-                      <RiMoneyDollarCircleLine className="text-2xl text-primary" />
-                      <div>
-                        <p className="text-small text-default-500">
-                          Total Revenue
-                        </p>
-                        <p className="text-2xl font-bold">
-                          {metricsData?.data?.revenue?.currentMonth}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1 mt-2">
-                      {(metricsData?.data?.revenue?.type === "increase" && (
-                        <RiArrowUpLine className="text-success" />
-                      )) ||
-                        (metricsData?.data?.revenue?.type === "decrease" && (
-                          <RiArrowDownLine className="text-danger" />
-                        ))}
-                      <p
-                        className={`text-small ${
-                          (metricsData?.data?.revenue?.type === "increase" &&
-                            "text-success") ||
-                          (metricsData?.data?.revenue?.type === "decrease" &&
-                            "text-danger") ||
-                          (metricsData?.data?.revenue?.type === "no change" &&
-                            "text-primary")
-                        }`}
-                      >
-                        {metricsData?.data?.revenue?.lastMonthDiff}
-                      </p>
-                      <p className="text-small text-default-500">
-                        from last month
-                      </p>
-                    </div>
-                  </CardBody>
-                </Card>
-              </div>
+    <div className="space-y-6">
+      {/* Headline metrics — one bordered grid, not eight separate cards */}
+      <section aria-label="Site totals">
+        <div className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-default/60 bg-default/60 lg:grid-cols-4">
+          {headline.map((metric) => (
+            <div key={metric.label} className="bg-background">
+              <MetricTile
+                label={metric.label}
+                value={metric.value}
+                icon={metric.icon}
+                delta={deltaOf(metric.bucket)}
+                trend={metric.bucket?.type}
+                meta={
+                  deltaOf(metric.bucket) ? "vs last month" : "all time"
+                }
+              />
             </div>
-
-            <div className="space-y-2">
-              <h2 className="text-lg font-medium">All Time</h2>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                <Card shadow="sm" radius="sm">
-                  <CardBody>
-                    <div className="flex items-center gap-2">
-                      <RiUser3Line className="text-2xl text-primary" />
-                      <div>
-                        <p className="text-small text-default-500">
-                          Total Users
-                        </p>
-                        <p className="text-2xl font-bold">
-                          {metricsData?.data?.users?.total}
-                        </p>
-                      </div>
-                    </div>
-                  </CardBody>
-                </Card>
-                <Card shadow="sm" radius="sm">
-                  <CardBody>
-                    <div className="flex items-center gap-2">
-                      <RiEyeLine className="text-2xl text-primary" />
-                      <div>
-                        <p className="text-small text-default-500">
-                          Total Views
-                        </p>
-                        <p className="text-2xl font-bold">
-                          {metricsData?.data?.views?.total}
-                        </p>
-                      </div>
-                    </div>
-                  </CardBody>
-                </Card>
-                <Card shadow="sm" radius="sm">
-                  <CardBody>
-                    <div className="flex items-center gap-2">
-                      <RiThumbUpLine className="text-2xl text-primary" />
-                      <div>
-                        <p className="text-small text-default-500">
-                          Total Upvotes
-                        </p>
-                        <p className="text-2xl font-bold">
-                          {metricsData?.data?.upvotes?.total}
-                        </p>
-                      </div>
-                    </div>
-                  </CardBody>
-                </Card>
-                <Card shadow="sm" radius="sm">
-                  <CardBody>
-                    <div className="flex items-center gap-2">
-                      <RiThumbDownLine className="text-2xl text-primary" />
-                      <div>
-                        <p className="text-small text-default-500">
-                          Total Downvotes
-                        </p>
-                        <p className="text-2xl font-bold">
-                          {metricsData?.data?.downvotes?.total}
-                        </p>
-                      </div>
-                    </div>
-                  </CardBody>
-                </Card>
-                <Card shadow="sm" radius="sm">
-                  <CardBody>
-                    <div className="flex items-center gap-2">
-                      <RiChat1Line className="text-2xl text-primary" />
-                      <div>
-                        <p className="text-small text-default-500">
-                          Total Comments
-                        </p>
-                        <p className="text-2xl font-bold">
-                          {metricsData?.data?.comments?.total}
-                        </p>
-                      </div>
-                    </div>
-                  </CardBody>
-                </Card>
-                <Card shadow="sm" radius="sm">
-                  <CardBody>
-                    <div className="flex items-center gap-2">
-                      <RiFileList3Line className="text-2xl text-primary" />
-                      <div>
-                        <p className="text-small text-default-500">
-                          Total Blogs
-                        </p>
-                        <p className="text-2xl font-bold">
-                          {metricsData?.data?.posts?.total}
-                        </p>
-                      </div>
-                    </div>
-                  </CardBody>
-                </Card>
-                <Card shadow="sm" radius="sm">
-                  <CardBody>
-                    <div className="flex items-center gap-2">
-                      <RiMoneyDollarCircleLine className="text-2xl text-primary" />
-                      <div>
-                        <p className="text-small text-default-500">
-                          Total Revenue
-                        </p>
-                        <p className="text-2xl font-bold">
-                          {metricsData?.data?.revenue?.total}
-                        </p>
-                      </div>
-                    </div>
-                  </CardBody>
-                </Card>
-              </div>
-            </div>
-            <div className="grid gap-4 mt-4 md:grid-cols-2">
-              <Card
-                shadow="sm"
-                radius="sm"
-                className="col-span-full md:col-span-1"
-              >
-                <CardHeader>
-                  <h3 className="text-xl font-semibold">Overview</h3>
-                </CardHeader>
-                <CardBody>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={metricsData?.data?.chartData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Line type="monotone" dataKey="views" stroke="#8884d8" />
-                      <Line
-                        type="monotone"
-                        dataKey="comments"
-                        stroke="#82ca9d"
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="upvotes"
-                        stroke="#ffc658"
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="downvotes"
-                        stroke="#ff5858"
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="revenue"
-                        stroke="#ff58f1"
-                      />
-                      <Line type="monotone" dataKey="users" stroke="#589bff" />
-                      <Line type="monotone" dataKey="posts" stroke="#92c700" />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </CardBody>
-              </Card>
-              <Card
-                shadow="sm"
-                radius="sm"
-                className="col-span-full md:col-span-1"
-              >
-                <CardHeader>
-                  <h3 className="text-xl font-semibold">Recent Activity</h3>
-                </CardHeader>
-                <CardBody>
-                  <Table
-                    aria-label="Recent activity table"
-                    radius="sm"
-                    shadow="none"
-                  >
-                    <TableHeader>
-                      <TableColumn>TYPE</TableColumn>
-                      <TableColumn>CONTENT</TableColumn>
-                      <TableColumn>USER</TableColumn>
-                      <TableColumn>TIME</TableColumn>
-                    </TableHeader>
-                    <TableBody>
-                      {recentActivity.map((activity) => (
-                        <TableRow key={activity.id}>
-                          <TableCell>
-                            <div className="lg:w-auto w-20">
-                              {activity.type}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="lg:w-auto w-44">
-                              {activity.content}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Avatar name={activity.user} />
-                          </TableCell>
-                          <TableCell>
-                            <div className="lg:w-auto w-28">
-                              {activity.timestamp}
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardBody>
-              </Card>
-            </div>
-          </div>
+          ))}
         </div>
-      )}
-    </>
+      </section>
+
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
+        {/* Trend */}
+        <SectionCard
+          className="self-start"
+          title="Activity this year"
+          description="Monthly views, publications, new members and comments."
+          action={
+            <ul className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              {series.map((item) => (
+                <li
+                  key={item.key}
+                  className="flex items-center gap-1.5 text-xs text-default-600"
+                >
+                  <span
+                    aria-hidden
+                    className="size-2 rounded-full"
+                    style={{ backgroundColor: item.color }}
+                  />
+                  {item.label}
+                </li>
+              ))}
+            </ul>
+          }
+        >
+          {chartData.length === 0 || !hasSignal ? (
+            <EmptyState
+              variant="inline"
+              title="No activity recorded this year"
+              description="The chart fills in as people read, comment and publish. It currently has no data points."
+            />
+          ) : (
+            <ActivityChart data={chartData} />
+          )}
+        </SectionCard>
+
+        {/* Engagement */}
+        <div className="space-y-6">
+          <SectionCard title="Engagement" description="Reader reactions.">
+            <div className="divide-y divide-default/60">
+              {engagement.map((metric) => (
+                <div
+                  key={metric.label}
+                  className="flex items-center justify-between gap-3 py-2.5 first:pt-0 last:pb-0"
+                >
+                  <span className="flex items-center gap-2 text-sm text-default-600">
+                    <span aria-hidden className="text-default-400">
+                      {metric.icon}
+                    </span>
+                    {metric.label}
+                  </span>
+                  <span className="text-sm font-semibold tabular-nums">
+                    {metric.value}
+                  </span>
+                </div>
+              ))}
+
+              <div className="flex items-center justify-between gap-3 py-2.5">
+                <span className="text-sm text-default-600">
+                  Upvote share
+                </span>
+                <span className="text-sm font-semibold tabular-nums">
+                  {approvalRate === null ? "—" : `${approvalRate}%`}
+                </span>
+              </div>
+            </div>
+          </SectionCard>
+
+          <SectionCard title="Manage" description="Jump to a screen.">
+            <div className="space-y-2">
+              <QuickLink
+                href="/admin/manage-blogs"
+                title="Articles"
+                description="Review, edit or remove posts"
+              />
+              <QuickLink
+                href="/admin/manage-users"
+                title="Members"
+                description="Roles, status and blocking"
+              />
+            </div>
+          </SectionCard>
+        </div>
+      </div>
+    </div>
   );
 }

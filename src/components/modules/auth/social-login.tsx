@@ -1,50 +1,52 @@
-"use client"
+"use client";
 
-import { Button, Divider } from "@heroui/react";
+import { Button } from "@heroui/react";
 import { signIn } from "next-auth/react";
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 
-interface IProps {}
+/**
+ * Third-party sign-in. Rendered as full-width labelled buttons so the option
+ * is readable, not a pair of cryptic icon tiles.
+ */
+const SocialLogin = () => {
+  const providers = [
+    {
+      id: "google",
+      label: "Continue with Google",
+      icon: <FcGoogle aria-hidden size={18} />,
+    },
+    {
+      id: "github",
+      label: "Continue with GitHub",
+      icon: <FaGithub aria-hidden size={18} />,
+    },
+  ];
 
-const SocialLogin = ({}: IProps) => {
   return (
-    <div className="mb-6">
-      <p className="text-center mb-2">or</p>
-      <div className="flex justify-center space-x-2">
-        <Button
-          radius="sm"
-          variant="flat"
-          isIconOnly
-          onClick={() => {
-            signIn("google", {
-              callbackUrl: "/",
-            });
-          }}
-        >
-          <FcGoogle size={24} />
-        </Button>
-        {/* <Button
-        onClick={() => {
-          signIn("facebook", {
-            callbackUrl: "/",
-          });
-        }}
-      >
-        <h4>Continue With Facebook</h4>
-      </Button> */}
-        <Button
-          radius="sm"
-          variant="flat"
-          isIconOnly
-          onClick={() => {
-            signIn("github", {
-              callbackUrl: "/",
-            });
-          }}
-        >
-          <FaGithub size={24} />
-        </Button>
+    <div>
+      <div className="flex items-center gap-3 text-xs uppercase tracking-wider text-default-400">
+        <span className="h-px flex-1 bg-default/60" aria-hidden />
+        or
+        <span className="h-px flex-1 bg-default/60" aria-hidden />
+      </div>
+
+      <div className="mt-5 grid gap-2 sm:grid-cols-2">
+        {providers.map((provider) => (
+          <Button
+            key={provider.id}
+            fullWidth
+            radius="lg"
+            variant="bordered"
+            className="font-medium"
+            startContent={provider.icon}
+            onClick={() => {
+              signIn(provider.id, { callbackUrl: "/" });
+            }}
+          >
+            {provider.label}
+          </Button>
+        ))}
       </div>
     </div>
   );

@@ -272,6 +272,36 @@ body {
   row-gap: 0.25rem;
 }
 
+/* --------------------------------------------------------------------------
+   Legal documents (/privacy, /terms, /cookie, …).
+
+   A four-column data table is unreadable when squeezed into a phone viewport,
+   so tables keep a readable minimum width and scroll inside their own
+   container instead of crushing the cells. The visible scrollbar tells the
+   reader there is more to the right.
+   -------------------------------------------------------------------------- */
+.legal-table-scroll {
+  overflow-x: auto;
+}
+
+.legal-table-scroll table {
+  min-width: 40rem;
+}
+
+.legal-table-scroll::-webkit-scrollbar {
+  height: 0.375rem;
+}
+
+.legal-table-scroll::-webkit-scrollbar-track {
+  background: var(--color-default-100);
+  border-radius: 9999px;
+}
+
+.legal-table-scroll::-webkit-scrollbar-thumb {
+  background: var(--color-default-300);
+  border-radius: 9999px;
+}
+
 /* Phones: one row that scrolls sideways instead of wrapping onto several
    rows, which would push the title below the fold. */
 @media (max-width: 40rem) {

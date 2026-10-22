@@ -1,203 +1,293 @@
+import AdSlot from "@/components/adsense/ad-slot";
 import AdBanner from "@/components/adsense/ad-banner";
+import PageHero from "@/components/editorial/page-hero";
+import ButtonLink from "@/components/ui/button-link";
 import Container from "@/components/ui/container";
-import { poppins } from "@/config/fonts";
-import { Button } from "@heroui/button";
+import { getAllCategories } from "@/services/category";
+import { getAllPosts } from "@/services/post";
+import type { ICategory } from "@/types";
 import { Metadata } from "next";
 import Link from "next/link";
-import { FaCheckCircle, FaLightbulb, FaRocket, FaUsers, FaPen } from "react-icons/fa";
+import { BiChevronRight } from "react-icons/bi";
+import { FiArrowUpRight } from "react-icons/fi";
 
 export const metadata: Metadata = {
-  title: "Features Page",
+  title: "Write and publish",
   description:
-    "Join our thriving tech community at TechTips Hub. Share your knowledge, learn from experts, and become part of a growing network of tech enthusiasts.",
+    "Share your tech knowledge on TechTips Hub: publish tutorials, reach readers who build software, and keep a public portfolio of your work.",
   keywords:
     "TechTips Hub, tech community, tech writing, knowledge sharing, tech tutorials, learning platform",
+  alternates: { canonical: "/features" },
   openGraph: {
-    title: "Join TechTips Hub Community",
+    title: "Write and publish on TechTips Hub",
     description:
-      "Share your tech knowledge, learn from experts, and become part of our growing community. Start your tech writing journey today!",
-    url: "https://techtipshub.vercel.app/join-community",
+      "Share your tech knowledge, learn from experts, and become part of our growing community.",
+    url: "/features",
   },
 };
 
-interface IProps {}
+/** The writing tools, described as what they do rather than feature names. */
+const composer = [
+  "Markdown-style shortcuts: type # for a heading, > for a quote, - for a list.",
+  "Syntax-highlighted code blocks for every language you write about.",
+  "Cover images, categories and tags, chosen when you publish.",
+  "Preview the rendered article before it goes live.",
+];
 
-const CommunityPage: React.FC<IProps> = () => {
+const community = [
+  "Threaded comments on every article, and authors can reply.",
+  "Follow the people whose work you want to read.",
+  "Honest view and vote counts, straight from the database.",
+  "A public profile with your bio, links and everything you have written.",
+];
+
+const steps = [
+  {
+    title: "Create a free account",
+    body: "One form, no payment details. Every account has the same abilities — there is no paid tier.",
+  },
+  {
+    title: "Draft in the composer",
+    body: "Write with shortcuts, drop in code blocks and a cover image, then preview the piece as readers will see it.",
+  },
+  {
+    title: "Publish, then keep it current",
+    body: "Edit or remove any article from Manage Blogs at any time. No email required, no approval queue.",
+  },
+];
+
+const CommunityPage = async () => {
+  const [postsResult, categoriesResult] = await Promise.all([
+    getAllPosts({ limit: "1" }).catch(() => null),
+    getAllCategories().catch(() => null),
+  ]);
+
+  const articleCount = Number(postsResult?.meta?.total) || 0;
+  const categories = (categoriesResult?.data as ICategory[]) || [];
+
   return (
-    <section
-      className={`pt-10 pb-20 lg:py-20 bg-[url("/bg-box-design.png")] overflow-hidden relative`}
-    >
+    <div>
+      {/* Hero */}
+      <section className="border-b border-default/60">
+        <Container>
+          <div className="grid items-end gap-10 py-14 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-16 lg:py-24">
+            <PageHero
+              eyebrow="Write for TechTips Hub"
+              title={
+                <>
+                  Share your tech knowledge with people who{" "}
+                  <span className="text-primary">build</span>
+                </>
+              }
+              lede="Publish tutorials and explainers, reach readers who actually try the code, and keep a public portfolio of everything you have written."
+              meta={
+                <div className="flex flex-wrap items-center gap-3">
+                  <ButtonLink
+                    href="/signup"
+                    radius="lg"
+                    color="primary"
+                    endContent={<BiChevronRight />}
+                    className="font-semibold"
+                  >
+                    Start writing today
+                  </ButtonLink>
+                  <ButtonLink href="/" radius="lg" variant="bordered">
+                    Explore articles
+                  </ButtonLink>
+                </div>
+              }
+            />
+
+            {/* Real counts, set as a footnote rather than a billboard. */}
+            <dl className="flex gap-10 border-t border-default/60 pt-5 lg:flex-col lg:gap-5 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-8">
+              {articleCount > 0 && (
+                <div>
+                  <dd className="text-2xl font-semibold tabular-nums tracking-tight">
+                    {articleCount.toLocaleString()}
+                  </dd>
+                  <dt className="mt-0.5 text-xs uppercase tracking-wider text-default-500">
+                    Articles published
+                  </dt>
+                </div>
+              )}
+              {categories.length > 0 && (
+                <div>
+                  <dd className="text-2xl font-semibold tabular-nums tracking-tight">
+                    {categories.length.toLocaleString()}
+                  </dd>
+                  <dt className="mt-0.5 text-xs uppercase tracking-wider text-default-500">
+                    Topics to write in
+                  </dt>
+                </div>
+              )}
+            </dl>
+          </div>
+        </Container>
+      </section>
+
       <Container>
-        <div className="space-y-10">
-          <div className="text-center space-y-6">
-            <h1
-              className={`${poppins.className} text-3xl lg:text-6xl text-center font-bold w-full max-w-4xl mx-auto lg:leading-snug`}
+        {/* The editor / the community: two columns of concrete capability. */}
+        <section
+          aria-labelledby="what-you-get"
+          className="grid gap-10 border-b border-default/60 py-16 lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-16 lg:py-20"
+        >
+          <div className="lg:pt-2">
+            <h2
+              id="what-you-get"
+              className="text-xs font-semibold uppercase leading-6 tracking-[0.14em] text-default-500"
             >
-              Share Your Tech Knowledge with{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e097ff] to-secondary dark:bg-clip-text dark:bg-gradient-to-r dark:from-primary dark:to-secondary dark:text-transparent">
-                TechTips Hub
-              </span>
-            </h1>
-            <p className="w-full max-w-2xl mx-auto text-xl leading-snug">
-              &quot;Join our community of tech enthusiasts where you can share your
-              expertise, learn from others, and build your tech writing
-              portfolio!&quot;
+              What you get
+            </h2>
+            <p className="mt-3 max-w-[16rem] text-sm leading-relaxed text-default-500">
+              Free, with no sign-up funnel or gatekeeping. The platform stays out
+              of the way of the writing.
             </p>
-            <div className="flex flex-col md:flex-row gap-3 md:gap-4 justify-center">
-              <Link href="/signup">
-                <Button
-                  radius="full"
-                  color="secondary"
-                  className="text-base md:text-lg md:px-8 md:py-6"
-                  startContent={<FaPen className="text-xl" />}
-                >
-                  Start Writing Today
-                </Button>
-              </Link>
-              <Link href="/">
-                <Button
-                  radius="full"
-                  color="primary"
-                  variant="bordered"
-                  className="text-base md:text-lg md:px-8 md:py-6"
-                  startContent={<FaRocket className="text-xl" />}
-                >
-                  Explore Articles
-                </Button>
-              </Link>
-            </div>
           </div>
 
-          <div>
-            <div className="text-center mb-10">
-              <h2 className="text-3xl font-bold mb-4">
-                Why Join Our Community?
-              </h2>
-              <p className="text-default-500">
-                Share knowledge, build your portfolio, and connect with fellow
-                tech enthusiasts
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full max-w-6xl mx-auto items-stretch">
-              <div className="border border-primary-50 p-6 rounded-lg shadow-sm flex flex-col space-y-6 hover:scale-105 transition-transform duration-300">
-                <div className="space-y-4 flex-1">
-                  <div className="flex justify-center">
-                    <FaPen className="text-4xl text-primary" />
-                  </div>
-                  <h3 className="text-2xl font-semibold text-center">
-                    Write & Share
-                  </h3>
-                  <ul className="space-y-3">
-                    <li className="flex items-center">
-                      <FaCheckCircle className="text-green-500 mr-2" />
-                      Build your tech portfolio
-                    </li>
-                    <li className="flex items-center">
-                      <FaCheckCircle className="text-green-500 mr-2" />
-                      Share your expertise
-                    </li>
-                    <li className="flex items-center">
-                      <FaCheckCircle className="text-green-500 mr-2" />
-                      Help others learn
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              <div className="border border-primary-50 p-6 rounded-lg shadow-sm flex flex-col space-y-6 hover:scale-105 transition-transform duration-300 bg-gradient-to-b from-primary/5 to-transparent">
-                <div className="space-y-4 flex-1">
-                  <div className="flex justify-center">
-                    <FaUsers className="text-4xl text-secondary" />
-                  </div>
-                  <h3 className="text-2xl font-semibold text-center">
-                    Community Benefits
-                  </h3>
-                  <ul className="space-y-3">
-                    <li className="flex items-center">
-                      <FaCheckCircle className="text-green-500 mr-2" />
-                      Network with experts
-                    </li>
-                    <li className="flex items-center">
-                      <FaCheckCircle className="text-green-500 mr-2" />
-                      Get feedback on articles
-                    </li>
-                    <li className="flex items-center">
-                      <FaCheckCircle className="text-green-500 mr-2" />
-                      Collaborate on content
-                    </li>
-                    <li className="flex items-center">
-                      <FaCheckCircle className="text-green-500 mr-2" />
-                      Build your reputation
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              <div className="border border-primary-50 p-6 rounded-lg shadow-sm flex flex-col space-y-6 hover:scale-105 transition-transform duration-300">
-                <div className="space-y-4 flex-1">
-                  <div className="flex justify-center">
-                    <FaLightbulb className="text-4xl text-primary" />
-                  </div>
-                  <h3 className="text-2xl font-semibold text-center">
-                    Growth Opportunities
-                  </h3>
-                  <ul className="space-y-3">
-                    <li className="flex items-center">
-                      <FaCheckCircle className="text-green-500 mr-2" />
-                      Improve writing skills
-                    </li>
-                    <li className="flex items-center">
-                      <FaCheckCircle className="text-green-500 mr-2" />
-                      Learn from feedback
-                    </li>
-                    <li className="flex items-center">
-                      <FaCheckCircle className="text-green-500 mr-2" />
-                      Showcase expertise
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            <div className="my-16">
-              <AdBanner />
-            </div>
-
-            <div className="text-center mt-16 space-y-6">
-              <h3 className="text-2xl font-bold">
-                Ready to Share Your Knowledge?
+          <div className="grid gap-10 md:grid-cols-2 md:gap-12">
+            <div>
+              <h3 className="border-b border-default/60 pb-3 font-semibold tracking-tight">
+                A composer that keeps up
               </h3>
-              <p className="text-default-500 max-w-2xl mx-auto">
-                Join our community today and start sharing your tech insights
-                with thousands of readers. Your expertise matters!
-              </p>
-              <Link href="/signup">
-                <Button
-                  color="secondary"
-                  size="lg"
-                  className="text-lg px-8"
-                  radius="sm"
-                  startContent={<FaUsers />}
-                >
-                  Join Our Community
-                </Button>
-              </Link>
+              <ul className="mt-4 space-y-3">
+                {composer.map((item) => (
+                  <li
+                    key={item}
+                    className="flex gap-3 text-sm leading-relaxed text-default-600"
+                  >
+                    <span
+                      aria-hidden
+                      className="mt-2 size-1 shrink-0 rounded-full bg-primary"
+                    />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3 className="border-b border-default/60 pb-3 font-semibold tracking-tight">
+                Readers who take part
+              </h3>
+              <ul className="mt-4 space-y-3">
+                {community.map((item) => (
+                  <li
+                    key={item}
+                    className="flex gap-3 text-sm leading-relaxed text-default-600"
+                  >
+                    <span
+                      aria-hidden
+                      className="mt-2 size-1 shrink-0 rounded-full bg-primary"
+                    />
+                    {item}
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
+        </section>
+
+        {/* How it works */}
+        <section
+          aria-labelledby="how-it-works"
+          className="grid gap-10 border-b border-default/60 py-16 lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-16 lg:py-20"
+        >
+          <h2
+            id="how-it-works"
+            className="text-xs font-semibold uppercase leading-6 tracking-[0.14em] text-default-500 lg:pt-2"
+          >
+            How it works
+          </h2>
+
+          <ol className="border-t border-default/60">
+            {steps.map((step, index) => (
+              <li
+                key={step.title}
+                className="grid gap-x-8 gap-y-1 border-b border-default/60 py-6 sm:grid-cols-[3rem_minmax(0,1fr)]"
+              >
+                <span className="text-xs font-semibold tabular-nums tracking-wider text-primary sm:pt-1">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <div>
+                  <h3 className="font-semibold tracking-tight">{step.title}</h3>
+                  <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-default-600">
+                    {step.body}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        {/* Topics */}
+        {categories.length > 0 && (
+          <section
+            aria-labelledby="topics"
+            className="grid gap-10 border-b border-default/60 py-16 lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-16"
+          >
+            <div className="lg:pt-2">
+              <h2
+                id="topics"
+                className="text-xs font-semibold uppercase leading-6 tracking-[0.14em] text-default-500"
+              >
+                What we publish
+              </h2>
+              <p className="mt-3 max-w-[16rem] text-sm leading-relaxed text-default-500">
+                Write in any of these, or pitch a new one.
+              </p>
+            </div>
+            <ul className="flex flex-wrap gap-2">
+              {categories.map((category) => (
+                <li key={category._id}>
+                  <Link
+                    href={`/?category=${encodeURIComponent(category.name)}`}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-default/60 px-3.5 py-1.5 text-sm text-default-700 transition-colors hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
+                  >
+                    {category.name}
+                    <FiArrowUpRight aria-hidden className="size-3.5 opacity-50" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {/* Closing note */}
+        <section className="py-16 lg:py-20">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-pretty text-2xl font-semibold tracking-tight md:text-3xl">
+              Ready to share what you know?
+            </h2>
+            <p className="mx-auto mt-3 max-w-xl leading-relaxed text-default-600">
+              Your first article is the hard one. After that it is just writing.
+              Read the{" "}
+              <Link
+                href="/community-guidelines"
+                className="font-medium text-primary underline-offset-4 hover:underline"
+              >
+                community guidelines
+              </Link>{" "}
+              first if you want to know what we look for.
+            </p>
+            <div className="mt-7 flex flex-wrap justify-center gap-3">
+              <ButtonLink href="/signup" radius="lg" color="primary">
+                Create a free account
+              </ButtonLink>
+              <ButtonLink href="/about-us" radius="lg" variant="bordered">
+                About the publication
+              </ButtonLink>
+            </div>
+          </div>
+        </section>
+
+        {/* Existing ad unit — position preserved. */}
+        <div className="pb-10">
+          <AdSlot>
+            <AdBanner />
+          </AdSlot>
         </div>
       </Container>
-
-      {/* Keep existing background effects */}
-      <div className="absolute right-[28%] top-0 hidden h-[150px] w-[200px] rotate-12 rounded-3xl bg-gradient-to-l from-violet-600 to-indigo-800 opacity-20 blur-3xl filter dark:block dark:opacity-20 lg:top-44 lg:-right-20 lg:h-72 lg:w-[350px] xl:h-80 xl:w-[500px] animate-scaleEffect duration-300" />
-      <div className="absolute bottom-44 -left-64 hidden h-[150px] w-[900px] -rotate-45 rounded-3xl bg-gradient-to-r from-violet-600 to-indigo-800 opacity-30 blur-3xl filter dark:hidden dark:sm:block lg:bottom-24 lg:-left-20 lg:h-28 lg:w-[250px] lg:-rotate-12 lg:opacity-20 xl:h-40 xl:w-[400px] animate-scaleEffect duration-300" />
-      <div className="absolute left-[28%] top-28 hidden rotate-12 rounded-3xl bg-sky-700/80 opacity-90 blur-3xl filter dark:opacity-30 lg:h-32 lg:w-[450px] dark:lg:block xl:h-44 xl:w-[600px] animate-scaleEffect duration-300" />
-      <div className="absolute h-16 w-[600px] rotate-[-40deg] rounded-3xl bg-sky-400 opacity-10 blur-2xl filter dark:hidden lg:bottom-24 lg:-left-28 lg:h-12 lg:w-[600px] lg:opacity-30 lg:blur-2xl xl:-left-40 xl:h-4 xl:w-[700px] xl:opacity-100" />
-      <div className="absolute h-14 w-[600px] rotate-[-40deg] rounded-3xl bg-purple-400 opacity-30 blur-2xl filter dark:hidden lg:bottom-20 lg:-left-28 lg:h-10 lg:w-[600px] lg:opacity-20 lg:blur-xl xl:-left-40 xl:h-2 xl:w-[800px] xl:opacity-100" />
-      <div className="absolute hidden h-16 w-[600px] rotate-[-40deg] rounded-3xl bg-sky-400 opacity-10 blur-2xl filter dark:hidden lg:top-24 lg:-right-28 lg:block lg:h-12 lg:w-[600px] lg:opacity-30 lg:blur-2xl xl:-right-40 xl:h-4 xl:w-[700px] xl:opacity-100" />
-      <div className="absolute hidden h-14 w-[600px] rotate-[-40deg] rounded-3xl bg-purple-400 opacity-30 blur-2xl filter dark:hidden lg:top-20 lg:-right-28 lg:block lg:h-10 lg:w-[600px] lg:opacity-20 lg:blur-xl xl:-right-40 xl:h-2 xl:w-[800px] xl:opacity-100" />
-    </section>
+    </div>
   );
 };
 
-export default CommunityPage; 
+export default CommunityPage;
