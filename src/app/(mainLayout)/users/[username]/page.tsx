@@ -3,8 +3,8 @@ import FollowUnFollowButton from "@/components/ui/follow-unfollow-button";
 import { getPostsByUserId } from "@/services/post";
 import { getUserByUsername } from "@/services/user";
 import { IPost, IUser } from "@/types";
-import { Avatar } from "@nextui-org/avatar";
-import { Button } from "@nextui-org/button";
+import { Avatar } from "@heroui/avatar";
+import { Button } from "@heroui/button";
 import { Metadata } from "next";
 import Link from "next/link";
 import { AiOutlineSmallDash } from "react-icons/ai";
@@ -115,7 +115,6 @@ const GetUserByIdPage = async ({
 
                 <div className="flex items-center space-x-4">
                   <Button
-                    as={Link}
                     href={`/@${username}/following`}
                     size="sm"
                     variant="flat"
@@ -124,7 +123,6 @@ const GetUserByIdPage = async ({
                     {totalFollowing} Following
                   </Button>
                   <Button
-                    as={Link}
                     href={`/@${username}/followers`}
                     size="sm"
                     variant="flat"

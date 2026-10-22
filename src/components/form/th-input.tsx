@@ -1,6 +1,6 @@
 "use client";
 
-import { Input, InputProps } from "@nextui-org/input";
+import { Input, InputProps } from "@heroui/react";
 import { useFormContext } from "react-hook-form";
 
 interface IProps extends InputProps {

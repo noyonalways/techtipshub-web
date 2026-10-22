@@ -33,7 +33,7 @@ const AdBanner = ({
       data-ad-slot={dataAdSlot}
       data-ad-format={dataAdFormat}
       data-full-width-responsive={dataFullWidthResponsive.toString()}
-    ></ins>
+     />
   );
 };
 

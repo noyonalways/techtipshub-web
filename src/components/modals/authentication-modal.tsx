@@ -1,13 +1,6 @@
 "use client";
 
-import { Button } from "@nextui-org/button";
-import {
-  Modal,
-  ModalHeader,
-  ModalBody,
-  useDisclosure,
-  ModalContent,
-} from "@nextui-org/modal";
+import { Button, Modal, ModalBody, ModalContent, ModalHeader, useDisclosure } from "@heroui/react";
 import Link from "next/link";
 import { ReactNode } from "react";
 

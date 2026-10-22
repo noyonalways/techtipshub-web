@@ -1,7 +1,7 @@
 import Container from "@/components/ui/container";
-import { Image } from "@nextui-org/image";
+import { Divider } from "@heroui/divider";
+import { Image } from "@heroui/image";
 import Link from "next/link";
-import { Divider } from "@nextui-org/divider";
 import SignUpForm from "@/components/modules/auth/signup-form";
 import { Metadata } from "next";
 import SocialLogin from "@/components/modules/auth/social-login";
@@ -52,8 +52,8 @@ const SignUpPage = () => {
         </div>
 
         <div className="-z-50">
-          <div className="absolute h-14 w-[600px] rotate-[45deg] rounded-3xl bg-purple-600 opacity-30  filter -bottom-5 lg:bottom-20 lg:-right-28 lg:block lg:h-10 lg:w-[600px] lg:opacity-20 xl:-right-40 xl:h-2 xl:w-[800px] xl:opacity-100 blur-2xl"></div>
-          <div className="absolute  h-20 w-[600px] rotate-[45deg] rounded-3xl bg-primary-500 opacity-10  filter bottom-14  lg:bottom-32 lg:-right-28 lg:block lg:h-12 lg:w-[600px] lg:opacity-30  xl:-right-40 xl:h-4 xl:w-[700px] xl:opacity-100 blur-2xl"></div>
+          <div className="absolute h-14 w-[600px] rotate-[45deg] rounded-3xl bg-purple-600 opacity-30  filter -bottom-5 lg:bottom-20 lg:-right-28 lg:block lg:h-10 lg:w-[600px] lg:opacity-20 xl:-right-40 xl:h-2 xl:w-[800px] xl:opacity-100 blur-2xl" />
+          <div className="absolute  h-20 w-[600px] rotate-[45deg] rounded-3xl bg-primary-500 opacity-10  filter bottom-14  lg:bottom-32 lg:-right-28 lg:block lg:h-12 lg:w-[600px] lg:opacity-30  xl:-right-40 xl:h-4 xl:w-[700px] xl:opacity-100 blur-2xl" />
         </div>
       </Container>
     </section>

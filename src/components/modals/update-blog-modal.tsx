@@ -3,18 +3,19 @@
 import { useUpdateBlogByAdmin } from "@/hooks/post.hook";
 import { getAllCategories } from "@/services/category";
 import { ICategory, IPost } from "@/types";
-import { Button } from "@nextui-org/button";
-import { Image } from "@nextui-org/image";
-import { Input } from "@nextui-org/input";
 import {
+  Button,
+  Image,
+  Input,
   Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
   ModalHeader,
+  Select,
+  SelectItem,
   useDisclosure,
-} from "@nextui-org/modal";
-import { Select, SelectItem } from "@nextui-org/select";
+} from "@heroui/react";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import "react-quill/dist/quill.snow.css";

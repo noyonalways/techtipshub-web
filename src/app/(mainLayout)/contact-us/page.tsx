@@ -1,8 +1,8 @@
 import AdBanner from "@/components/adsense/ad-banner";
 import ContactForm from "@/components/modules/contact/contact-form";
 import Container from "@/components/ui/container";
-import { Button } from "@nextui-org/button";
-import { Card, CardBody, CardHeader } from "@nextui-org/card";
+import { Button } from "@heroui/button";
+import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Metadata } from "next";
 import { BiMapPin, BiPhone } from "react-icons/bi";
 import { BsMailbox } from "react-icons/bs";
@@ -33,7 +33,7 @@ const ContactUsPage: React.FC<IProps> = () => {
             <div className="mb-8 md:mb-0 md:mr-8">
               <h1 className="text-4xl font-bold mb-4">Get in Touch</h1>
               <p className="text-xl text-white dark:text-white">
-                We're here to help and answer any question you might have.
+                We&apos;re here to help and answer any question you might have.
               </p>
             </div>
             <Button
@@ -53,7 +53,7 @@ const ContactUsPage: React.FC<IProps> = () => {
               <div className="flex flex-col">
                 <h2 className="text-md text-xl font-semibold">Contact Form</h2>
                 <p className="text-small text-default-500">
-                  Fill out the form and we'll be in touch as soon as possible.
+                  Fill out the form and we&apos;ll be in touch as soon as possible.
                 </p>
               </div>
             </CardHeader>

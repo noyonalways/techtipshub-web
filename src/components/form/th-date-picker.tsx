@@ -1,4 +1,4 @@
-import { DatePicker, DatePickerProps } from "@nextui-org/date-picker";
+import { DatePicker, DatePickerProps } from "@heroui/date-picker";
 import { Controller } from "react-hook-form";
 
 interface IProps extends DatePickerProps {

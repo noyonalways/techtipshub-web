@@ -1,8 +1,10 @@
 "use client";
 
 import { useUser } from "@/context/user.provider";
-import { NavbarItem } from "@nextui-org/navbar";
-import { button as buttonStyles } from "@nextui-org/theme";
+import {
+  button as buttonStyles,
+  NavbarItem,
+} from "@heroui/react";
 import NextLink from "next/link";
 import NavarDropdown from "./navbar-dropdown";
 

@@ -1,11 +1,5 @@
-import { Button } from "@nextui-org/button";
-import {
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalHeader,
-  useDisclosure,
-} from "@nextui-org/modal";
+import { Button } from "@heroui/button";
+import { Modal, ModalBody, ModalContent, ModalHeader, useDisclosure } from "@heroui/modal";
 import THForm from "../form/th-from";
 import THTextarea from "../form/th-textarea";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
@@ -21,8 +15,7 @@ interface IProps {
 const deleteBlogValidationSchema = z.object({
   reason: z
     .string({
-      required_error: "Reason is required",
-      invalid_type_error: "Reason must be string",
+      error: "Reason is required",
     })
     .min(1, "Reason is required"),
 });

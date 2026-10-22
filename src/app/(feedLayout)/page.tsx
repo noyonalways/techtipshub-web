@@ -17,22 +17,22 @@ export const metadata: Metadata = {
 };
 
 interface IProps {
-  searchParams: {
+  searchParams: Promise<{
     search: string;
     category: string;
-  };
+  }>;
 }
 
 const INITIAL_NUMBERS_OF_POSTS = "5";
 
 export default async function Home({ searchParams }: IProps) {
-  const params = searchParams
-    ? {
-        searchTerm: searchParams.search,
-        category: searchParams.category,
-        limit: INITIAL_NUMBERS_OF_POSTS,
-      }
-    : undefined;
+  const { search, category } = await searchParams;
+
+  const params = {
+    searchTerm: search,
+    category: category,
+    limit: INITIAL_NUMBERS_OF_POSTS,
+  };
 
   const data = await getAllPosts(params);
   const posts = data?.data as IPost[];

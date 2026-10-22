@@ -2,16 +2,17 @@ import Container from "@/components/ui/container";
 import FollowUnFollowButton from "@/components/ui/follow-unfollow-button";
 import { getUserByUsername } from "@/services/user";
 import { IUser } from "@/types";
-import { Avatar } from "@nextui-org/avatar";
+import { Avatar } from "@heroui/avatar";
 import { PiCalendarDotsLight } from "react-icons/pi";
 
 interface IProps {
-  params: { username: string };
+  params: Promise<{ username: string }>;
   children: React.ReactNode;
 }
 
-const FollowersFollowingLayout = async ({params, children}: IProps) => {
-  const data = await getUserByUsername(params.username.split("40")[1]);
+const FollowersFollowingLayout = async ({ params, children }: IProps) => {
+  const { username: rawUsername } = await params;
+  const data = await getUserByUsername(rawUsername.split("40")[1]);
 
   const {
     _id,

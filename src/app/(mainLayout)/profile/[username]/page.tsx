@@ -5,8 +5,8 @@ import ProfileShareDropdown from "@/components/ui/profile-share-dropdown";
 import { getProfileInfo } from "@/services/auth";
 import { getLoggedInUserPosts } from "@/services/post";
 import { IPost, IUser } from "@/types";
-import { Avatar } from "@nextui-org/avatar";
-import { Button } from "@nextui-org/button";
+import { Avatar } from "@heroui/avatar";
+import { Button } from "@heroui/button";
 import { Metadata } from "next";
 import Link from "next/link";
 import { AiOutlineSmallDash } from "react-icons/ai";
@@ -137,7 +137,6 @@ const DynamicProfilePage = async () => {
 
                   <div className="flex items-center space-x-4">
                     <Button
-                      as={Link}
                       href={`/@${username}/following`}
                       size="sm"
                       variant="flat"
@@ -146,7 +145,6 @@ const DynamicProfilePage = async () => {
                       {totalFollowing} Following
                     </Button>
                     <Button
-                      as={Link}
                       href={`/@${username}/followers`}
                       size="sm"
                       variant="flat"

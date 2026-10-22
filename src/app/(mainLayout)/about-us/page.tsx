@@ -1,10 +1,9 @@
 import AdBanner from "@/components/adsense/ad-banner";
 import Container from "@/components/ui/container";
-import { Avatar } from "@nextui-org/avatar";
-import { Button } from "@nextui-org/button";
-import { Card, CardBody, CardHeader } from "@nextui-org/card";
+import { Avatar } from "@heroui/avatar";
+import { Button } from "@heroui/button";
+import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Metadata } from "next";
-import Link from "next/link";
 import {
   BiBookOpen,
   BiChevronRight,
@@ -102,7 +101,6 @@ const AboutUs: React.FC<IProps> = () => {
             </p>
             <Button
               href="/login"
-              as={Link}
               radius="sm"
               color="primary"
               size="lg"
@@ -211,7 +209,7 @@ const AboutUs: React.FC<IProps> = () => {
               {testimonials.map((testimonial, index) => (
                 <Card key={index}>
                   <CardBody className="p-6">
-                    <p className="mb-4 italic">"{testimonial.content}"</p>
+                    <p className="mb-4 italic">&quot;{testimonial.content}&quot;</p>
                     <div className="flex items-center">
                       <Avatar
                         src={`/placeholder.svg?height=40&width=40`}
@@ -241,7 +239,6 @@ const AboutUs: React.FC<IProps> = () => {
             <div className="flex justify-center gap-4">
               <Button
                 href="/signup"
-                as={Link}
                 radius="sm"
                 color="primary"
                 endContent={<FiZap />}
@@ -251,7 +248,6 @@ const AboutUs: React.FC<IProps> = () => {
               </Button>
               <Button
                 href="/contact-us"
-                as={Link}
                 radius="sm"
                 variant="bordered"
                 endContent={<BiMailSend />}

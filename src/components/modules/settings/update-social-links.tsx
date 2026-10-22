@@ -5,8 +5,7 @@ import THInput from "@/components/form/th-input";
 import Loading from "@/components/loading";
 import { useUpdateSocialLinks } from "@/hooks/user.hook";
 import { TSocialLink, TSocialPlatform } from "@/types";
-import { Button } from "@nextui-org/button";
-import { Divider } from "@nextui-org/divider";
+import { Button, Divider } from "@heroui/react";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 
 interface IProps {

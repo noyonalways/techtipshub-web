@@ -5,8 +5,10 @@ import THForm from "@/components/form/th-from";
 import THInput from "@/components/form/th-input";
 import THTextarea from "@/components/form/th-textarea";
 import { IUser } from "@/types";
-import { Avatar } from "@nextui-org/avatar";
-import { Button } from "@nextui-org/button";
+import {
+  Avatar,
+  Button,
+} from "@heroui/react";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 import { GoImage } from "react-icons/go";
 import { useUpdateProfile } from "@/hooks/user.hook";

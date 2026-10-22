@@ -4,11 +4,19 @@ import Loading from "@/components/loading";
 import { useUpdatePostByUserUsingId } from "@/hooks/post.hook";
 import { getAllCategories } from "@/services/category";
 import { ICategory, IPost } from "@/types";
-import { Button } from "@nextui-org/button";
-import { Image } from "@nextui-org/image";
-import { Input } from "@nextui-org/input";
-import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@nextui-org/modal";
-import { Select, SelectItem } from "@nextui-org/select";
+import {
+  Button,
+  Image,
+  Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Select,
+  SelectItem,
+  useDisclosure,
+} from "@heroui/react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";

@@ -1,6 +1,6 @@
 "use client";
 
-import { Textarea, TextAreaProps } from "@nextui-org/input";
+import { Textarea, TextAreaProps } from "@heroui/react";
 import { useFormContext } from "react-hook-form";
 
 interface IProps extends TextAreaProps {

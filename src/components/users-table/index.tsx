@@ -1,21 +1,8 @@
 "use client";
 
-import {
-  useBlockUser,
-  useGetAllUsers,
-  useUnblockUser,
-} from "@/hooks/user.hook";
+import { useBlockUser, useGetAllUsers, useUnblockUser } from "@/hooks/user.hook";
 import { IUser } from "@/types";
-import { Avatar } from "@nextui-org/avatar";
-import { Button } from "@nextui-org/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from "@nextui-org/table";
+import { Avatar, Button, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/react";
 import Link from "next/link";
 import { CgSpinner } from "react-icons/cg";
 import {

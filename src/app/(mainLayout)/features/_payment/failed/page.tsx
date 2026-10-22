@@ -1,9 +1,9 @@
 import Container from "@/components/ui/container";
 import { getPaymentInfoByTransactionId } from "@/services/payment";
 import { IPayment } from "@/types";
-import { Button } from "@nextui-org/button";
-import { Card, CardBody, CardFooter, CardHeader } from "@nextui-org/card";
-import { Divider } from "@nextui-org/divider";
+import { Button } from "@heroui/button";
+import { Card, CardBody, CardFooter, CardHeader } from "@heroui/card";
+import { Divider } from "@heroui/divider";
 import { BiXCircle } from "react-icons/bi";
 import { FiAlertTriangle, FiHelpCircle, FiRefreshCcw } from "react-icons/fi";
 import { format } from "date-fns";
@@ -19,15 +19,15 @@ export const metadata: Metadata = {
 };
 
 interface IProps {
-  searchParams: {
+  searchParams: Promise<{
     transactionId: string;
-  };
+  }>;
 }
 
 const PaymentFailedPage = async ({ searchParams }: IProps) => {
-  const paymentData = await getPaymentInfoByTransactionId(
-    searchParams.transactionId
-  );
+  const { transactionId: txnId } = await searchParams;
+
+  const paymentData = await getPaymentInfoByTransactionId(txnId);
 
   const {
     amount,
@@ -55,7 +55,7 @@ const PaymentFailedPage = async ({ searchParams }: IProps) => {
               <div className="flex flex-col items-center">
                 <h1 className="text-2xl font-bold">Payment Failed</h1>
                 <p className="text-sm opacity-80">
-                  We couldn't process your payment
+                  We couldn&apos;t process your payment
                 </p>
               </div>
             </CardHeader>

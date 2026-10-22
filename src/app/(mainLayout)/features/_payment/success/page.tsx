@@ -1,9 +1,9 @@
 import Container from "@/components/ui/container";
 import { getPaymentInfoByTransactionId } from "@/services/payment";
 import { IPayment } from "@/types";
-import { Card, CardBody, CardFooter, CardHeader } from "@nextui-org/card";
-import { Divider } from "@nextui-org/divider";
-import { button as buttonStyles } from "@nextui-org/theme";
+import { Card, CardBody, CardFooter, CardHeader } from "@heroui/card";
+import { Divider } from "@heroui/divider";
+import { button as buttonStyles } from "@heroui/theme";
 import Link from "next/link";
 import { BiCalendar, BiCreditCard } from "react-icons/bi";
 import { BsCheckCircle } from "react-icons/bs";
@@ -22,15 +22,15 @@ export const metadata: Metadata = {
 
 
 interface IProps {
-  searchParams: {
+  searchParams: Promise<{
     transactionId: string;
-  };
+  }>;
 }
 
 const PaymentSuccessPage = async ({ searchParams }: IProps) => {
-  const paymentData = await getPaymentInfoByTransactionId(
-    searchParams.transactionId
-  );
+  const { transactionId: txnId } = await searchParams;
+
+  const paymentData = await getPaymentInfoByTransactionId(txnId);
 
   const {
     amount,

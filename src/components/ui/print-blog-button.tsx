@@ -4,7 +4,7 @@
 "use client";
 
 import { IPost } from "@/types";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/react";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 
@@ -29,7 +29,7 @@ const PrintBlogButton = ({ blog }: IProps) => {
       {isClient ? (
         <PDFDownloadButton blog={blog} />
       ) : (
-        <Button isLoading isIconOnly variant="light"></Button>
+        <Button isLoading isIconOnly variant="light" />
       )}
     </>
   );

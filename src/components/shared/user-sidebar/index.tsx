@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/react";
 import Link from "next/link";
 import { useState } from "react";
 import {
@@ -46,7 +46,7 @@ const UserSidebar = ({}: IProps) => {
                 onClick={() => setOpen(!open)}
                 startContent={<HiXMark size={16} />}
                 isIconOnly
-              ></Button>
+               />
             )}
 
             <ul className="px-4 flex flex-col w-full space-y-2">

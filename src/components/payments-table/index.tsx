@@ -2,15 +2,15 @@
 
 import { useGetAllPayments } from "@/hooks/payment.hook";
 import { IPayment } from "@/types";
-import { Avatar } from "@nextui-org/avatar";
 import {
+  Avatar,
   Table,
   TableBody,
   TableCell,
   TableColumn,
   TableHeader,
   TableRow,
-} from "@nextui-org/table";
+} from "@heroui/react";
 import { format } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { CgSpinner } from "react-icons/cg";

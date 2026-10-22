@@ -1,7 +1,7 @@
 import { IPost } from "@/types";
-import { Avatar } from "@nextui-org/avatar";
-import { Button } from "@nextui-org/button";
-import { Image as NextImage } from "@nextui-org/image";
+import { Avatar } from "@heroui/avatar";
+import { Button } from "@heroui/button";
+import { Image as NextImage } from "@heroui/image";
 import Link from "next/link";
 import { AiOutlineComment } from "react-icons/ai";
 import { BiDownvote, BiUpvote } from "react-icons/bi";

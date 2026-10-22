@@ -1,6 +1,6 @@
 import Container from "@/components/ui/container";
 import { poppins } from "@/config/fonts";
-import { Image } from "@nextui-org/image";
+import { Image } from "@heroui/image";
 import Link from "next/link";
 import { FaDiscord, FaFacebook, FaLinkedin, FaYoutube } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";

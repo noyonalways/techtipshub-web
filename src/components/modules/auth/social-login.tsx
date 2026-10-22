@@ -1,7 +1,6 @@
 "use client"
 
-import { Button } from "@nextui-org/button";
-import { Divider } from "@nextui-org/divider";
+import { Button, Divider } from "@heroui/react";
 import { signIn } from "next-auth/react";
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";

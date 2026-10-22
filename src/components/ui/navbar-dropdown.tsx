@@ -3,13 +3,13 @@
 import { protectedRoutes } from "@/constant";
 import { useUser } from "@/context/user.provider";
 import { logOutUser } from "@/services/auth";
-import { Avatar } from "@nextui-org/avatar";
 import {
+  Avatar,
   Dropdown,
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
-} from "@nextui-org/dropdown";
+} from "@heroui/react";
 import NextLink from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -20,8 +20,8 @@ const NavarDropdown: React.FC<IProps> = () => {
   const pathname = usePathname();
   const { setIsLoading: setUserLoading, user } = useUser();
 
-  const handleLogoutUser = () => {
-    logOutUser();
+  const handleLogoutUser = async () => {
+    await logOutUser();
     setUserLoading(true);
 
     if (protectedRoutes.some((route) => pathname.match(route))) {

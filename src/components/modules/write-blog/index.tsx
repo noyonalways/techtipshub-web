@@ -1,20 +1,23 @@
 "use client";
 
-import { Button } from "@nextui-org/button";
-import { Input } from "@nextui-org/input";
-import dynamic from "next/dynamic";
-import { useState, useRef, useEffect } from "react";
 import {
+  Button,
+  Checkbox,
+  Image,
+  Input,
   Modal,
   ModalBody,
-  ModalHeader,
-  ModalFooter,
   ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Select,
+  SelectItem,
+  Spinner,
   useDisclosure,
-} from "@nextui-org/modal";
+} from "@heroui/react";
+import dynamic from "next/dynamic";
+import { useState, useRef, useEffect } from "react";
 import "react-quill/dist/quill.snow.css";
-import { Select, SelectItem } from "@nextui-org/select";
-import { Checkbox } from "@nextui-org/checkbox";
 import { GoImage } from "react-icons/go";
 import { RiCloseLargeFill } from "react-icons/ri";
 import { useForm, Controller, FieldValues } from "react-hook-form";
@@ -22,9 +25,7 @@ import { getAllCategories } from "@/services/category";
 import { ICategory, IUser } from "@/types";
 import { getProfileInfo } from "@/services/auth";
 import { useCreatePost } from "@/hooks/post.hook";
-import { Image } from "@nextui-org/image";
 import { useRouter } from "next/navigation";
-import { Spinner } from "@nextui-org/spinner";
 
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false }) as any;
 
@@ -349,7 +350,7 @@ const WriteBlog = () => {
                     <>
                       <Select {...field} label="Category" isRequired>
                         {categories?.map((category) => (
-                          <SelectItem key={category._id} value={category._id}>
+                          <SelectItem key={category._id}>
                             {category.name}
                           </SelectItem>
                         ))}

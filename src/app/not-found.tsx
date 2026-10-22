@@ -1,5 +1,5 @@
 import Container from "@/components/ui/container";
-import { button as buttonStyles } from "@nextui-org/theme";
+import { button as buttonStyles } from "@heroui/theme";
 import { Metadata } from "next";
 import Link from "next/link";
 
@@ -25,10 +25,10 @@ const NotFoundPage: React.FC<IProps> = () => {
         <div className="min-h-dvh flex flex-col items-center justify-center text-center">
           <h1 className="text-6xl font-bold text-default-600">404</h1>
           <p className="text-xl text-default-500 mt-4 mb-2">
-            Oops! The page you're looking for doesn't exist.
+            Oops! The page you&apos;re looking for doesn&apos;t exist.
           </p>
           <p className="text-md text-default-400 mb-8">
-            It seems we can't find what you're looking for.
+            It seems we can&apos;t find what you&apos;re looking for.
           </p>
 
           <Link

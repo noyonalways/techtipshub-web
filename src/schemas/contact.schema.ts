@@ -3,28 +3,27 @@ import { z } from "zod";
 export const contactFormValidationSchema = z.object({
   firstName: z
     .string({
-      required_error: "First name ir required",
+      error: "First name is required",
     })
     .min(1, "First name is required"),
   lastName: z
     .string({
-      required_error: "Last name ir required",
+      error: "Last name is required",
     })
     .min(1, "Last name is required"),
   email: z
-    .string({
-      required_error: "Email is required",
+    .email({
+      error: "Email is required",
     })
-    .min(1, "Email is required")
-    .email("Please provide a valid email address"),
+    .min(1, "Email is required"),
   subject: z
     .string({
-      required_error: "Subject is required",
+      error: "Subject is required",
     })
     .min(1, "Subject is required"),
   message: z
     .string({
-      required_error: "Message is required",
+      error: "Message is required",
     })
     .min(1, "Message is required"),
 });

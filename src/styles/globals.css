@@ -1,10 +1,92 @@
 @import "tailwindcss";
-@config "../tailwind.config.js";
+@config "../../tailwind.config.js";
 @plugin "@tailwindcss/typography";
+
+/*
+ * HeroUI v2 theme for Tailwind v4.
+ * `heroui-plugin.cjs` adapts HeroUI's theme plugin for the `@plugin`
+ * directive. It reads the theme from tailwind.config.js via `@config`,
+ * so keep `themes: {}` there as the single source of truth.
+ */
+@plugin "./heroui-plugin.cjs";
+
 @custom-variant dark (&:is(.dark *));
+
+/*
+ * Theme tokens that the HeroUI JS plugin does not emit for Tailwind v4.
+ * Without these, `text-default-500`, `bg-default-50`, `primary-500`, etc.
+ * would not be generated as utilities.
+ */
+@theme {
+  --color-default-50: var(--heroui-default-50);
+  --color-default-100: var(--heroui-default-100);
+  --color-default-200: var(--heroui-default-200);
+  --color-default-300: var(--heroui-default-300);
+  --color-default-400: var(--heroui-default-400);
+  --color-default-500: var(--heroui-default-500);
+  --color-default-600: var(--heroui-default-600);
+  --color-default-700: var(--heroui-default-700);
+  --color-default-800: var(--heroui-default-800);
+  --color-default-900: var(--heroui-default-900);
+  --color-default: var(--heroui-default);
+
+  --color-background: var(--heroui-background);
+  --color-foreground: var(--heroui-foreground);
+  --color-content-1: var(--heroui-content1);
+  --color-content-2: var(--heroui-content2);
+  --color-content-3: var(--heroui-content3);
+  --color-content-4: var(--heroui-content4);
+
+  --color-primary-50: var(--heroui-primary-50);
+  --color-primary-100: var(--heroui-primary-100);
+  --color-primary-200: var(--heroui-primary-200);
+  --color-primary-300: var(--heroui-primary-300);
+  --color-primary-400: var(--heroui-primary-400);
+  --color-primary-500: var(--heroui-primary-500);
+  --color-primary: var(--heroui-primary);
+
+  --color-secondary-50: var(--heroui-secondary-50);
+  --color-secondary-100: var(--heroui-secondary-100);
+  --color-secondary-200: var(--heroui-secondary-200);
+  --color-secondary-300: var(--heroui-secondary-300);
+  --color-secondary-400: var(--heroui-secondary-400);
+  --color-secondary-500: var(--heroui-secondary-500);
+  --color-secondary: var(--heroui-secondary);
+
+  --color-success-50: var(--heroui-success-50);
+  --color-success-100: var(--heroui-success-100);
+  --color-success-200: var(--heroui-success-200);
+  --color-success-300: var(--heroui-success-300);
+  --color-success-400: var(--heroui-success-400);
+  --color-success-500: var(--heroui-success-500);
+  --color-success: var(--heroui-success);
+
+  --color-warning-50: var(--heroui-warning-50);
+  --color-warning-100: var(--heroui-warning-100);
+  --color-warning-200: var(--heroui-warning-200);
+  --color-warning-300: var(--heroui-warning-300);
+  --color-warning-400: var(--heroui-warning-400);
+  --color-warning-500: var(--heroui-warning-500);
+  --color-warning: var(--heroui-warning);
+
+  --color-danger-50: var(--heroui-danger-50);
+  --color-danger-100: var(--heroui-danger-100);
+  --color-danger-200: var(--heroui-danger-200);
+  --color-danger-300: var(--heroui-danger-300);
+  --color-danger-400: var(--heroui-danger-400);
+  --color-danger-500: var(--heroui-danger-500);
+  --color-danger: var(--heroui-danger);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
 
 * {
   scrollbar-width: thin;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
 }
 
 p {
@@ -15,6 +97,7 @@ p {
   color: var(--color-gray-400);
 }
 
+/* react-quill editor, themed with HeroUI tokens */
 .ql-container {
   background-color: var(--color-default-50);
   border-radius: 0.25rem;

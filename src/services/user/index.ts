@@ -3,7 +3,7 @@
 import envConfig from "@/config/env.config";
 import axiosInstance from "@/lib/AxiosInstance";
 import { TSocialLink } from "@/types";
-import { revalidateTag } from "next/cache";
+import { updateTag } from "next/cache";
 
 // get user by username
 export const getUserByUsername = async (username: string) => {
@@ -37,7 +37,7 @@ export const followUser = async (userId: string) => {
   try {
     const res = await axiosInstance.put(`/users/${userId}/follow`);
 
-    revalidateTag("singleUser");
+    updateTag("singleUser");
 
     return res.data;
   } catch (err: any) {
@@ -50,7 +50,7 @@ export const unfollowUser = async (userId: string) => {
   try {
     const res = await axiosInstance.delete(`/users/${userId}/unfollow`);
 
-    revalidateTag("singleUser");
+    updateTag("singleUser");
 
     return res.data;
   } catch (err: any) {
@@ -124,7 +124,7 @@ export const updateProfile = async (payload: FormData) => {
     const res = await axiosInstance.patch(`/users/update-profile`, payload);
 
 
-    revalidateTag("loggedInUserProfile")
+    updateTag("loggedInUserProfile")
 
     return res.data;
   } catch (err: any) {
@@ -139,7 +139,7 @@ export const updateSocialLinks = async (payload: {
   try {
     const res = await axiosInstance.put(`/users/profile/update-social-links`, payload);
 
-    revalidateTag("loggedInUserProfile")
+    updateTag("loggedInUserProfile")
 
     return res?.data;
   } catch (err: any) {

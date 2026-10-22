@@ -1,15 +1,15 @@
 "use client";
 
 import { useDeletePostByUserUsingId, useUpdatePostByUserUsingId } from "@/hooks/post.hook";
-import { Button } from "@nextui-org/button";
 import {
+  Button,
   Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
   ModalHeader,
   useDisclosure,
-} from "@nextui-org/modal";
+} from "@heroui/react";
 import { useRouter } from "next/navigation";
 
 import { FiTrash2 } from "react-icons/fi";

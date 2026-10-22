@@ -11,13 +11,14 @@ export const metadata: Metadata = {
 };
 
 interface IProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 const UpdateSingleBlog = async ({ params }: IProps) => {
-  const data = await getPostBySlug(params?.slug);
+  const { slug } = await params;
+  const data = await getPostBySlug(slug);
   const post = (data?.data as IPost) ?? {};
 
 

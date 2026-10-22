@@ -1,5 +1,5 @@
 import Container from "@/components/ui/container";
-import { Skeleton } from "@nextui-org/skeleton";
+import { Skeleton } from "@heroui/skeleton";
 
 interface IProps {}
 

@@ -13,10 +13,10 @@ import { poppins } from "@/config/fonts";
 import { getAllPosts, getCommentsByPostId, getPostBySlug } from "@/services/post";
 import { IPost } from "@/types";
 import { IComment } from "@/types/comment.type";
-import { Avatar } from "@nextui-org/avatar";
-import { Button } from "@nextui-org/button";
-import { Image as NextImage } from "@nextui-org/image";
-import { Textarea } from "@nextui-org/input";
+import { Avatar } from "@heroui/avatar";
+import { Button } from "@heroui/button";
+import { Image as NextImage } from "@heroui/image";
+import { Textarea } from "@heroui/input";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AiOutlineComment } from "react-icons/ai";
@@ -113,7 +113,6 @@ const DynamicBlogPage = async ({ params }: { params: { slug: string } }) => {
                     Accessing premium content requires logging in.
                   </p>
                   <Button
-                    as={Link}
                     href={`/login?redirect=blogs/${params?.slug}`}
                     radius="full"
                     variant="solid"
@@ -129,7 +128,6 @@ const DynamicBlogPage = async ({ params }: { params: { slug: string } }) => {
                     {data?.message}
                   </p>
                   <Button
-                    as={Link}
                     href="/subscriptions"
                     radius="full"
                     variant="solid"
@@ -143,7 +141,6 @@ const DynamicBlogPage = async ({ params }: { params: { slug: string } }) => {
                 <div className="text center space-y-4 w-full flex flex-col items-center justify-center h-[calc(100vh-410px)]">
                   <p className="text-center text-default-600">Blog not found</p>
                   <Button
-                    as={Link}
                     href={`/`}
                     radius="full"
                     variant="solid"

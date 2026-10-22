@@ -5,7 +5,7 @@ import THInput from "@/components/form/th-input";
 import { useForgetPassword } from "@/hooks/auth.hook";
 import { passwordResetValidationSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { Suspense, useEffect } from "react";
 import { FieldValues, SubmitHandler } from "react-hook-form";

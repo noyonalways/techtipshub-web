@@ -1,7 +1,7 @@
 import { IComment } from "@/types/comment.type";
-import { Avatar } from "@nextui-org/avatar";
-import { Button } from "@nextui-org/button";
-import { Image } from "@nextui-org/image";
+import { Avatar } from "@heroui/avatar";
+import { Button } from "@heroui/button";
+import { Image } from "@heroui/image";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { MdModeEdit, MdDelete } from "react-icons/md";

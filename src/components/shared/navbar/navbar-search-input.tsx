@@ -3,7 +3,7 @@
 import THForm from "@/components/form/th-from";
 import THInput from "@/components/form/th-input";
 import { SearchIcon } from "@/components/icons";
-import { Kbd } from "@nextui-org/kbd";
+import { Kbd } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 

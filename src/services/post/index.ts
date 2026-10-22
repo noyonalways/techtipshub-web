@@ -2,7 +2,7 @@
 
 import envConfig from "@/config/env.config";
 import axiosInstance from "@/lib/AxiosInstance";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { cookies } from "next/headers";
 
 export const getAllPosts = async (
@@ -38,7 +38,7 @@ export const getAllPosts = async (
 export const getFollowingUsersPosts = async (
   params?: Record<string, string | undefined>
 ) => {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const accessToken = cookieStore.get("tth_access_token")?.value;
 
   try {
@@ -75,7 +75,7 @@ export const createPost = async (payload: FormData) => {
   try {
     const res = await axiosInstance.post("/posts", payload);
 
-    revalidateTag("allPosts");
+    updateTag("allPosts");
     revalidatePath("/")
 
     return res?.data;
@@ -97,7 +97,7 @@ export const getPostBySlug = async (slug: string) => {
 export const getLoggedInUserPosts = async (
   params?: Record<string, string | undefined>
 ) => {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const accessToken = cookieStore.get("tth_access_token")?.value;
   try {
     const url = new URL(`${envConfig.baseApi}/posts/my-posts`);
@@ -151,7 +151,7 @@ export const voteOnPost = async (
       `/posts/${postId}/vote?voteType=${voteType}`
     );
 
-    revalidateTag("singlePost");
+    updateTag("singlePost");
 
     return res.data;
   } catch (err: any) {
@@ -165,7 +165,7 @@ export const commentOnPost = async (postId: string, payload: FormData) => {
   try {
     const res = await axiosInstance.post(`/posts/${postId}/comments`, payload);
 
-    revalidateTag("comments");
+    updateTag("comments");
 
     return await res?.data;
   } catch (err: any) {
@@ -198,7 +198,7 @@ export const deleteBlogByAdminUsingId = async (
       data: { reason },
     });
 
-    revalidateTag("allPosts");
+    updateTag("allPosts");
 
     return res.data;
   } catch (err: any) {
@@ -211,7 +211,7 @@ export const deleteBlogByUserUsingId = async (blogId: string) => {
   try {
     const res = await axiosInstance.delete(`/posts/${blogId}`);
 
-    revalidateTag("myPosts");
+    updateTag("myPosts");
 
     return res.data;
   } catch (err: any) {
@@ -225,7 +225,7 @@ export const updateBlogByUserUsingId = async (blogId: string, payload: FormData)
   try {
     const res = await axiosInstance.put(`/posts/${blogId}`, payload);
 
-    revalidateTag("myPosts");
+    updateTag("myPosts");
 
     return res.data;
   } catch (err: any) {
@@ -238,7 +238,7 @@ export const updateBlogByAdmin = async (blogId: string, payload: FormData) => {
   try {
     const res = await axiosInstance.put(`/posts/${blogId}/by-admin`, payload);
 
-    revalidateTag("allPosts");
+    updateTag("allPosts");
 
     return res.data;
   } catch (err: any) {
@@ -251,7 +251,7 @@ export const deleteCommentByUser = async (commentId: string) => {
   try {
     const res = await axiosInstance.delete(`/comments/${commentId}`);
 
-    revalidateTag("comments");
+    updateTag("comments");
 
     return res.data;
   } catch (err: any) {
@@ -264,7 +264,7 @@ export const updateCommentByUser = async (commentId: string, payload: FormData) 
   try {
     const res = await axiosInstance.put(`/comments/${commentId}`, payload);
 
-    revalidateTag("comments");
+    updateTag("comments");
 
     return res.data;
   } catch (err: any) {

@@ -1,8 +1,8 @@
 import AdBanner from "@/components/adsense/ad-banner";
 import { getFollowersByUserId, getUserByUsername } from "@/services/user";
 import { IUFollower, IUser } from "@/types";
-import { Avatar } from "@nextui-org/avatar";
-import { Button } from "@nextui-org/button";
+import { Avatar } from "@heroui/avatar";
+import { Button } from "@heroui/button";
 import Link from "next/link";
 
 interface IProps {
@@ -27,7 +27,6 @@ const Followers = async ({ params }: IProps) => {
       <div className="flex items-center space-x-1 border-b border-default/50">
         <Button
           variant="light"
-          as={Link}
           radius="sm"
           href={`/@${username}/followers`}
         >
@@ -35,7 +34,6 @@ const Followers = async ({ params }: IProps) => {
         </Button>
         <Button
           variant="light"
-          as={Link}
           radius="sm"
           href={`/@${username}/following`}
         >

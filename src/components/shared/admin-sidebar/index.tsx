@@ -1,8 +1,10 @@
 "use client"
 
 import { ThemeSwitch } from "@/components/ui/theme-switch";
-import { Button } from "@nextui-org/button";
-import { Image } from "@nextui-org/image";
+import {
+  Button,
+  Image,
+} from "@heroui/react";
 import Link from "next/link";
 import { useState } from "react";
 import { HiBars2, HiXMark } from "react-icons/hi2";

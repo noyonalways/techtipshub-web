@@ -4,7 +4,7 @@ import { useUser } from "@/context/user.provider";
 import { useSubscribePremiumMonthly } from "@/hooks/subscription.hook";
 import { getProfileInfo } from "@/services/auth";
 import { IUser } from "@/types";
-import { Button, ButtonProps } from "@nextui-org/button";
+import { Button, ButtonProps } from "@heroui/react";
 import { ReactNode, useEffect, useState } from "react";
 import Loading from "../loading";
 import { AuthenticationModal } from "../modals";

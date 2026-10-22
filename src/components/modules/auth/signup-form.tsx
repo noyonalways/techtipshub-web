@@ -8,7 +8,7 @@ import Loading from "@/components/loading";
 import { useUserRegister } from "@/hooks/auth.hook";
 import { signUpValidationSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { FieldValues, SubmitHandler } from "react-hook-form";

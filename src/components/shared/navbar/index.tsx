@@ -4,22 +4,22 @@ import LoginLogoutSwitch from "@/components/ui/login-logout-switch";
 import { ThemeSwitch } from "@/components/ui/theme-switch";
 import WritePostButton from "@/components/ui/write-post-button";
 import { siteConfig } from "@/config/site";
-import { Image } from "@nextui-org/image";
+import { usePathname } from "next/navigation";
 import {
+  Button,
+  Image,
+  link as linkStyles,
+  Navbar as NextUINavbar,
   NavbarBrand,
   NavbarContent,
   NavbarItem,
   NavbarMenu,
   NavbarMenuItem,
   NavbarMenuToggle,
-  Navbar as NextUINavbar,
-} from "@nextui-org/navbar";
-import { link as linkStyles } from "@nextui-org/theme";
+} from "@heroui/react";
 import clsx from "clsx";
 import NextLink from "next/link";
 import NavbarSearchInput from "./navbar-search-input";
-import { usePathname } from "next/navigation";
-import { Button } from "@nextui-org/button";
 import { GoPencil } from "react-icons/go";
 import { useUser } from "@/context/user.provider";
 

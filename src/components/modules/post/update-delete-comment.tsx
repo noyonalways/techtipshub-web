@@ -6,7 +6,7 @@ import {
   useDeleteCommentByUser,
   useUpdateCommentByUser,
 } from "@/hooks/post.hook";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/react";
 import { MdDelete, MdModeEdit } from "react-icons/md";
 
 interface IProps {

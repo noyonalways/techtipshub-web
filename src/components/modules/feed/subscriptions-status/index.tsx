@@ -3,8 +3,10 @@
 import { useUser } from "@/context/user.provider";
 import { getProfileInfo } from "@/services/auth";
 import { IUser } from "@/types";
-import { Button } from "@nextui-org/button";
-import { Skeleton } from "@nextui-org/skeleton";
+import {
+  Button,
+  Skeleton,
+} from "@heroui/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { HiUser } from "react-icons/hi2";

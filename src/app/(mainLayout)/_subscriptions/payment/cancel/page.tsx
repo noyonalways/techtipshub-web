@@ -1,9 +1,9 @@
 import Container from "@/components/ui/container";
 import { getPaymentInfoByTransactionId } from "@/services/payment";
 import { IPayment } from "@/types";
-import { Card, CardBody, CardFooter, CardHeader } from "@nextui-org/card";
-import { Divider } from "@nextui-org/divider";
-import { button as buttonStyles } from "@nextui-org/theme";
+import { Card, CardBody, CardFooter, CardHeader } from "@heroui/card";
+import { Divider } from "@heroui/divider";
+import { button as buttonStyles } from "@heroui/theme";
 import { format } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { Metadata } from "next";
@@ -20,13 +20,15 @@ export const metadata: Metadata = {
 };
 
 interface IProps {
-  searchParams: {
+  searchParams: Promise<{
     transactionId: string;
-  };
+  }>;
 }
 const PaymentCancelPage = async ({ searchParams }: IProps) => {
+  const { transactionId: queriedTransactionId } = await searchParams;
+
   const paymentData = await getPaymentInfoByTransactionId(
-    searchParams.transactionId
+    queriedTransactionId
   );
 
   const { amount, transactionId, subscription, currency } =

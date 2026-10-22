@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import MiniFooter from "@/components/shared/mini-footer";
-import { Skeleton } from "@nextui-org/skeleton";
+import { Skeleton } from "@heroui/react";
 import Categories from "./categories";
 import { getAllCategories } from "@/services/category";
 import { ICategory } from "@/types";

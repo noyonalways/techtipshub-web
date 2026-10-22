@@ -18,16 +18,19 @@ export const metadata: Metadata = {
 };
 
 interface IProps {
-  searchParams: {
+  searchParams: Promise<{
     search: string;
     category: string;
-  };
+  }>;
 }
 
 export default async function FollowingUsersPosts({ searchParams }: IProps) {
-  const params = searchParams
-    ? { searchTerm: searchParams.search, category: searchParams.category }
-    : undefined;
+  const { search, category } = await searchParams;
+
+  const params = {
+    searchTerm: search,
+    category: category,
+  };
 
   const data = await getFollowingUsersPosts(params);
   const posts = data?.data as IPost[];

@@ -1,7 +1,7 @@
 import { IPost } from "@/types";
-import { Avatar } from "@nextui-org/avatar";
-import { Button } from "@nextui-org/button";
-import { Image } from "@nextui-org/image";
+import { Avatar } from "@heroui/avatar";
+import { Button } from "@heroui/button";
+import { Image } from "@heroui/image";
 import Link from "next/link";
 import { FiEdit } from "react-icons/fi";
 import { parseHtmlContent } from "@/utils";
@@ -96,7 +96,6 @@ const ManageBlogCard = ({ post }: IProps) => {
           <UserDeleteBlogModal id={_id} />
           <Button
             href={`/settings/update/${slug}`}
-            as={Link}
             size="sm"
             variant="light"
             startContent={<FiEdit className="text-lg text-gray-600" />}

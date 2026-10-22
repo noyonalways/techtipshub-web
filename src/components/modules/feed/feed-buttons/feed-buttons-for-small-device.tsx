@@ -1,7 +1,7 @@
 "use client";
 
 import { useUser } from "@/context/user.provider";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { PiMagicWandLight, PiUsers } from "react-icons/pi";

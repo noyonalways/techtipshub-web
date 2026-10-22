@@ -8,7 +8,7 @@ import { useUserLogin } from "@/hooks/auth.hook";
 import { signInValidationSchema } from "@/schemas";
 import { TLogin } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { FieldValues, SubmitHandler } from "react-hook-form";

@@ -3,7 +3,7 @@
 import { useUser } from "@/context/user.provider";
 import { useFollowUser, useUnfollowUser } from "@/hooks/user.hook";
 import { getUserFollowingStatus } from "@/services/user";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/react";
 import { useEffect, useState } from "react";
 import { GoPlus } from "react-icons/go";
 import { HiMinus } from "react-icons/hi2";
@@ -82,7 +82,7 @@ const FollowUnFollowButton: React.FC<IProps> = ({ id }) => {
           variant="solid"
           color="primary"
           isLoading={isLoading}
-        ></Button>
+         />
       ) : (
         <>
           {loggedInUser ? (

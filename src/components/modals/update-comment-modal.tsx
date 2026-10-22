@@ -1,21 +1,21 @@
 "use client";
 
-import { Button } from "@nextui-org/button";
-import THForm from "../form/th-from";
-import THTextarea from "../form/th-textarea";
 import { LuImagePlus } from "react-icons/lu";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 import { ChangeEvent, useState } from "react";
 import { toast } from "sonner";
 import { useUpdateCommentByUser } from "@/hooks/post.hook";
 import {
+  Button,
   Modal,
   ModalBody,
   ModalContent,
   ModalHeader,
   useDisclosure,
-} from "@nextui-org/modal";
+} from "@heroui/react";
 import { MdModeEdit } from "react-icons/md";
+import THForm from "../form/th-from";
+import THTextarea from "../form/th-textarea";
 
 interface IProps {
   commentId: string;

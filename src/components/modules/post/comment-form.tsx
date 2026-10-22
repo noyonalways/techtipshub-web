@@ -7,7 +7,7 @@ import { useUser } from "@/context/user.provider";
 import { useCommentOnPost } from "@/hooks/post.hook";
 import { commentValidationSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/react";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 import { LuImagePlus } from "react-icons/lu";
 import { useState } from "react";

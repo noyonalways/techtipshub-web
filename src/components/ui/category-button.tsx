@@ -1,7 +1,7 @@
 "use client";
 
 import { ICategory } from "@/types";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/react";
 import { useRouter } from "next/navigation";
 
 interface IProps extends ICategory {}

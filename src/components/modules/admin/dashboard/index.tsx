@@ -1,16 +1,18 @@
 "use client";
 
 import { useDashboardMetrics } from "@/hooks/metrics";
-import { Avatar } from "@nextui-org/avatar";
-import { Card, CardBody, CardHeader } from "@nextui-org/card";
 import {
+  Avatar,
+  Card,
+  CardBody,
+  CardHeader,
   Table,
   TableBody,
   TableCell,
   TableColumn,
   TableHeader,
   TableRow,
-} from "@nextui-org/table";
+} from "@heroui/react";
 import React from "react";
 import {
   RiArrowUpLine,

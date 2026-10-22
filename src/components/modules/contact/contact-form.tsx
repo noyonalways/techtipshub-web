@@ -5,7 +5,7 @@ import THInput from "@/components/form/th-input";
 import THTextarea from "@/components/form/th-textarea";
 import { contactFormValidationSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/react";
 import { FieldValues } from "react-hook-form";
 import { BsArrowRight } from "react-icons/bs";
 
