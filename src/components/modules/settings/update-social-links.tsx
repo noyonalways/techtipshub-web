@@ -3,9 +3,10 @@
 import THForm from "@/components/form/th-from";
 import THInput from "@/components/form/th-input";
 import Loading from "@/components/loading";
+import SettingsSaveBar from "@/components/modules/settings/settings-save-bar";
+import SettingsSection from "@/components/modules/settings/settings-section";
 import { useUpdateSocialLinks } from "@/hooks/user.hook";
 import { TSocialLink, TSocialPlatform } from "@/types";
-import { Button } from "@heroui/react";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 import { BsTwitterX } from "react-icons/bs";
 import {
@@ -25,37 +26,49 @@ const allowedSocialLinks = [
   {
     name: "linkedin",
     platform: "Linkedin",
+    label: "LinkedIn",
+    hint: "linkedin.com/in/…",
     placeholder: "https://linkedin.com/in/username",
     icon: <FaLinkedin aria-hidden className="size-4" />,
   },
   {
     name: "github",
     platform: "Github",
+    label: "GitHub",
+    hint: "github.com/…",
     placeholder: "https://github.com/username",
     icon: <FaGithub aria-hidden className="size-4" />,
   },
   {
     name: "instagram",
     platform: "Instagram",
+    label: "Instagram",
+    hint: "instagram.com/…",
     placeholder: "https://instagram.com/username",
     icon: <FaInstagram aria-hidden className="size-4" />,
   },
   {
     name: "twitter",
     platform: "Twitter",
-    placeholder: "https://twitter.com/username",
+    label: "X / Twitter",
+    hint: "x.com/…",
+    placeholder: "https://x.com/username",
     icon: <BsTwitterX aria-hidden className="size-4" />,
   },
   {
     name: "facebook",
     platform: "Facebook",
+    label: "Facebook",
+    hint: "facebook.com/…",
     placeholder: "https://facebook.com/username",
     icon: <FaFacebook aria-hidden className="size-4" />,
   },
   {
     name: "youtube",
     platform: "Youtube",
-    placeholder: "https://youtube.com/channel/@username",
+    label: "YouTube",
+    hint: "youtube.com/@…",
+    placeholder: "https://youtube.com/@username",
     icon: <FaYoutube aria-hidden className="size-4" />,
   },
 ];
@@ -74,11 +87,16 @@ const UpdateSocialLinks = ({ socialLinks = [] }: IProps) => {
     youtube: links.find((link) => link.platform === "Youtube")?.url || "",
   };
 
+  const savedCount = allowedSocialLinks.filter(
+    (link) => defaultValues[link.name as keyof typeof defaultValues],
+  ).length;
+
   const onSubmit: SubmitHandler<FieldValues> = (values) => {
     const updatedSocialLinks = allowedSocialLinks
       .map((link) => ({
         platform: link.platform as TSocialPlatform,
-        url: values[link.name] as string,
+        // A pasted value often arrives with stray spaces; trim before saving.
+        url: String(values[link.name] ?? "").trim(),
       }))
       .filter((link) => link.url);
 
@@ -88,49 +106,57 @@ const UpdateSocialLinks = ({ socialLinks = [] }: IProps) => {
   return (
     <>
       {isPending && <Loading />}
-      <section id="social-links" className="scroll-mt-24">
-        <h2 className="text-sm font-semibold">Social profiles</h2>
-        <p className="mt-1 text-sm text-default-500">
-          Links saved here appear in your public profile header. Empty fields
-          are removed.
-        </p>
-
-        <THForm onSubmit={onSubmit} defaultValues={defaultValues}>
-          <div className="mt-5 space-y-4">
-            {allowedSocialLinks.map((socialLink) => (
-              <div key={socialLink.name}>
-                <label
-                  htmlFor={socialLink.name}
-                  className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-default-500"
-                >
-                  <span aria-hidden className="text-default-400">
-                    {socialLink.icon}
-                  </span>
-                  {socialLink.platform}
-                </label>
-                <THInput
-                  name={socialLink.name}
-                  variant="bordered"
-                  placeholder={socialLink.placeholder}
-                  radius="lg"
-                  id={socialLink.name}
-                />
-              </div>
-            ))}
-
-            <div className="flex justify-end border-t border-default/60 pt-5">
-              <Button
-                radius="lg"
-                color="primary"
-                className="font-semibold"
-                type="submit"
-              >
-                Save links
-              </Button>
+      <THForm onSubmit={onSubmit} defaultValues={defaultValues}>
+        <div className="space-y-6">
+          <SettingsSection
+            id="social-links"
+            title="Social profiles"
+            description="Linked from your public profile header. Leave a field empty to drop that link."
+            action={
+              <span className="text-xs tabular-nums text-default-500">
+                {savedCount} of {allowedSocialLinks.length} linked
+              </span>
+            }
+          >
+            <div className="grid gap-x-5 gap-y-4 sm:grid-cols-2">
+              {allowedSocialLinks.map((socialLink) => (
+                <div key={socialLink.name}>
+                  <label
+                    htmlFor={socialLink.name}
+                    className="mb-1 flex items-center justify-between gap-2 text-xs font-semibold text-default-600"
+                  >
+                    <span className="flex items-center gap-2">
+                      <span aria-hidden className="text-default-400">
+                        {socialLink.icon}
+                      </span>
+                      {socialLink.label}
+                    </span>
+                    <span className="font-normal text-default-400">
+                      {socialLink.hint}
+                    </span>
+                  </label>
+                  <THInput
+                    name={socialLink.name}
+                    variant="bordered"
+                    placeholder={socialLink.placeholder}
+                    radius="lg"
+                    id={socialLink.name}
+                    type="url"
+                    classNames={{ inputWrapper: "h-10" }}
+                  />
+                </div>
+              ))}
             </div>
-          </div>
-        </THForm>
-      </section>
+          </SettingsSection>
+
+          <SettingsSaveBar
+            isPending={isPending}
+            hint="Saved links show their icon beside your name."
+          >
+            Save links
+          </SettingsSaveBar>
+        </div>
+      </THForm>
     </>
   );
 };

@@ -1,49 +1,59 @@
 "use client";
 
-import Loading from "@/components/loading";
 import THForm from "@/components/form/th-from";
 import THInput from "@/components/form/th-input";
 import THTextarea from "@/components/form/th-textarea";
+import Loading from "@/components/loading";
+import ProfileCard from "@/components/modules/settings/profile-card";
+import SettingsSaveBar from "@/components/modules/settings/settings-save-bar";
+import SettingsSection from "@/components/modules/settings/settings-section";
 import { useUpdateProfile } from "@/hooks/user.hook";
 import { IUser } from "@/types";
-import { Avatar, Button } from "@heroui/react";
+import Link from "next/link";
 import { useState } from "react";
 import { FieldValues, SubmitHandler } from "react-hook-form";
-import { GoImage } from "react-icons/go";
+import { HiOutlineArrowRight } from "react-icons/hi2";
 
-interface IProps extends Partial<IUser> {}
+interface IProps extends Partial<IUser> {
+  /** Total articles, shown in the photo card's context line. */
+  articleCount?: number;
+}
 
 const fieldLabel =
   "mb-1 block text-xs font-semibold uppercase tracking-wider text-default-500";
 
+const MAX_BIO = 280;
+
 const UpdateProfileDetailsForm = ({
   fullName,
+  username,
   designation,
   location,
   phone,
   bio,
   profilePicture,
+  articleCount,
 }: IProps) => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [previewImage, setPreviewImage] = useState(profilePicture);
   const { mutate: updateProfile, isPending } = useUpdateProfile();
-
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setSelectedImage(file);
-      setPreviewImage(URL.createObjectURL(file));
-    }
-  };
 
   const onSubmit: SubmitHandler<FieldValues> = (values) => {
     const formData = new FormData();
     formData.append("data", JSON.stringify(values));
+
+    // The photo is part of the same save. Sending it only when one was picked
+    // keeps the stored image untouched otherwise — but it must be sent at all,
+    // or the reader has to press save twice to see it.
     if (selectedImage) {
       formData.append("image", selectedImage);
     }
 
-    updateProfile(formData);
+    updateProfile(formData, {
+      onSuccess: (data) => {
+        // Start a clean state only once the server accepted the change.
+        if (data?.success) setSelectedImage(null);
+      },
+    });
   };
 
   return (
@@ -53,60 +63,54 @@ const UpdateProfileDetailsForm = ({
         onSubmit={onSubmit}
         defaultValues={{ fullName, designation, location, phone, bio }}
       >
-        <div className="space-y-8">
-          {/* Identity */}
-          <section aria-labelledby="profile-identity">
-            <h2 id="profile-identity" className="text-sm font-semibold">
-              Profile photo
-            </h2>
-            <p className="mt-1 text-sm text-default-500">
-              Shown beside your name on articles and comments.
-            </p>
-
-            <div className="mt-4 flex flex-col gap-4 border-b border-default/60 pb-8 sm:flex-row sm:items-center sm:gap-6">
-              <Avatar
-                className="size-20 shrink-0 object-cover text-2xl font-bold"
-                radius="full"
-                src={previewImage}
-                name={(fullName || "?").charAt(0).toUpperCase()}
-              />
-              <div className="space-y-1.5">
-                <Button
-                  as="label"
-                  size="sm"
-                  htmlFor="profilePicture"
-                  radius="lg"
-                  variant="bordered"
-                  className="cursor-pointer font-medium"
-                  startContent={<GoImage size={16} />}
+        <div className="space-y-6">
+          <SettingsSection
+            id="identity"
+            title="Identity"
+            description="How you look on your profile, articles and comments."
+            action={
+              username ? (
+                <Link
+                  href={`/profile/@${username}`}
+                  className="inline-flex items-center gap-1 text-sm font-medium text-primary underline-offset-4 hover:underline"
                 >
-                  Choose image
-                  <input
-                    type="file"
-                    id="profilePicture"
-                    name="profilePicture"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleImageChange}
-                  />
-                </Button>
-                <p className="text-xs text-default-500">
-                  Square image, at least 500 × 500 px. PNG or JPEG.
-                </p>
-              </div>
-            </div>
-          </section>
+                  View public profile
+                  <HiOutlineArrowRight aria-hidden className="size-3.5" />
+                </Link>
+              ) : undefined
+            }
+          >
+            <ProfileCard
+              fullName={fullName}
+              designation={designation}
+              location={location}
+              bio={bio}
+              username={username}
+              savedPicture={profilePicture}
+              selectedImage={selectedImage}
+              onSelectImage={setSelectedImage}
+            />
+            {typeof articleCount === "number" && articleCount > 0 && (
+              <p className="mt-5 border-t border-default/60 pt-4 text-xs text-default-500">
+                Your name and photo appear on{" "}
+                <Link
+                  href="/settings/manage-blogs"
+                  className="font-medium text-foreground underline underline-offset-4"
+                >
+                  {articleCount} published{" "}
+                  {articleCount === 1 ? "article" : "articles"}
+                </Link>
+                .
+              </p>
+            )}
+          </SettingsSection>
 
-          {/* Details */}
-          <section aria-labelledby="profile-details">
-            <h2 id="profile-details" className="text-sm font-semibold">
-              Public details
-            </h2>
-            <p className="mt-1 text-sm text-default-500">
-              These appear on your profile and next to your articles.
-            </p>
-
-            <div className="mt-5 grid gap-5 sm:grid-cols-2">
+          <SettingsSection
+            id="details"
+            title="Public details"
+            description="Shown on your profile and next to every article you write."
+          >
+            <div className="grid gap-5 sm:grid-cols-2">
               <div className="sm:col-span-2">
                 <label htmlFor="fullName" className={fieldLabel}>
                   Full name
@@ -153,30 +157,33 @@ const UpdateProfileDetailsForm = ({
                   placeholder="Never shown publicly"
                   radius="lg"
                   id="phone"
+                  description="For account recovery only — readers never see it."
                 />
               </div>
               <div className="sm:col-span-2">
-                <label className={fieldLabel}>Bio</label>
+                <label className={fieldLabel} htmlFor="bio">
+                  Bio
+                </label>
                 <THTextarea
                   name="bio"
                   variant="bordered"
                   placeholder="A short introduction — what you work on, what you write about."
                   radius="lg"
+                  id="bio"
+                  maxLength={MAX_BIO}
+                  description={`A sentence or two reads best. ${MAX_BIO} characters max.`}
                 />
               </div>
             </div>
+          </SettingsSection>
 
-            <div className="mt-6 flex items-center justify-end gap-3 border-t border-default/60 pt-5">
-              <Button
-                radius="lg"
-                color="primary"
-                className="font-semibold"
-                type="submit"
-              >
-                Save changes
-              </Button>
-            </div>
-          </section>
+          <SettingsSaveBar
+            isPending={isPending}
+            filePending={!!selectedImage}
+            hint="Changes appear on your public profile right away."
+          >
+            Save changes
+          </SettingsSaveBar>
         </div>
       </THForm>
     </>

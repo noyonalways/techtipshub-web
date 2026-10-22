@@ -4,8 +4,8 @@ import { useUser } from "@/context/user.provider";
 import { Avatar } from "@heroui/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import { FiMenu, FiX } from "react-icons/fi";
+import { useState } from "react";
+import { FiEdit3, FiMenu, FiX } from "react-icons/fi";
 import { HiOutlineArrowLeft, HiOutlineArrowRight } from "react-icons/hi2";
 import { userLinks } from "./user-links";
 
@@ -18,23 +18,31 @@ const UserSidebar = () => {
   const pathname = usePathname();
   const { user } = useUser();
 
-  // Navigating to another settings page should close the mobile panel.
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
+  // Navigating to another settings page should close the mobile panel. Tracking
+  // the path we opened on means this holds even for a link back to this exact
+  // page, while still needing no effect.
+  const [openForPath, setOpenForPath] = useState<string | null>(null);
+  if (openForPath !== null && openForPath !== pathname) {
+    setOpenForPath(null);
+    if (open) setOpen(false);
+  }
+
+  const toggle = () => {
+    const next = !open;
+    setOpen(next);
+    setOpenForPath(next ? pathname : null);
+  };
 
   const current =
     userLinks.find((link) => link.href === pathname) ??
-    userLinks.filter((link) => pathname?.startsWith(`${link.href}/`)).at(-1);
-
-  return (
+    userLinks.filter((link) => pathname?.startsWith(`${link.href}/`)).at(-1);  return (
     <>
       {/* Mobile trigger */}
       <div className="border-b border-default/60 lg:hidden">
         <div className="mx-auto flex w-full max-w-6xl items-center gap-3 px-4 py-3 sm:px-6">
           <button
             type="button"
-            onClick={() => setOpen((value) => !value)}
+            onClick={toggle}
             aria-expanded={open}
             aria-controls="settings-nav"
             className="inline-flex items-center gap-2 rounded-lg border border-default/60 px-2.5 py-1.5 text-sm font-medium transition-colors hover:bg-default-50"
@@ -78,7 +86,7 @@ const UserSidebar = () => {
                 {user?.name || user?.username || "Your account"}
               </p>
               <p className="truncate text-xs text-default-500">
-                {user?.email}
+                {user?.username ? `@${user.username}` : user?.email}
               </p>
             </div>
           </div>
@@ -112,6 +120,17 @@ const UserSidebar = () => {
             </ul>
           </div>
 
+          {current?.description && (
+            <div className="rounded-lg bg-default-50 px-3 py-2.5 dark:bg-default-100/10">
+              <p className="text-[0.6875rem] font-semibold uppercase tracking-wider text-default-400">
+                On this page
+              </p>
+              <p className="mt-1 text-xs leading-relaxed text-default-600">
+                {current.description}
+              </p>
+            </div>
+          )}
+
           <div className="mt-2 space-y-0.5 border-t border-default/60 pt-4">
             {user?.username && (
               <Link
@@ -123,6 +142,13 @@ const UserSidebar = () => {
               </Link>
             )}
             <Link
+              href="/write-blog"
+              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-default-700 transition-colors hover:bg-default-100 hover:text-foreground"
+            >
+              <FiEdit3 aria-hidden className="size-4" />
+              Write a new post
+            </Link>
+            <Link
               href="/"
               className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-default-700 transition-colors hover:bg-default-100 hover:text-foreground"
             >
@@ -130,11 +156,6 @@ const UserSidebar = () => {
               Back to the feed
             </Link>
           </div>
-
-          <p className="hidden text-xs leading-relaxed text-default-400 lg:block">
-            Changes are saved to your public profile immediately after you
-            submit them.
-          </p>
         </nav>
       </aside>
     </>

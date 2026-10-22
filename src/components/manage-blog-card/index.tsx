@@ -1,7 +1,7 @@
 import { IPost } from "@/types";
-import { Avatar } from "@heroui/avatar";
 import Link from "next/link";
 import { FiEdit3, FiEye } from "react-icons/fi";
+import { HiOutlineChatBubbleLeftEllipsis } from "react-icons/hi2";
 import { parseHtmlContent } from "@/utils";
 import { UserDeleteBlogModal } from "../modals";
 
@@ -18,8 +18,15 @@ const formatDate = (value?: string) =>
       })
     : null;
 
+// A stable hue per category keeps a long list scannable without a legend.
+const categoryTone = (name: string) => {
+  let hash = 0;
+  for (const char of name) hash = (hash * 31 + char.charCodeAt(0)) % 360;
+  return `hsl(${hash} 62% 42%)`;
+};
+
 const ManageBlogCard = ({ post }: IProps) => {
-  const { author, title, content, coverImage, createdAt, category, slug, _id } =
+  const { title, content, coverImage, createdAt, category, slug, _id } =
     post ?? {};
 
   const parsedContent = parseHtmlContent(content ?? "");
@@ -31,23 +38,24 @@ const ManageBlogCard = ({ post }: IProps) => {
   return (
     <article className="group grid gap-4 border-b border-default/60 py-5 sm:grid-cols-[minmax(0,1fr)_10rem] sm:gap-6">
       <div className="min-w-0">
-        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-default-500">
+        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-xs text-default-500">
           {category?.name && (
-            <span className="rounded-full border border-default/60 px-2 py-0.5 font-medium text-default-600">
+            <span
+              className="rounded-full border px-2 py-0.5 font-medium"
+              style={{
+                borderColor: `${categoryTone(category.name)}33`,
+                color: categoryTone(category.name),
+                backgroundColor: `${categoryTone(category.name)}0d`,
+              }}
+            >
               {category.name}
             </span>
           )}
-          {createdAt && <time dateTime={createdAt}>{formatDate(createdAt)}</time>}
-          <span aria-hidden className="text-default-300">
-            ·
-          </span>
-          <span className="tabular-nums">{post.totalViews ?? 0} views</span>
-          <span aria-hidden className="text-default-300">
-            ·
-          </span>
-          <span className="tabular-nums">
-            {post.totalComments ?? 0} comments
-          </span>
+          {createdAt && (
+            <time dateTime={createdAt} className="tabular-nums">
+              {formatDate(createdAt)}
+            </time>
+          )}
         </div>
 
         <h3 className="mt-2 text-pretty text-lg font-semibold leading-snug tracking-tight">
@@ -65,24 +73,41 @@ const ManageBlogCard = ({ post }: IProps) => {
           </p>
         )}
 
-        {author && (
-          <div className="mt-3 flex items-center gap-2 text-xs text-default-500">
-            <Avatar
-              className="size-5 object-cover"
-              radius="full"
-              src={author.profilePicture}
-              name={(author.fullName || "?").charAt(0).toUpperCase()}
-            />
-            <span className="truncate">{author.fullName}</span>
+        <dl className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-default-500">
+          <div className="flex items-center gap-1.5">
+            <FiEye aria-hidden className="size-3.5 text-default-400" />
+            <dt className="sr-only">Views</dt>
+            <dd className="tabular-nums">
+              {(post.totalViews ?? 0).toLocaleString()}{" "}
+              {(post.totalViews ?? 0) === 1 ? "view" : "views"}
+            </dd>
           </div>
-        )}
+          <div className="flex items-center gap-1.5">
+            <HiOutlineChatBubbleLeftEllipsis
+              aria-hidden
+              className="size-3.5 text-default-400"
+            />
+            <dt className="sr-only">Comments</dt>
+            <dd className="tabular-nums">
+              {(post.totalComments ?? 0).toLocaleString()}{" "}
+              {(post.totalComments ?? 0) === 1 ? "comment" : "comments"}
+            </dd>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <dt className="sr-only">Status</dt>
+            <dd className="flex items-center gap-1.5 font-medium text-success">
+              <span aria-hidden className="size-1.5 rounded-full bg-current" />
+              Published
+            </dd>
+          </div>
+        </dl>
       </div>
 
-      <div className="flex flex-row items-end justify-between gap-3 sm:flex-col sm:items-stretch sm:justify-start">
+      <div className="flex items-center gap-3 sm:flex-col sm:items-stretch sm:justify-start">
         {coverImage && (
           <Link
             href={`/blogs/${slug}`}
-            className="order-2 w-24 shrink-0 overflow-hidden rounded-lg border border-default/60 sm:order-1 sm:w-full"
+            className="w-24 shrink-0 overflow-hidden rounded-lg border border-default/60 sm:order-first sm:w-full"
             tabIndex={-1}
             aria-hidden
           >
@@ -96,22 +121,24 @@ const ManageBlogCard = ({ post }: IProps) => {
           </Link>
         )}
 
-        <div className="order-1 flex flex-wrap items-center gap-1 sm:order-2">
+        {/* The publish date already labels the card, so the author row was
+            repeating the only author who can appear on this page. */}
+        <div className="grid flex-1 grid-cols-3 items-center gap-1 sm:flex-none">
           <Link
             href={`/settings/update/${slug}`}
-            className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-default-700 transition-colors hover:bg-default-100 hover:text-primary"
+            className="inline-flex items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-sm font-medium text-default-700 transition-colors hover:bg-default-100 hover:text-primary sm:py-1.5"
           >
             <FiEdit3 aria-hidden className="size-4" />
             Edit
           </Link>
           <Link
             href={`/blogs/${slug}`}
-            className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-default-700 transition-colors hover:bg-default-100"
+            className="inline-flex items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-sm font-medium text-default-700 transition-colors hover:bg-default-100 sm:py-1.5"
           >
             <FiEye aria-hidden className="size-4" />
             View
           </Link>
-          <UserDeleteBlogModal id={_id} />
+          <UserDeleteBlogModal id={_id} title={title} />
         </div>
       </div>
     </article>
