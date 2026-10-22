@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useEffect, useState } from "react";
 import MiniFooter from "@/components/shared/mini-footer";
@@ -28,31 +28,31 @@ const RightSideBar = () => {
   }, []);
 
   return (
-    <div className="hidden lg:inline-block xl:basis-[22%] 2xl:basis-[18%] space-y-6 sticky top-16 lg:pt-4 2xl:pr-2 lg:pl-0 h-[calc(100vh-85px)] lg:overflow-y-hidden">
-      {isLoading ? (
-        <div className="border border-default/50 p-6 rounded-xl space-y-2">
-          <h2 className="font-semibold text-lg">Categories</h2>
-          <div className="gap-2 flex flex-wrap">
-            <Skeleton className="h-8 w-20 rounded-full" />
-            <Skeleton className="h-8 w-24 rounded-full" />
-            <Skeleton className="h-8 w-20 rounded-full" />
-            <Skeleton className="h-8 w-24 rounded-full" />
-            <Skeleton className="h-8 w-20 rounded-full" />
-            <Skeleton className="h-8 w-20 rounded-full" />
-            <Skeleton className="h-8 w-20 rounded-full" />
-            <Skeleton className="h-8 w-20 rounded-full" />
-            <Skeleton className="h-8 w-24 rounded-full" />
+    <aside className="sticky top-16 hidden h-[calc(100vh-4rem)] w-64 shrink-0 border-l border-default/50 px-4 py-6 xl:block xl:w-72">
+      <div className="h-full space-y-6 overflow-y-auto">
+        {isLoading ? (
+          <div className="space-y-3 rounded-xl border border-default/50 p-5">
+            <h2 className="text-sm font-semibold">Categories</h2>
+            <div className="flex flex-wrap gap-2">
+              <Skeleton className="h-7 w-20 rounded-full" />
+              <Skeleton className="h-7 w-24 rounded-full" />
+              <Skeleton className="h-7 w-20 rounded-full" />
+              <Skeleton className="h-7 w-24 rounded-full" />
+              <Skeleton className="h-7 w-20 rounded-full" />
+              <Skeleton className="h-7 w-20 rounded-full" />
+            </div>
           </div>
+        ) : (
+          <Categories categories={categories || []} />
+        )}
+
+        <div className="space-y-4">
+          <MiniFooter />
+          {/* Existing sidebar ad unit — position frozen. */}
+          <AdBanner />
         </div>
-      ) : (
-        <Categories categories={categories || []} />
-      )}
-      <div className="space-y-4">
-        <MiniFooter />
-        {/* ad banner */}
-        <AdBanner />
       </div>
-    </div>
+    </aside>
   );
 };
 

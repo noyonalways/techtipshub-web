@@ -1,17 +1,15 @@
 import { IPost } from "@/types";
 import { Avatar } from "@heroui/avatar";
-import { Button } from "@heroui/button";
-import { Image as NextImage } from "@heroui/image";
 import Link from "next/link";
 import { AiOutlineComment } from "react-icons/ai";
 import { BiDownvote, BiUpvote } from "react-icons/bi";
 import { HiOutlineEye } from "react-icons/hi2";
-import { parseHtmlContent } from "@/utils";
-import UpVoteButton from "../ui/upvote-button";
-import DownVoteButton from "../ui/downvote-button";
+import { parseHtmlContent, formatPostDate } from "@/utils";
 import Image from "next/image";
 
 interface IProps extends IPost {}
+
+const EXCERPT_LENGTH = 180;
 
 const BlogCard = ({
   author,
@@ -26,121 +24,140 @@ const BlogCard = ({
   upVotes,
   category,
   slug,
-  _id,
 }: IProps) => {
   const parsedContent = parseHtmlContent(content);
+  const excerpt =
+    parsedContent.length > EXCERPT_LENGTH
+      ? `${parsedContent.substring(0, EXCERPT_LENGTH).trimEnd()}…`
+      : parsedContent;
+
+  // Show a counter only when the database actually holds a value for it, so a
+  // brand new post reads as new rather than as an abandoned one.
+  const hasVotes = upVotes > 0 || downVotes > 0;
+  const publishedOn = formatPostDate(createdAt);
 
   return (
-    <div className="border border-default/50 p-6 rounded-xl space-y-4 w-full">
-      <div className="flex justify-between items-end">
-        <Link
-          href={`/users/@${author?.username}`}
-          className="flex space-x-4 items-center"
-        >
-          <Avatar
-            className="size-12 object-cover"
-            radius="full"
-            src={author?.profilePicture}
-            color="primary"
-            isBordered
-          />
-          <div>
-            <h3 className="text-base font-medium">
-              {author?.fullName}{" "}
-              {author?.isPremiumUser && (
-                <span
-                  title="Premium User"
-                  className="ml-1 hover:bg-purple-200 inline-block bg-slate-200 px-2 rounded-md text-sm  dark:text-white dark:bg-primary/60"
-                >
-                  Pro
-                </span>
-              )}{" "}
-            </h3>
-            <span className="text-xs">
-              @{author?.username} - {new Date(createdAt)?.toDateString()}
-            </span>
-          </div>
-        </Link>
-        {isPremium && (
-          <span className="bg-primary-100 text-xs px-3 py-1 rounded-full text-primary dark:text-white">
-            Premium
-          </span>
-        )}
-      </div>
+    <article className="group w-full">
       <Link
         href={`/blogs/${slug}`}
-        className="flex flex-col-reverse lg:flex-row lg:items-start lg:space-x-4"
+        className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 rounded-lg"
       >
-        <div className="lg:flex-1 space-y-1">
-          <h1 className="text-2xl font-bold">{title}</h1>
-          <p>
-            {parsedContent.length > 120
-              ? parsedContent.substring(0, 120) + "..."
-              : parsedContent}
-          </p>
-        </div>
-        <div className="basis-full lg:basis-[28%] mb-3 lg:mb-0 rounded-md overflow-hidden">
-          <Image
-            className="w-full h-full object-cover"
-            src={coverImage}
-            alt={`${title}-cover-image`}
-            width={320}
-            height={320}
-          />
-        </div>
-      </Link>
-      <div className="flex flex-col items-end lg:flex-row lg:items-center justify-between space-y-2 lg:space-y-0">
-        <div className="flex items-center space-x-2 lg:space-x-4">
-          <div className={`flex space-x-2 items-center`}>
-            <div className="flex items-center space-x-1">
-              <Button
-                isIconOnly
-                size="sm"
-                radius="full"
-                variant="light"
-                isDisabled
-              >
-                <BiDownvote size={14} />
-              </Button>
-              <span className="text-sm text-gray-500">{downVotes}</span>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
+          <div className="min-w-0 flex-1">
+            <div className="mb-2 flex items-center gap-2 text-xs text-default-500">
+              <span className="rounded-full bg-default-100 px-2 py-0.5 font-medium text-default-600 dark:bg-default-50">
+                {category?.name}
+              </span>
+              {isPremium && (
+                <span className="rounded-full bg-primary-100 px-2 py-0.5 font-medium text-primary dark:bg-primary/20 dark:text-primary-200">
+                  Premium
+                </span>
+              )}
             </div>
 
-            <div className="flex items-center space-x-1">
-              <Button
-                isIconOnly
-                size="sm"
-                radius="full"
-                variant="light"
-                isDisabled
-              >
-                <BiUpvote size={14} />
-              </Button>
-              <span className="text-sm text-gray-500">{upVotes}</span>
-            </div>
+            <h2 className="text-pretty text-xl font-bold leading-snug tracking-tight text-foreground transition-colors group-hover:text-primary sm:text-[1.375rem]">
+              {title}
+            </h2>
+
+            {excerpt && (
+              <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-default-600">
+                {excerpt}
+              </p>
+            )}
           </div>
 
-          <Button
-            isDisabled
-            size="sm"
-            variant="light"
-            startContent={<AiOutlineComment className="text-lg" />}
-          >
-            {totalComments} Comments
-          </Button>
-          <Button
-            isDisabled
-            size="sm"
-            variant="light"
-            startContent={<HiOutlineEye className="text-lg" />}
-          >
-            {totalViews} Views
-          </Button>
+        {coverImage && (
+          <div className="shrink-0 overflow-hidden rounded-lg bg-default-100 sm:w-40 lg:w-44">
+            <div className="relative aspect-[16/10]">
+              <Image
+                className="object-cover"
+                src={coverImage}
+                alt=""
+                fill
+                sizes="(min-width: 1024px) 176px, (min-width: 640px) 160px, 100vw"
+              />
+            </div>
+          </div>
+        )}
         </div>
-        <span className="px-3 py-1 rounded-full text-sm bg-slate-100 dark:bg-slate-900">
-          {category.name}
-        </span>
+      </Link>
+
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+        <div className="flex min-w-0 items-center gap-2">
+          <Avatar
+            className="size-6 shrink-0"
+            radius="full"
+            src={author?.profilePicture}
+            name={author?.fullName}
+            showFallback
+          />
+          <Link
+            href={`/users/@${author?.username}`}
+            className="truncate text-xs font-medium text-foreground hover:text-primary"
+          >
+            {author?.fullName}
+          </Link>
+          {author?.isPremiumUser && (
+            <span
+              title="Premium author"
+              className="rounded bg-default-100 px-1.5 py-0.5 text-[0.625rem] font-semibold uppercase tracking-wide text-default-600 dark:bg-default-50"
+            >
+              Pro
+            </span>
+          )}
+          {publishedOn && (
+            <>
+              <span aria-hidden className="text-default-400">
+                ·
+              </span>
+              <time
+                dateTime={createdAt}
+                className="whitespace-nowrap text-xs text-default-500"
+              >
+                {publishedOn}
+              </time>
+            </>
+          )}
+        </div>
+
+        {(hasVotes || totalComments > 0 || totalViews > 0) && (
+          <div className="flex items-center gap-3 text-xs tabular-nums text-default-500">
+            {hasVotes && (
+              <span className="flex items-center gap-2" aria-label="Votes">
+                <span className="flex items-center gap-1">
+                  <BiUpvote aria-hidden size={14} />
+                  {upVotes}
+                </span>
+                {downVotes > 0 && (
+                  <span className="flex items-center gap-1">
+                    <BiDownvote aria-hidden size={14} />
+                    {downVotes}
+                  </span>
+                )}
+              </span>
+            )}
+            {totalComments > 0 && (
+              <span
+                className="flex items-center gap-1"
+                aria-label={`${totalComments} comments`}
+              >
+                <AiOutlineComment aria-hidden size={14} />
+                {totalComments}
+              </span>
+            )}
+            {totalViews > 0 && (
+              <span
+                className="flex items-center gap-1"
+                aria-label={`${totalViews} views`}
+              >
+                <HiOutlineEye aria-hidden size={14} />
+                {totalViews}
+              </span>
+            )}
+          </div>
+        )}
       </div>
-    </div>
+    </article>
   );
 };
 

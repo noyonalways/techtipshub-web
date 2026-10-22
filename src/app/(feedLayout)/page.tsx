@@ -35,8 +35,24 @@ export default async function Home({ searchParams }: IProps) {
   };
 
   const data = await getAllPosts(params);
-  const posts = data?.data as IPost[];
+  const posts = (data?.data as IPost[]) || [];
 
+  if (posts.length === 0) {
+    const hasFilters = Boolean(search || category);
+
+    return (
+      <div className="rounded-xl border border-default/60 px-6 py-16 text-center">
+        <h2 className="text-lg font-semibold">
+          {hasFilters ? "No posts match your filters" : "No posts published yet"}
+        </h2>
+        <p className="mx-auto mt-2 max-w-sm text-sm text-default-500">
+          {hasFilters
+            ? "Try a different search term or category to see more articles."
+            : "New articles will appear here as soon as they are published."}
+        </p>
+      </div>
+    );
+  }
 
   return <FeedPosts initialPosts={posts} />;
 }

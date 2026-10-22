@@ -8,9 +8,9 @@ interface IProps {
 
 const Categories = ({ categories }: IProps) => {
   return (
-    <div className="border border-default/50 p-6 rounded-xl space-y-2">
-      <h2 className="font-semibold text-lg">Categories</h2>
-      <div className="gap-2 flex flex-wrap">
+    <div className="space-y-3 rounded-xl border border-default/50 p-5">
+      <h2 className="text-sm font-semibold">Categories</h2>
+      <div className="flex flex-wrap gap-2">
         {categories.map((category) => (
           <CategoryButton key={category._id} {...category} />
         ))}

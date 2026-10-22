@@ -98,11 +98,16 @@ body {
   color: var(--color-foreground);
 }
 
-p {
+/* Paragraphs inherit their container's colour by default. The old
+   unconditional `p { color: gray-500 }` override made every paragraph on the
+   site grey — including article body copy inside `prose` — so readable ink and
+   muted secondary text are now chosen per component. Legacy screens that
+   relied on the grey can opt in with `.tth-muted-prose`. */
+.tth-muted-prose p {
   color: var(--color-gray-500);
 }
 
-.dark p {
+.dark .tth-muted-prose p {
   color: var(--color-gray-400);
 }
 

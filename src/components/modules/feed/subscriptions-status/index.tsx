@@ -52,9 +52,9 @@ const SubscriptionsStatus = ({}: IProps) => {
       ) : (
         <>
           {!isPremium ? (
-            <div className="p-4 border border-default/50 rounded-xl">
-              <h3 className="font-semibold">Upgrade to Premium</h3>
-              <p className="mb-2">
+            <div className="space-y-2 rounded-xl border border-default/60 p-4">
+              <h3 className="text-sm font-semibold">Upgrade to Premium</h3>
+              <p className="text-xs leading-relaxed text-default-500">
                 Unlock premium features designed to enhance your writing
                 journey.
               </p>
@@ -62,6 +62,7 @@ const SubscriptionsStatus = ({}: IProps) => {
                 size="sm"
                 href="/subscriptions"
                 as={Link}
+                className="mt-1"
                 startContent={<IoDiamondOutline />}
                 radius="sm"
                 color="primary"
@@ -70,15 +71,16 @@ const SubscriptionsStatus = ({}: IProps) => {
               </Button>
             </div>
           ) : (
-            <div className="p-4 border border-default/50 rounded-xl">
-              <h3 className="font-semibold">Premium Member</h3>
-              <p className="mb-2">
+            <div className="space-y-2 rounded-xl border border-default/60 p-4">
+              <h3 className="text-sm font-semibold">Premium Member</h3>
+              <p className="text-xs leading-relaxed text-default-500">
                 Your subscription status is active. Enjoy the premium features.
               </p>
               <Button
                 size="sm"
                 href={`/profile/@${user?.username}`}
                 as={Link}
+                className="mt-1"
                 startContent={<HiUser />}
                 radius="sm"
                 color="primary"

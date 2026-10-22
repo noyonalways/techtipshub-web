@@ -12,14 +12,13 @@ import { poppins } from "@/config/fonts";
 import { getAllPosts, getCommentsByPostId, getPostBySlug } from "@/services/post";
 import { IPost } from "@/types";
 import { IComment } from "@/types/comment.type";
+import { formatPostDate } from "@/utils";
 import { Avatar } from "@heroui/avatar";
 import { Button } from "@heroui/button";
-import { Image as NextImage } from "@heroui/image";
-import { Textarea } from "@heroui/input";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { AiOutlineComment } from "react-icons/ai";
-import { BiBookmark, BiDownvote, BiUpvote } from "react-icons/bi";
+import { BiDownvote, BiUpvote } from "react-icons/bi";
+import { HiOutlineEye } from "react-icons/hi2";
 import { IoDiamondOutline } from "react-icons/io5";
 import Image from "next/image";
 
@@ -94,9 +93,10 @@ const DynamicBlogPage = async ({ params }: { params: Promise<{ slug: string }> }
     downVotes,
     totalComments,
     slug,
+    category,
   } = (data?.data as IPost) ?? {};
 
-  let comments;
+  let comments: IComment[] = [];
   if (data?.success) {
     const res = await getCommentsByPostId(_id);
     comments = res?.data as IComment[];
@@ -144,189 +144,174 @@ const DynamicBlogPage = async ({ params }: { params: Promise<{ slug: string }> }
               )}
             </>
           ) : (
-            <div className="space-y-4">
-              <div className="flex justify-center mt-4 w-full print:max-w-xl print:mx-auto rounded-md overflow-hideen">
-                <Image
-                  className="w-full h-full"
-                  src={coverImage}
-                  alt={`${title}-cover-image`}
-                  width={800}
-                  height={400}
-                />
-              </div>
-              <div className="space-y-14 print:space-y-8">
-                <div className="space-y-6">
-                  <h1
-                    className={`${poppins.className} text-3xl lg:text-4xl font-bold text-center`}
+            <article className="mx-auto max-w-3xl space-y-8 pt-6 print:max-w-xl">
+              <header className="space-y-5">
+                <div className="flex flex-wrap items-center gap-2 text-xs">
+                  <Link
+                    href={`/?category=${encodeURIComponent(category?.name ?? "")}`}
+                    className="rounded-full bg-default-100 px-2.5 py-1 font-medium text-default-600 hover:bg-default-200"
                   >
-                    {title}
-                  </h1>
-                  <div className="flex justify-center lg:justify-center items-center space-x-2 lg:space-x-4 mx-auto w-full max-w-xl">
-                    <Link
-                      href={`/users/@${author?.username}`}
-                      className="flex items-center space-x-4"
-                    >
-                      <Avatar
-                        className="h-8 w-8 object-cover"
-                        radius="full"
-                        src={author?.profilePicture}
-                        name={author?.fullName}
-                        isBordered
-                      />
-                      <h3 className="font-medium text-sm lg:text-lg">
+                    {category?.name}
+                  </Link>
+                  {isPremium && (
+                    <span className="flex items-center gap-1 rounded-full bg-secondary/15 px-2.5 py-1 font-medium text-secondary">
+                      <IoDiamondOutline aria-hidden />
+                      Premium
+                    </span>
+                  )}
+                </div>
+
+                <h1
+                  className={`${poppins.className} text-pretty text-3xl font-bold leading-tight tracking-tight lg:text-[2.75rem] print:text-3xl`}
+                >
+                  {title}
+                </h1>
+
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-3 border-b border-default/60 pb-5">
+                  <Link
+                    href={`/users/@${author?.username}`}
+                    className="group flex items-center gap-3"
+                  >
+                    <Avatar
+                      className="size-10 shrink-0"
+                      radius="full"
+                      src={author?.profilePicture}
+                      name={author?.fullName}
+                      showFallback
+                    />
+                    <div className="leading-tight">
+                      <p className="text-sm font-semibold text-foreground group-hover:text-primary">
                         {author?.fullName}
-                      </h3>
-                    </Link>
-                    <span className="text-default-500">-</span>
-                    <div className="text-default-500 text-xs lg:text-base">
-                      {new Date(createdAt)?.toDateString()}
-                    </div>
-
-                    <div className="print:hidden">
-                      <FollowUnFollowButton id={author?._id} />
-                    </div>
-                  </div>
-
-                  <div
-                    className={`flex flex-col lg:flex-row justify-center items-center gap-4 print:hidden`}
-                  >
-                    <div className="flex items-center space-x-2">
-                      {isPremium && (
-                        <Button
-                          color="secondary"
-                          variant="flat"
-                          radius="full"
-                          startContent={
-                            <IoDiamondOutline className="text-lg" />
-                          }
-                        >
-                          Premium Content
-                        </Button>
-                      )}
-
-                      {totalViews > 0 && (
-                        <Button size="md" variant="flat" radius="full">
-                          {totalViews} Views
-                        </Button>
+                      </p>
+                      {author?.username && (
+                        <p className="text-xs text-default-500">
+                          @{author.username}
+                        </p>
                       )}
                     </div>
+                  </Link>
 
-                    <div className="flex items-center space-x-2 print:hidden">
-                      <Button
-                        size="md"
-                        variant="light"
-                        radius="full"
-                        startContent={<BiDownvote />}
-                      >
-                        {downVotes} votes
-                      </Button>
-                      <Button
-                        size="md"
-                        variant="light"
-                        radius="full"
-                        startContent={<BiUpvote />}
-                      >
-                        {upVotes} votes
-                      </Button>
-                      <Button
-                        size="md"
-                        variant="light"
-                        radius="full"
-                        startContent={<AiOutlineComment />}
-                      >
-                        {totalComments} comments
-                      </Button>
+                  {formatPostDate(createdAt) && (
+                    <div className="text-xs text-default-500">
+                      <time dateTime={createdAt}>
+                        {formatPostDate(createdAt)}
+                      </time>
                     </div>
+                  )}
+
+                  <div className="print:hidden">
+                    <FollowUnFollowButton id={author?._id} />
+                  </div>
+
+                  {totalViews > 0 && (
+                    <span className="flex items-center gap-1.5 text-xs text-default-500">
+                      <HiOutlineEye aria-hidden className="text-base" />
+                      {totalViews.toLocaleString()} views
+                    </span>
+                  )}
+                </div>
+              </header>
+
+              {coverImage && (
+                <div className="relative -mx-2 h-56 overflow-hidden rounded-xl bg-default-100 sm:mx-0 sm:h-72 lg:h-80 print:hidden">
+                  <Image
+                    className="object-cover"
+                    src={coverImage}
+                    alt={title}
+                    fill
+                    priority
+                    sizes="(min-width: 1024px) 768px, 100vw"
+                  />
+                </div>
+              )}
+
+              <div className="print:hidden">
+                <AdBanner />
+              </div>
+
+              <div className="prose prose-neutral mx-auto max-w-none dark:prose-invert prose-headings:font-semibold prose-a:text-primary prose-img:rounded-lg">
+                <div dangerouslySetInnerHTML={{ __html: content }} />
+              </div>
+
+              <div className="space-y-10">
+                <div className="flex flex-col gap-4 border-y border-default/60 py-3 print:hidden sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center">
+                    <UpVoteButton
+                      postId={_id}
+                      className="text-3xl"
+                      radius="full"
+                      variant="light"
+                      isIconOnly
+                      slug={slug}
+                    >
+                      <BiUpvote className="text-lg" />
+                    </UpVoteButton>
+                    <span className="min-w-6 text-center text-sm font-medium tabular-nums text-default-600">
+                      {upVotes}
+                    </span>
+                    <DownVoteButton
+                      postId={_id}
+                      className="text-3xl"
+                      radius="full"
+                      variant="light"
+                      isIconOnly
+                      slug={slug}
+                    >
+                      <BiDownvote className="text-lg" />
+                    </DownVoteButton>
+                    {downVotes > 0 && (
+                      <span className="min-w-6 text-center text-sm tabular-nums text-default-500">
+                        {downVotes}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-1">
+                    <BlogCommentButton />
+                    <BlogShareDropdown />
+                    <PrintBlogButton blog={data?.data} />
                   </div>
                 </div>
 
-                <div className="print:hidden">
-                  <AdBanner />
-                </div>
-
-                <div className="prose dark:prose-invert max-w-full">
-                  <div dangerouslySetInnerHTML={{ __html: content }} />
-                </div>
-
-                <div className="space-y-10">
-                  <div className="border border-default/50 py-2 px-2 rounded-full w-full max-w-fit mx-auto flex justify-center items-center print:hidden">
-                    <div className="border-r border-default/30 ">
-                      <DownVoteButton
-                        postId={_id}
-                        className="text-3xl mr-2"
-                        radius="full"
-                        variant="light"
-                        isIconOnly
-                        slug={slug}
+                {tags?.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    {tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="rounded-md bg-default-100 px-2.5 py-1 text-xs font-medium text-default-600"
                       >
-                        <BiDownvote className="text-lg" />
-                      </DownVoteButton>
-                    </div>
-
-                    <div className="border-r border-default/30 ">
-                      <UpVoteButton
-                        postId={_id}
-                        className="text-3xl mx-2"
-                        radius="full"
-                        variant="light"
-                        isIconOnly
-                        slug={slug}
-                      >
-                        <BiUpvote className="text-lg" />
-                      </UpVoteButton>
-                    </div>
-
-                    <div className="border-r border-default/30 ">
-                      <BlogCommentButton />
-                    </div>
-
-                    <div className="border-r border-default/30">
-                      <Button
-                        className="text-2xl mx-2"
-                        variant="light"
-                        isIconOnly
-                        radius="full"
-                      >
-                        <BiBookmark />
-                      </Button>
-                    </div>
-
-                    <div className="border-r border-default/30">
-                      <BlogShareDropdown />
-                    </div>
-
-                    <div>
-                      <PrintBlogButton blog={data?.data} />
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 justify-center w-full max-w-3xl flex-wrap mx-auto">
-                    {tags?.map((tag) => (
-                      <Button key={tag} variant="flat" radius="sm" size="sm">
                         {tag}
-                      </Button>
+                      </span>
                     ))}
                   </div>
-                </div>
-
-                <div className="print:hidden">
-                  <AdBanner />
-                </div>
-
-                {/* comments */}
-                <div>
-                  <h2 className="text-2xl font-semibold mb-4">Comments</h2>
-                  <CommentForm postId={_id} slug={slug} />
-
-                  <div className="mt-8 space-y-4">
-                    {comments &&
-                      comments?.map((comment) => (
-                        <CommentCard key={comment._id} {...comment} />
-                      ))}
-                  </div>
-                </div>
+                )}
               </div>
-            </div>
+
+              <div className="print:hidden">
+                <AdBanner />
+              </div>
+
+              {/* comments */}
+              <section id="comments" className="space-y-6">
+                <div className="flex items-baseline gap-2">
+                  <h2 className="text-xl font-semibold">Comments</h2>
+                  {totalComments > 0 && (
+                    <span className="text-sm text-default-500">
+                      {totalComments}
+                    </span>
+                  )}
+                </div>
+                <CommentForm postId={_id} slug={slug} />
+
+                <div className="space-y-4">
+                  {comments?.length
+                    ? comments.map((comment) => (
+                        <CommentCard key={comment._id} {...comment} />
+                      ))
+                    : null}
+                </div>
+              </section>
+            </article>
           )}
         </>
       </Container>

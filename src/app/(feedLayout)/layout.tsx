@@ -1,5 +1,4 @@
 import {
-  FeedButtonsForSideBar,
   FeedButtonsForSmallDevice,
 } from "@/components/modules/feed/feed-buttons";
 import LeftSideBar from "@/components/modules/feed/left-sidebar";
@@ -15,19 +14,19 @@ const FeedLayout = ({ children }: IProps) => {
     <>
       <Navbar />
       <section className="w-full">
-        <div className="flex flex-col lg:flex-row lg:justify-between items-start w-full">
-          {/* Left side bar */}
+        <div className="mx-auto flex w-full max-w-[88rem] flex-col items-start lg:flex-row">
+          {/* Left rail: persistent navigation */}
           <LeftSideBar />
 
-          {/* Main content */}
-          <div className="basis-full w-full lg:w-auto lg:basis-[46%] 2xl:basis-[40%] py-4 px-2 lg:px-0">
-            <div className="flex items-center space-x-4 mb-4 lg:hidden">
+          {/* Main content: the reading column */}
+          <div className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8">
+            <div className="mb-5 flex items-center gap-3 lg:hidden">
               <FeedButtonsForSmallDevice />
             </div>
-            {children}
+            <div className="mx-auto w-full max-w-[47.5rem]">{children}</div>
           </div>
 
-          {/* Right side bar */}
+          {/* Right rail: categories + site links */}
           <RightSideBar />
         </div>
       </section>
