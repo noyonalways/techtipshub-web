@@ -1,140 +1,197 @@
 "use client";
 
+import { writeBlogPath } from "@/lib/blog-routes";
+
+
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Button } from "@heroui/react";
+import { AnimatePresence, motion } from "framer-motion";
+import { HiOutlinePencilSquare } from "react-icons/hi2";
+import { FiMenu, FiX } from "react-icons/fi";
+import { useUser } from "@/context/user.provider";
+import { siteConfig } from "@/config/site";
+import { Logo } from "@/components/shared/logo";
 import LoginLogoutSwitch from "@/components/ui/login-logout-switch";
 import { ThemeSwitch } from "@/components/ui/theme-switch";
-import WritePostButton from "@/components/ui/write-post-button";
-import { siteConfig } from "@/config/site";
-import { Image } from "@nextui-org/image";
-import {
-  NavbarBrand,
-  NavbarContent,
-  NavbarItem,
-  NavbarMenu,
-  NavbarMenuItem,
-  NavbarMenuToggle,
-  Navbar as NextUINavbar,
-} from "@nextui-org/navbar";
-import { link as linkStyles } from "@nextui-org/theme";
-import clsx from "clsx";
-import NextLink from "next/link";
 import NavbarSearchInput from "./navbar-search-input";
-import { usePathname } from "next/navigation";
-import { Button } from "@nextui-org/button";
-import { GoPencil } from "react-icons/go";
-import { useUser } from "@/context/user.provider";
+
+const isActivePath = (pathname: string | null, href: string) =>
+  href === "/" ? pathname === "/" : Boolean(pathname?.startsWith(href));
 
 export const Navbar = () => {
-  const pathName = usePathname();
+  const pathname = usePathname();
   const { user } = useUser();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <NextUINavbar
-      maxWidth="full"
-      position="sticky"
-      className="border border-default/50 z-50 print:hidden"
-    >
-      <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
-        <NavbarBrand as="li" className="gap-3 max-w-fit">
-          <NextLink href="/">
-            <Image
-              className="size-10"
-              src="/tech-tips-hub-logo.png"
-              alt="tech-tips-hub-logo"
-            />
-          </NextLink>
-          <div className="size-10 flex justify-center lg:hidden">
-            <NavbarMenuToggle />
-          </div>
-        </NavbarBrand>
-        <ul className="hidden lg:flex gap-10 justify-start ml-2">
-          {siteConfig.navItems.map((item) => (
-            <NavbarItem key={item.href}>
-              <NextLink
-                className={clsx(
-                  linkStyles({ color: "foreground" }),
-                  "data-[active=true]:text-primary data-[active=true]:font-medium",
-                  pathName === item.href ? "text-primary" : ""
-                )}
-                color="foreground"
-                href={item.href}
-              >
-                {item.label}
-              </NextLink>
-            </NavbarItem>
-          ))}
-        </ul>
-      </NavbarContent>
+    <header className="sticky top-0 z-50 border-b border-default/60 bg-background/95 backdrop-blur print:hidden">
+      <div className="mx-auto flex h-16 w-full max-w-page items-center gap-3 px-4 sm:gap-4 sm:px-6 lg:px-8">
+        {/* Brand + mobile menu toggle */}
+        <div className="flex shrink-0 items-center gap-1">
+          <button
+            type="button"
+            aria-expanded={menuOpen}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            onClick={() => setMenuOpen((open) => !open)}
+            className="-ml-2 rounded-lg p-2 text-default-600 transition-colors hover:bg-default-100 hover:text-foreground lg:hidden"
+          >
+            {menuOpen ? (
+              <FiX className="size-5" aria-hidden />
+            ) : (
+              <FiMenu className="size-5" aria-hidden />
+            )}
+          </button>
 
-      <NavbarContent
-        className="hidden sm:flex basis-1/5 sm:basis-full"
-        justify="end"
-      >
-        <NavbarItem className="hidden lg:flex">
-          {<NavbarSearchInput />}
-        </NavbarItem>
-
-        <NavbarItem className="hidden sm:flex gap-2">
-          <ThemeSwitch className="hidden lg:inline-block" />
-        </NavbarItem>
-
-        {user && (
-          <NavbarItem>
-            <Button
-              as={NextLink}
-              size="sm"
-              radius="full"
-              variant="solid"
-              color="primary"
-              startContent={<GoPencil className="text-lg" />}
-              href="/write-blog"
-            >
-              Write Blog
-            </Button>
-          </NavbarItem>
-        )}
-
-        <LoginLogoutSwitch />
-      </NavbarContent>
-
-      <NavbarContent className="md:hidden basis-1 pl-4" justify="end">
-        <ThemeSwitch />
-        {user && (
-          <NavbarItem>
-            <Button
-              as={NextLink}
-              size="sm"
-              radius="full"
-              variant="solid"
-              color="primary"
-              startContent={<GoPencil className="text-lg" />}
-              href="/write-blog"
-            >
-              Write Blog
-            </Button>
-          </NavbarItem>
-        )}
-        <LoginLogoutSwitch />
-      </NavbarContent>
-
-      <NavbarMenu className="z-50">
-        <NavbarSearchInput />
-        <div className="mx-4 mt-2 flex flex-col gap-2">
-          {siteConfig.navMenuItems.map((item, index) => (
-            <NavbarMenuItem key={`${item}-${index}`}>
-              <NextLink
-                className={clsx(
-                  linkStyles({ color: "foreground" }),
-                  "data-[active=true]:text-primary data-[active=true]:font-medium",
-                  pathName === item.href ? "text-primary" : ""
-                )}
-                href={item.href}
-              >
-                {item.label}
-              </NextLink>
-            </NavbarMenuItem>
-          ))}
+          <Link
+            href="/"
+            aria-label="TechTipsHub home"
+            className="flex items-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70"
+          >
+            <Logo size="md" className="hidden sm:inline-flex" />
+            <Logo size="sm" wordmark={false} className="sm:hidden" />
+          </Link>
         </div>
-      </NavbarMenu>
-    </NextUINavbar>
+
+        {/* Primary navigation. Each link spans the bar's full height so the
+            2px current-state rule lands on the header's own bottom border
+            instead of floating inside it. */}
+        <nav aria-label="Main" className="hidden self-stretch lg:block">
+          <ul className="flex h-full items-stretch gap-1">
+            {siteConfig.navItems.map((item) => {
+              const active = isActivePath(pathname, item.href);
+              return (
+                <li key={item.href} className="flex">
+                  <Link
+                    href={item.href}
+                    aria-current={active ? "page" : undefined}
+                    className={`flex items-center border-b-2 px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70 ${
+                      active
+                        ? "border-primary text-foreground"
+                        : "border-transparent text-default-600 hover:text-foreground"
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
+        {/* Search grows to fill the middle, up to 16rem: wide enough for the
+            placeholder and the ⌘K hint, narrow enough that it does not read as
+            the header's main control. The cap is an arbitrary value on purpose;
+            `max-w-2xs` is not in this Tailwind scale and silently resolves to
+            nothing. `w-0` gives the flex item a real starting basis, with
+            `min-w-0` to stop the row's gap from holding it open. */}
+        <div className="ml-auto hidden w-0 min-w-0 max-w-[16rem] flex-1 lg:block">
+          <NavbarSearchInput />
+        </div>
+
+        {/* Actions */}
+        <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2 lg:ml-0">
+          <ThemeSwitch />
+
+          {user ? (
+            <Button
+              as={Link}
+              href={writeBlogPath}
+              size="sm"
+              radius="full"
+              color="primary"
+              startContent={<HiOutlinePencilSquare className="text-base" />}
+              className="hidden font-medium sm:inline-flex"
+            >
+              Write
+            </Button>
+          ) : null}
+
+          <LoginLogoutSwitch />
+        </div>
+      </div>
+
+      {/* Mobile navigation drawer */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className="overflow-hidden border-t border-default/60 bg-background lg:hidden"
+          >
+            <div className="space-y-4 px-4 py-4 sm:px-6 lg:px-8">
+              <NavbarSearchInput block />
+
+              <nav aria-label="Main (mobile)">
+                <ul className="space-y-1">
+                  {siteConfig.navMenuItems.map((item) => {
+                    const active = isActivePath(pathname, item.href);
+                    return (
+                      <li key={item.href}>
+                        <Link
+                          href={item.href}
+                          onClick={() => setMenuOpen(false)}
+                          aria-current={active ? "page" : undefined}
+                          className={`block rounded-lg px-3 py-2.5 text-sm font-medium ${
+                            active
+                              ? "bg-primary/10 text-primary-accessible"
+                              : "text-default-700 hover:bg-default-100"
+                          }`}
+                        >
+                          {item.label}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </nav>
+
+              {user ? (
+                <Button
+                  as={Link}
+                  href={writeBlogPath}
+                  onPress={() => setMenuOpen(false)}
+                  fullWidth
+                  radius="lg"
+                  color="primary"
+                  startContent={<HiOutlinePencilSquare className="text-base" />}
+                >
+                  Write a blog
+                </Button>
+              ) : (
+                // Below `sm` the top bar keeps only the theme switch, so the
+                // account actions live here where there is room to hit them.
+                <div className="flex flex-col gap-2 sm:hidden">                  <Button
+                    as={Link}
+                    className="font-medium border border-default-300 text-foreground hover:bg-default-100"
+                    href="/login"
+                    onPress={() => setMenuOpen(false)}
+                    fullWidth
+                    radius="lg"
+                    variant="bordered"
+                  >
+                    Log in
+                  </Button>
+                  <Button
+                    as={Link}
+                    className="font-semibold"
+                    href="/signup"
+                    onPress={() => setMenuOpen(false)}
+                    fullWidth
+                    radius="lg"
+                    color="primary"
+                  >
+                    Sign up
+                  </Button>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </header>
   );
 };

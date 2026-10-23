@@ -43,7 +43,7 @@ export const ImageIcon: React.FC<IconSvgProps> = ({
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth="1.25"
-      ></path>
+       />
     </svg>
   );
 };
@@ -68,7 +68,7 @@ export const BlogIcon: React.FC<IconSvgProps> = ({
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth="1.25"
-      ></path>
+       />
     </svg>
   );
 };

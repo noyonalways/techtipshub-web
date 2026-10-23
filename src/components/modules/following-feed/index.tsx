@@ -1,26 +1,27 @@
 "use client";
 
+import { AdSlot } from "@/components/adsense";
 import BlogCard from "@/components/blog-card";
-import { getFollowingUsersPosts } from "@/services/post";
-import { IPost } from "@/types";
+import { getFollowingUsersBlogs } from "@/services/blog";
+import { IBlog } from "@/types";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 
 interface IProps {
-  initialPosts: IPost[];
+  initialBlogs: IBlog[];
 }
 
-const FollowingFeedPosts = ({ initialPosts }: IProps) => {
+const FollowingFeedBlogs = ({ initialBlogs }: IProps) => {
   const searchParams = useSearchParams();
 
   const [page, setPage] = useState(2);
-  const [posts, setPosts] = useState<IPost[]>(initialPosts);
+  const [blogs, setBlogs] = useState<IBlog[]>(initialBlogs);
   const [hasMore, setHasMore] = useState(true);
   const { ref, inView } = useInView();
 
-  // Function to load more posts
-  const loadMorePosts = async () => {
+  // Function to load more blogs
+  const loadMoreBlogs = async () => {
     if (!hasMore) return;
 
     const params: { page: string; limit: string; [key: string]: string } = {
@@ -34,43 +35,53 @@ const FollowingFeedPosts = ({ initialPosts }: IProps) => {
     if (searchTerm) params.searchTerm = searchTerm;
     if (category) params.category = category;
 
-    const data = await getFollowingUsersPosts(params);
-    const newPosts = data?.data || [];
+    const data = await getFollowingUsersBlogs(params);
+    const newBlogs = data?.data || [];
 
-    if(data.success && newPosts.length > 0) {
-      setPosts((prevPosts) => [...prevPosts, ...newPosts]);
+    if(data.success && newBlogs.length > 0) {
+      setBlogs((prevBlogs) => [...prevBlogs, ...newBlogs]);
       setPage((prevPage) => prevPage + 1);
     }
 
-    // Stop further fetching if fewer posts than the limit are returned
-    if (newPosts.length < 5) {
+    // Stop further fetching if fewer blogs than the limit are returned
+    if (newBlogs.length < 5) {
       setHasMore(false);
     }
   };
 
-  // Watch for changes in searchParams to reset posts and refetch
+  // Watch for changes in searchParams to reset blogs and refetch
   useEffect(() => {
-    setPosts(initialPosts);
+    setBlogs(initialBlogs);
     setPage(2);
     setHasMore(true);
   }, [searchParams]);
 
   useEffect(() => {
     if (inView && hasMore) {
-      loadMorePosts();
+      loadMoreBlogs();
     }
   }, [inView, hasMore]);
 
   return (
     <div className="space-y-6 flex-1 w-full">
-      {posts?.map((post) => (
-        <BlogCard key={post?._id} {...post} />
+      {blogs?.map((blog, index) => (
+        <Fragment key={blog?._id}>
+          <BlogCard {...blog} />
+          {/* Same density as the main feed: one unit per four cards, after
+              the fourth card, never on a feed shorter than five blogs. */}
+          {blogs.length > 4 && (index + 1) % 4 === 0 && (
+            <AdSlot
+              placement="following-feed-inline"
+              className="mt-0 rounded-[10px] border border-default/60 bg-default-50/30 px-3 pb-3"
+            />
+          )}
+        </Fragment>
       ))}
       <div className="text-center" ref={ref}>
-        {hasMore ? "Loading..." : "No more posts available."}
+        {hasMore ? "Loading..." : "No more blogs available."}
       </div>
     </div>
   );
 };
 
-export default FollowingFeedPosts;
+export default FollowingFeedBlogs;

@@ -2,13 +2,13 @@
 
 // components/PDFDownloadButton.tsx
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import { MdOutlineDownload } from "react-icons/md";
 import BlogDocument from "../blog-document";
-import { IPost } from "@/types";
+import { IBlog } from "@/types";
 
 interface IProps {
-  blog: IPost; // Assuming IPost is defined in types.ts
+  blog: IBlog;
 }
 
 const PDFDownloadButton = ({ blog }: IProps) => (

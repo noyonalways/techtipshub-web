@@ -1,41 +1,38 @@
 "use client";
 
 import { useUser } from "@/context/user.provider";
-import { NavbarItem } from "@nextui-org/navbar";
-import { button as buttonStyles } from "@nextui-org/theme";
+import { button as buttonStyles } from "@heroui/react";
 import NextLink from "next/link";
 import NavarDropdown from "./navbar-dropdown";
 
-interface IProps {}
-
-const LoginLogoutSwitch: React.FC<IProps> = () => {
+const LoginLogoutSwitch = () => {
   const { user } = useUser();
   return (
     <>
       {user ? (
-        <NavbarItem>
-          <NavarDropdown />
-        </NavbarItem>
+        <NavarDropdown />
       ) : (
-        <div className="hidden lg:flex">
+        <div className="hidden items-center gap-1 sm:flex">
           <NextLink
             className={`${buttonStyles({
               radius: "full",
               variant: "light",
-            })} hover:bg-default-100 duration-200 active:scale-95`}
+              size: "sm",
+            })} hidden font-medium duration-200 hover:bg-default-100 active:scale-95 sm:inline-flex`}
             href={`/login`}
           >
-            Log In
+            Log in
           </NextLink>
           <NextLink
             className={`${buttonStyles({
               color: "primary",
               radius: "full",
               variant: "solid",
-            })} duration-200 active:scale-95`}
+              size: "sm",
+            })} hidden font-medium duration-200 active:scale-95 sm:inline-flex`}
             href={`/signup`}
           >
-            Sign Up
+            Sign up
           </NextLink>
         </div>
       )}

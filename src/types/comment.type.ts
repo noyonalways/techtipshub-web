@@ -1,6 +1,7 @@
 export interface IComment {
   _id: string;
-  post: ICommentPost;
+  /** Stored API field name for the commented blog. */
+  post: ICommentBlog;
   user: ICommentUser;
   content: string;
   isDeleted: boolean;
@@ -11,7 +12,7 @@ export interface IComment {
   updatedAt: string;
 }
 
-export interface ICommentPost {
+export interface ICommentBlog {
   _id: string;
   title: string;
   slug: string;

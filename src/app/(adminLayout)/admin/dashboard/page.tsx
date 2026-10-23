@@ -1,20 +1,18 @@
-import DashboardTitle from "@/components/dashboard-title";
+"use client";
+
 import DashboardContent from "@/components/modules/admin/dashboard";
-import { Metadata } from "next";
+import AdminPageHeader from "@/components/modules/admin/kit/page-header";
+import { useAdminTitle } from "@/components/shared/admin-sidebar/use-admin-title";
 
-export const metadata: Metadata = {
-  title: "Admin Dashboard",
-  description:
-    "Manage your administrative tasks and insights on TechTips Hub from the dashboard.",
-  keywords: "Admin Dashboard, TechTips Hub, admin panel, management, insights",
-};
+const AdminDashboard = () => {
+  useAdminTitle("Admin");
 
-interface IProps {}
-
-const AdminDashboard: React.FC<IProps> = () => {
   return (
     <div>
-      <DashboardTitle title="Dashboard" />
+      <AdminPageHeader
+        title="Dashboard"
+        description="Traffic, engagement and growth across the whole site. Every figure comes from the admin overview endpoints."
+      />
       <DashboardContent />
     </div>
   );

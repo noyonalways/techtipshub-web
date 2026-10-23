@@ -1,47 +1,34 @@
-
-import MyPosts from "@/components/modules/settings/my-posts";
-import PageTitle from "@/components/modules/settings/page-title";
-import { getLoggedInUserPosts } from "@/services/post";
-import { IPost } from "@/types";
+import ManageBlogs from "@/components/modules/settings/manage-blogs";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: 'Manage Blogs',
-  description: 'Manage all your blogs in one place with TechTips Hub.',
-  keywords: 'Manage Blogs, TechTips Hub, Blogging',
+  title: "Manage Blogs",
+  description: "Manage all your blogs in one place with TechTipsHub.",
+  keywords: "Manage Blogs, TechTipsHub, Blogging",
 };
 
 interface IProps {
-  searchParams: {
-    search: string;
-    category: string;
-  };
+  searchParams: Promise<{
+    search?: string;
+    category?: string;
+    sort?: string;
+  }>;
 }
 
-const INITIAL_NUMBERS_OF_POSTS = "5";
+/**
+ * The article list under its old settings address.
+ *
+ * Kept so existing links and bookmarks keep working; new links point at
+ * `/me/blogs`. Both render the same component.
+ */
+const ManageBlogsPage = ({ searchParams }: IProps) => (
+  <div className="space-y-6">
+    <ManageBlogs
+      searchParams={searchParams}
+      title="Manage Blogs"
+      description="Edit, review or remove anything you have published."
+    />
+  </div>
+);
 
-const ManageBlogs = async ({ searchParams }: IProps) => {
-  
-  const params = searchParams
-    ? {
-        searchTerm: searchParams.search,
-        category: searchParams.category,
-        limit: INITIAL_NUMBERS_OF_POSTS,
-      }
-    : undefined;
-
-  const data = await getLoggedInUserPosts(params);
-  const blogs = data?.data as IPost[];
-
-  return (
-    <section className="py-10">
-      <div className="max-w-3xl mx-auto px-2 lg:px-0">
-        <PageTitle title="Manage Blogs" description="Manage your all blogs" />
-
-        <MyPosts initialPosts={blogs} />
-      </div>
-    </section>  
-  );
-};
-
-export default ManageBlogs;
+export default ManageBlogsPage;

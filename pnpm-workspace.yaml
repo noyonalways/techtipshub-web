@@ -1,0 +1,9 @@
+allowBuilds:
+  '@heroui/shared-utils': true
+  unrs-resolver: true
+
+# CVE-2026 cleaner: @tailwindcss/typography pins the vulnerable 6.x line.
+# Only `.astSync()`/`.selector()` are used, both still supported in 7.
+overrides:
+  postcss-selector-parser@<7.1.6: ^7.1.6
+

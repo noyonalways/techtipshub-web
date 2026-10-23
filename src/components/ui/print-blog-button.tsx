@@ -3,13 +3,13 @@
 // components/PrintBlogButton.tsx
 "use client";
 
-import { IPost } from "@/types";
-import { Button } from "@nextui-org/button";
+import { IBlog } from "@/types";
+import { Button } from "@heroui/react";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 
 interface IProps {
-  blog: IPost;
+  blog: IBlog;
 }
 
 // Dynamically import PDFDownloadButton with SSR disabled
@@ -29,7 +29,7 @@ const PrintBlogButton = ({ blog }: IProps) => {
       {isClient ? (
         <PDFDownloadButton blog={blog} />
       ) : (
-        <Button isLoading isIconOnly variant="light"></Button>
+        <Button isLoading isIconOnly variant="light" />
       )}
     </>
   );

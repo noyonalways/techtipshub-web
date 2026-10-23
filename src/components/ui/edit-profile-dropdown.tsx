@@ -1,12 +1,6 @@
 "use client";
 
-import { Button } from "@nextui-org/button";
-import {
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-} from "@nextui-org/dropdown";
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/react";
 import Link from "next/link";
 import { GoPencil } from "react-icons/go";
 
@@ -26,7 +20,11 @@ const EditProfileDropdown = ({}: IProps) => {
           Edit
         </Button>
       </DropdownTrigger>
-      <DropdownMenu aria-label="Profile Actions" variant="flat">
+      <DropdownMenu
+        aria-label="Profile Actions"
+        classNames={{ base: "border border-default-100" }}
+        variant="flat"
+      >
         <DropdownItem key="update-profile">
           <Link className="h-full w-full block" href={`/settings`}>
             Update Profile Details

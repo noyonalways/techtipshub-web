@@ -1,71 +1,63 @@
 import SuspendedLoginForm from "@/components/modules/auth/login-form";
+import AuthShell from "@/components/modules/auth/auth-shell";
 import SocialLogin from "@/components/modules/auth/social-login";
-import Container from "@/components/ui/container";
-import { Divider } from "@nextui-org/divider";
-import { Image } from "@nextui-org/image";
 import { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Login",
   description:
-    "Log in to TechTips Hub to access personalized content and manage your account. Stay updated with the latest tech insights.",
+    "Log in to TechTipsHub to access personalized content and manage your account. Stay updated with the latest tech insights.",
   openGraph: {
     url: "https://techtipshub.vercel.app/login",
     title: "Login",
     description:
-      "Access your TechTips Hub account for personalized content and latest updates.",
+      "Access your TechTipsHub account for personalized content and latest updates.",
   },
 };
 
-interface IProps {}
+const points = [
+  {
+    title: "Read every article in full",
+    description:
+      "Preview what is on the feed; sign in to read the complete piece, including code samples.",
+  },
+  {
+    title: "Take part in the discussion",
+    description:
+      "Comment on articles, vote on what helped and follow the authors you want to keep up with.",
+  },
+  {
+    title: "Publish your own tutorials",
+    description:
+      "Every account can write, edit and manage articles with the built-in composer.",
+  },
+];
 
-const LoginPage: React.FC<IProps> = () => {
+const LoginPage = () => {
   return (
-    <section className="py-10 relative w-full overflow-hidden">
-      <Container>
-        <div className="w-full max-w-lg mx-auto mb-40 mt-10 lg:mb-40 lg:mt-10">
-          <div className="space-y-4 flex flex-col items-center mb-8">
-            <Link href="/">
-              <Image
-                className="size-14"
-                src="/tech-tips-hub-logo.png"
-                alt="tech-tips-hub-logo"
-              />
-            </Link>
-            <div>
-              <h2 className="text-center text-3xl font-bold">User Login</h2>
-            </div>
-          </div>
-
-          <SuspendedLoginForm />
-          <div className="text-center mt-2 pb-4">
-            <Link
-              href="/forget-password"
-              className="text-primary hover:underline"
-            >
-              Forgotten Password?
-            </Link>
-          </div>
-
-          <SocialLogin />
-
-
-          <Divider className="bg-default/50" />
-          <div className="flex items-center justify-center mt-4 text-sm space-x-1 text-center">
-            <span>Don't have an account?</span>
-            <Link className="text-primary hover:underline" href="/signup">
-              Sign Up
-            </Link>
-          </div>
-        </div>
-
-        <div className="-z-50 hidden md:block">
-          <div className="absolute h-14 w-[600px] rotate-[45deg] rounded-3xl bg-purple-600 opacity-30  filter -bottom-5 lg:bottom-20 lg:-right-28 lg:block lg:h-10 lg:w-[600px] lg:opacity-20 xl:-right-40 xl:h-2 xl:w-[800px] xl:opacity-100 blur-2xl"></div>
-          <div className="absolute  h-20 w-[600px] rotate-[45deg] rounded-3xl bg-primary-500 opacity-10  filter bottom-14  lg:bottom-32 lg:-right-28 lg:block lg:h-12 lg:w-[600px] lg:opacity-30  xl:-right-40 xl:h-4 xl:w-[700px] xl:opacity-100 blur-2xl"></div>
-        </div>
-      </Container>
-    </section>
+    <AuthShell
+      eyebrow="Account"
+      title="Welcome back"
+      description="Sign in to pick up where you left off — your feed, your drafts and the discussion."
+      points={points}
+      footer={
+        <p>
+          Don&apos;t have an account?{" "}
+          <Link
+            href="/signup"
+            className="font-semibold text-primary-accessible underline-offset-4 hover:underline"
+          >
+            Create one free
+          </Link>
+        </p>
+      }
+    >
+      <div className="space-y-6">
+        <SuspendedLoginForm />
+        <SocialLogin />
+      </div>
+    </AuthShell>
   );
 };
 

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1128 191" width="1128" height="191">
+  <rect width="1128" height="191" fill="#141315"/>
+  <g transform="translate(56 22) scale(1.15)"><rect x="26" y="26" width="76" height="76" rx="14" fill="#F2A93B"/><path d="M42 44h44v11H75v27H63V55H53v27H42V55z" fill="#141315"/></g>
+  <text x="240" y="100" font-family="Fraunces" font-weight="700" font-size="62" letter-spacing="-1.6" fill="#FCFAF6">TechTips<tspan fill="#F2A93B">Hub</tspan></text>
+  <text x="242" y="132" font-family="Archivo, Inter, system-ui, sans-serif" font-weight="600" font-size="16" letter-spacing="3.4" fill="#9C948A">WRITING FOR BUILDERS</text>
+  <text x="1072" y="108" text-anchor="end" font-family="Archivo, Inter, system-ui, sans-serif" font-weight="400" font-size="22" fill="#FCFAF6">techtipshub.vercel.app</text>
+</svg>

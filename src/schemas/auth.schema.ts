@@ -3,31 +3,29 @@ import { z } from "zod";
 export const signUpValidationSchema = z.object({
   fullName: z
     .string({
-      required_error: "Full Name is required",
+      error: "Full Name is required",
     })
     .min(1, "Full Name is required")
     .trim(),
   email: z
-    .string({
-      required_error: "Email is required",
+    .email({
+      error: "Email is required",
     })
-    .min(1, "Email is required")
-    .email("Please provide a valid email")
     .trim(),
   username: z
     .string({
-      required_error: "Username is required",
+      error: "Username is required",
     })
     .min(1, "Username is required"),
   password: z
     .string({
-      required_error: "Password is required",
+      error: "Password is required",
     })
-    .min(1, "Password is required"),
+    .min(6, "Use at least 6 characters"),
   dateOfBirth: z
     .object(
       { day: z.number(), month: z.number(), year: z.number() },
-      { required_error: "Date of birth is required" }
+      { error: "Date of birth is required" }
     )
     .transform(({ day, month, year }) => {
       return `${year}-${month <= 9 ? "0" + month : month}-${
@@ -36,7 +34,7 @@ export const signUpValidationSchema = z.object({
     }),
   gender: z
     .string({
-      required_error: "Gender is required",
+      error: "Gender is required",
     })
     .min(1, "Gender is required"),
   image: z.any().optional(),
@@ -44,25 +42,34 @@ export const signUpValidationSchema = z.object({
 
 export const signInValidationSchema = z.object({
   email: z
-    .string({
-      required_error: "Email is required",
+    .email({
+      error: "Email is required",
     })
-    .min(1, "Email is required")
-    .email("Please provide a valid email")
     .trim(),
   password: z
     .string({
-      required_error: "Password is required",
+      error: "Password is required",
     })
     .min(1, "Password is required"),
 });
 
 export const passwordResetValidationSchema = z.object({
   email: z
-    .string({
-      required_error: "Email is required",
+    .email({
+      error: "Email is required",
     })
-    .min(1, "Email is required")
-    .email("Please provide a valid email")
     .trim(),
 });
+
+/** Used by the in-app reset page: a new password and its confirmation. */
+export const newPasswordValidationSchema = z
+  .object({
+    newPassword: z
+      .string({ error: "Password is required" })
+      .min(6, "Use at least 6 characters"),
+    confirmPassword: z.string({ error: "Confirm your password" }),
+  })
+  .refine((values) => values.newPassword === values.confirmPassword, {
+    message: "The passwords do not match",
+    path: ["confirmPassword"],
+  });

@@ -1,21 +1,21 @@
 "use client";
 
-import { Button } from "@nextui-org/button";
-import THForm from "../form/th-from";
-import THTextarea from "../form/th-textarea";
 import { LuImagePlus } from "react-icons/lu";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 import { ChangeEvent, useState } from "react";
 import { toast } from "sonner";
-import { useUpdateCommentByUser } from "@/hooks/post.hook";
+import { useUpdateCommentByUser } from "@/hooks/blog.hook";
 import {
+  Button,
   Modal,
   ModalBody,
   ModalContent,
   ModalHeader,
   useDisclosure,
-} from "@nextui-org/modal";
+} from "@heroui/react";
 import { MdModeEdit } from "react-icons/md";
+import THForm from "../form/th-from";
+import THTextarea from "../form/th-textarea";
 
 interface IProps {
   commentId: string;
@@ -62,6 +62,7 @@ const CommentUpdateModal = ({commentId, content}: IProps) => {
       <Button
         isLoading={isPending}
         onClick={onOpen}
+        className="text-primary-accessible"
         variant="light"
         size="sm"
         radius="full"

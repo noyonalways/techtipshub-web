@@ -1,7 +1,7 @@
 "use client"
 
 import { useUser } from "@/context/user.provider";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { PiMagicWandLight, PiUsers } from "react-icons/pi";
@@ -15,23 +15,27 @@ const FeedButtonsForSideBar = ({}: IProps) => {
     <>
       <Button
         as={Link}
-        href={`/`}
-        variant={pathName === "/" ? "flat" : "light"}
-        color={pathName === "/" ? "primary" : "default"}
+        href="/"
         radius="sm"
-        className={`w-full justify-start`}
+        className={
+          pathName === "/"
+            ? "w-full justify-start bg-primary-100 font-medium text-foreground hover:bg-primary-200"
+            : "w-full justify-start bg-transparent font-medium text-default-600 hover:bg-default-100 hover:text-foreground"
+        }
         startContent={<PiMagicWandLight className="text-lg" />}
       >
         Personalized
       </Button>
       <Button
-        isDisabled={!loggedInUser}
         as={Link}
-        href={`/following`}
-        variant={pathName === "/following" ? "flat" : "light"}
-        color={pathName === "/following" ? "primary" : "default"}
+        href="/following"
+        isDisabled={!loggedInUser}
         radius="sm"
-        className={`w-full justify-start`}
+        className={
+          pathName === "/following"
+            ? "w-full justify-start bg-primary-100 font-medium text-foreground hover:bg-primary-200"
+            : "w-full justify-start bg-transparent font-medium text-default-600 hover:bg-default-100 hover:text-foreground"
+        }
         startContent={<PiUsers className="text-lg" />}
       >
         Following

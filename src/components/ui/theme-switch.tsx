@@ -1,8 +1,7 @@
 "use client";
 
-import { SwitchProps, useSwitch } from "@nextui-org/switch";
+import { SwitchProps, useSwitch, VisuallyHidden } from "@heroui/react";
 import { useIsSSR } from "@react-aria/ssr";
-import { VisuallyHidden } from "@react-aria/visually-hidden";
 import clsx from "clsx";
 import { useTheme } from "next-themes";
 import { FC } from "react";
@@ -41,7 +40,6 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({
   });
 
   return (
-    //@ts-ignore
     <Component
       {...getBaseProps({
         className: clsx(
@@ -64,7 +62,7 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({
               "rounded-lg",
               "flex items-center justify-center",
               "group-data-[selected=true]:bg-transparent",
-              "!text-default-500",
+              "!text-default-600",
               "pt-px",
               "px-0",
               "mx-0",

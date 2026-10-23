@@ -1,30 +1,138 @@
-import AdBanner from "@/components/adsense/ad-banner";
-import { FeedButtonsForSideBar } from "../feed-buttons";
-import SubscriptionsStatus from "../subscriptions-status";
+"use client";
 
-interface IProps {}
+import { writeBlogPath } from "@/lib/blog-routes";
 
-const LeftSideBar = ({}: IProps) => {
+
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { useUser } from "@/context/user.provider";
+import { PiMagicWandLight, PiUsers } from "react-icons/pi";
+import { HiOutlinePencilSquare } from "react-icons/hi2";
+import { FiBookOpen, FiInfo, FiMail } from "react-icons/fi";
+import { AdSlot } from "@/components/adsense";
+
+interface NavItem {
+  href: string;
+  label: string;
+  icon: React.ReactNode;
+  requiresAuth?: boolean;
+}
+
+const browseItems: NavItem[] = [
+  {
+    href: "/",
+    label: "Personalized",
+    icon: <PiMagicWandLight className="text-lg" />,
+  },
+  {
+    href: "/following",
+    label: "Following",
+    icon: <PiUsers className="text-lg" />,
+    requiresAuth: true,
+  },
+];
+
+const exploreItems: NavItem[] = [
+  {
+    href: "/features",
+    label: "Community",
+    icon: <FiBookOpen className="text-lg" />,
+  },
+  { href: "/about", label: "About", icon: <FiInfo className="text-lg" /> },
+  {
+    href: "/contact",
+    label: "Contact",
+    icon: <FiMail className="text-lg" />,
+  },
+];
+
+const NavLink = ({ item, active }: { item: NavItem; active: boolean }) => (
+  <Link
+    href={item.href}
+    aria-current={active ? "page" : undefined}
+    className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+      active
+        ? "bg-primary/10 text-primary-accessible"
+        : "text-default-700 hover:bg-default-100 hover:text-foreground"
+    }`}
+  >
+    <span aria-hidden className="shrink-0">
+      {item.icon}
+    </span>
+    {item.label}
+  </Link>
+);
+
+const NavSection = ({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) => (
+  <div className="space-y-1">
+    <p className="px-3 pb-1 tth-label-sm text-default-600">
+      {title}
+    </p>
+    {children}
+  </div>
+);
+
+const LeftSideBar = () => {
+  const { user } = useUser();
+  const pathname = usePathname();
+
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname?.startsWith(href);
+
   return (
-    <div className="hidden lg:flex xl:basis-[22%] 2xl:basis-[18%] space-y-6 sticky top-16 lg:p-4 border-r border-default/50">
-      <div className="flex flex-col h-full min-h-[calc(100vh-90px)] w-full items-stretch relative" >
-        {/* Feed buttons at top */}
-        <div className="space-y-2">
-          <div className="flex flex-col space-y-2">
-            <FeedButtonsForSideBar />
+    <aside className="tth-rail hidden w-56 shrink-0 border-r border-default/60 lg:block">
+      <div className="tth-rail-inner flex flex-col px-3 py-5">
+        <nav aria-label="Feed navigation" className="space-y-6">
+          {user && (
+            <Link
+              href={writeBlogPath}
+              className="flex items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-opacity hover:opacity-90"
+            >
+              <HiOutlinePencilSquare className="text-lg" aria-hidden />
+              Write a blog
+            </Link>
+          )}
+
+          <NavSection title="Browse">
+            {browseItems.map((item) => (
+              <NavLink
+                key={item.href}
+                item={item}
+                active={!!isActive(item.href)}
+              />
+            ))}
+          </NavSection>
+
+          <NavSection title="Explore">
+            {exploreItems.map((item) => (
+              <NavLink
+                key={item.href}
+                item={item}
+                active={!!isActive(item.href)}
+              />
+            ))}
+          </NavSection>
+        </nav>
+
+        {/* Keeps the sidebar ad inside the sticky column, where it has always
+            lived. The block claims the space under the navigation and caps
+            itself so the rail never needs an internal scrollbar. */}
+        <div className="flex min-h-0 flex-1 flex-col gap-4 pt-6">
+          <div className="tth-rail-ad">
+            <AdSlot
+              placement="left-rail"
+              className="mt-0 rounded-[10px] border border-default/60 bg-default-50/30 px-3 pb-2"
+            />
           </div>
         </div>
-
-        {/* Ad banner at bottom */}
-        <div className="mt-4 absolute bottom-0 left-0 right-0">
-          <AdBanner
-            dataAdFormat="auto"
-            dataAdSlot="9749465109"
-            dataFullWidthResponsive={true}
-          />
-        </div>
       </div>
-    </div>  
+    </aside>
   );
 };
 

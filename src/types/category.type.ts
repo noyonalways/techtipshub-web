@@ -2,7 +2,7 @@ export interface ICategory {
   _id: string;
   name: string;
   description: string;
-  postCount: number;
+  blogCount: number;
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;

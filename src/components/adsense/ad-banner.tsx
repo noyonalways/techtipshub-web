@@ -1,40 +1,22 @@
 "use client";
 
-import { useEffect } from "react";
+import AdSlot from "./adsense-slot";
 
+/**
+ * Backward-compatible shim for the old <AdBanner /> call sites. All framing,
+ * reserved height and the single AdSense push live in <AdSlot>; this file only
+ * maps the legacy props onto it. New code should import AdSlot directly.
+ */
 type AdBannerProps = {
-  dataAdSlot: string;
-  dataAdFormat: string;
-  dataFullWidthResponsive: boolean;
+  placement?: string;
+  className?: string;
 };
 
-const AdBanner = ({
-  dataAdFormat,
-  dataAdSlot,
-  dataFullWidthResponsive,
-}: AdBannerProps) => {
-
-  useEffect(() => {
-    try {
-      ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push(
-        {}
-      );
-    } catch (error: any) {
-      console.log(error.message);
-    }
-  }, []);
-  
-
+export default function AdBanner({
+  placement = "legacy",
+  className,
+}: AdBannerProps) {
   return (
-    <ins
-      className="adsbygoogle"
-      style={{ display: "block" }}
-      data-ad-client="ca-pub-6721594154492556"
-      data-ad-slot={dataAdSlot}
-      data-ad-format={dataAdFormat}
-      data-full-width-responsive={dataFullWidthResponsive.toString()}
-    ></ins>
+    <AdSlot variant="display" placement={placement} className={className} />
   );
-};
-
-export default AdBanner;
+}

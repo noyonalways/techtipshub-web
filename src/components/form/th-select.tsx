@@ -1,4 +1,4 @@
-import { Select, SelectItem, SelectProps } from "@nextui-org/select";
+import { Select, SelectItem, SelectProps } from "@heroui/select";
 import { useFormContext } from "react-hook-form";
 
 interface IProps {
@@ -38,6 +38,7 @@ const THSelect: React.FC<IProps> = ({
   return (
     <Select
       {...register(name)}
+      {...props}
       errorMessage={errorMessage || ""}
       isInvalid={!!errors[name]}
       label={label}
@@ -47,7 +48,7 @@ const THSelect: React.FC<IProps> = ({
       id={id}
       isRequired={isRequired}
       placeholder={placeholder}
-      {...props}
+      classNames={{ popoverContent: "border border-default-100" }}
     >
       {options?.map((option) => (
         <SelectItem  key={option.key}>{option.label}</SelectItem>

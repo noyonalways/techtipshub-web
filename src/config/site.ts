@@ -1,8 +1,12 @@
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
-  name: "TechTips Hub",
-  description: "Make beautiful websites regardless of your design experience.",
+  name: "TechTipsHub",
+  shortName: "TechTips",
+  url: "https://techtipshub.vercel.app",
+  tagline: "writing for builders",
+  description:
+    "Practical writing on web development, AI and the tools modern developers use: tutorials, explainers and honest tool comparisons.",
   navItems: [
     {
       label: "Feed",
@@ -13,12 +17,12 @@ export const siteConfig = {
       href: "/features",
     },
     {
-      label: "About Us",
-      href: "/about-us",
+      label: "About",
+      href: "/about",
     },
     {
-      label: "Contact Us",
-      href: "/contact-us",
+      label: "Contact",
+      href: "/contact",
     },
   ],
   navMenuItems: [
@@ -31,20 +35,12 @@ export const siteConfig = {
       href: "/features",
     },
     {
-      label: "About Us",
-      href: "/about-us",
+      label: "About",
+      href: "/about",
     },
     {
-      label: "Contact Us",
-      href: "/contact-us",
-    },
-    {
-      label: "Log In",
-      href: "/login",
-    },
-    {
-      label: "Sign Up",
-      href: "/signup",
+      label: "Contact",
+      href: "/contact",
     },
   ],
   links: {

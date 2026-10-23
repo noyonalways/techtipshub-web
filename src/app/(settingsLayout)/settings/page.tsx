@@ -1,34 +1,78 @@
+import AccountSummary from "@/components/modules/settings/account-summary";
 import PageTitle from "@/components/modules/settings/page-title";
 import UpdateProfileDetailsForm from "@/components/modules/settings/update-profile-details-form";
 import UpdateSocialLinks from "@/components/modules/settings/update-social-links";
 import { getProfileInfo } from "@/services/auth";
+import { getAccountSummary } from "@/services/settings";
+import { IUser } from "@/types";
 import { Metadata } from "next";
+import Link from "next/link";
+import { HiOutlineArrowRight } from "react-icons/hi2";
 
 export const metadata: Metadata = {
   title: "Profile Settings",
-  description: "Manage your TechTips Hub profile settings.",
-  keywords: "Profile, Settings, TechTips Hub",
+  description: "Manage your TechTipsHub profile settings.",
+  keywords: "Profile, Settings, TechTipsHub",
 };
 
-interface IProps {}
+/**
+ * Account settings: who you are on TechTipsHub, what that account has
+ * produced, and the links that hang off it.
+ */
+const SettingsPage = async () => {
+  const [profileData, summary] = await Promise.all([
+    getProfileInfo().catch(() => null),
+    getAccountSummary().catch(() => null),
+  ]);
 
-const SettingsPage =   async ({}: IProps) => {
-const profileData = await getProfileInfo();
-  
+  const user = (profileData?.data as IUser) ?? undefined;
+
   return (
-    <section className="py-10">
-      <div className="max-w-3xl mx-auto px-2 lg:px-0">
-        <PageTitle
-          title="Profile"
-          description="Manage your TechTips Hub profile"
-        />
+    <div className="space-y-8">
+      <PageTitle
+        title="Your profile"
+        description="The details readers see when they land on your profile or one of your articles."
+        action={
+          user?.username ? (
+            <Link
+              href={`/profile/@${user.username}`}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-default/60 px-3 py-2 text-sm font-medium transition-colors hover:border-primary-600/50 hover:text-primary-accessible"
+            >
+              View public profile
+              <HiOutlineArrowRight aria-hidden className="size-3.5" />
+            </Link>
+          ) : undefined
+        }
+      />
 
-        <>
-          <UpdateProfileDetailsForm {...profileData?.data} />
-          <UpdateSocialLinks socialLinks={profileData?.data?.socialLinks} />
-        </>
-      </div>
-    </section>
+      {!user?._id && (
+        <div
+          role="alert"
+          className="flex flex-col items-start gap-3 rounded-xl border border-default/60 bg-default-50/60 px-4 py-3 text-sm text-default-600 dark:bg-default-100/5"
+        >
+          <p>
+            We could not load your account details.{" "}
+            {profileData?.message ||
+              "The fields below start empty — reload the page to try again."}
+          </p>
+          {profileData?.statusCode === 401 && (
+            <Link
+              href="/login?redirect=%2Fsettings"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary-accessible underline-offset-4 hover:underline"
+            >
+              Sign in again
+              <HiOutlineArrowRight aria-hidden className="size-3.5" />
+            </Link>
+          )}
+        </div>
+      )}
+
+      {summary && <AccountSummary summary={summary} />}
+
+      <UpdateProfileDetailsForm {...user} articleCount={summary?.articles} />
+      <UpdateSocialLinks socialLinks={user?.socialLinks} />
+    </div>
   );
 };
+
 export default SettingsPage;

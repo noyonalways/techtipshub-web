@@ -1,12 +1,6 @@
-import { Button } from "@nextui-org/button";
-import {
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  useDisclosure,
-} from "@nextui-org/modal";
+import { Button } from "@heroui/button";
+import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@heroui/modal";
+import { FiCheckCircle, FiSlash } from "react-icons/fi";
 
 interface IProps {
   actionType: "block" | "unblock";
@@ -37,11 +31,17 @@ const BlockUnblockConfirmActionModal = ({
         isDisabled={user.role === "Admin" || isPending}
         onPress={onOpen}
         size="sm"
-        radius="sm"
+        radius="lg"
         variant="flat"
         color={actionType === "block" ? "danger" : "success"}
+        isIconOnly
+        aria-label={actionType === "block" ? "Block user" : "Unblock user"}
       >
-        {actionType === "block" ? "Block" : "Unblock"}
+        {actionType === "block" ? (
+          <FiSlash className="size-4" aria-hidden />
+        ) : (
+          <FiCheckCircle className="size-4" aria-hidden />
+        )}
       </Button>
 
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>

@@ -1,41 +1,40 @@
 "use client";
 
-import { useUpdateBlogByAdmin } from "@/hooks/post.hook";
+import { useUpdateBlogByAdmin } from "@/hooks/blog.hook";
 import { getAllCategories } from "@/services/category";
-import { ICategory, IPost } from "@/types";
-import { Button } from "@nextui-org/button";
-import { Image } from "@nextui-org/image";
-import { Input } from "@nextui-org/input";
+import { ICategory, IBlog } from "@/types";
 import {
+  Button,
+  Image,
+  Input,
   Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
   ModalHeader,
+  Select,
+  SelectItem,
   useDisclosure,
-} from "@nextui-org/modal";
-import { Select, SelectItem } from "@nextui-org/select";
-import dynamic from "next/dynamic";
+} from "@heroui/react";
 import { useEffect, useState } from "react";
-import "react-quill/dist/quill.snow.css";
-
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false }) as any;
+import { FiEdit3 } from "react-icons/fi";
+import RichTextEditor from "@/components/editor/rich-text-editor";
 
 interface IProps {
-  post: IPost;
-  refetchPosts: () => void;
+  blog: IBlog;
+  refetchBlogs: () => void;
 }
 
-const UpdateBlogModal = ({ post, refetchPosts }: IProps) => {
-  const [title, setTitle] = useState(post?.title);
-  const [content, setContent] = useState(post?.content);
-  const [category, setCategory] = useState(post.category?._id);
-  const [tags, setTags] = useState(post.tags?.join(", ") || "");
+const UpdateBlogModal = ({ blog, refetchBlogs }: IProps) => {
+  const [title, setTitle] = useState(blog?.title);
+  const [content, setContent] = useState(blog?.content);
+  const [category, setCategory] = useState(blog.category?._id);
+  const [tags, setTags] = useState(blog.tags?.join(", ") || "");
   const [categories, setCategories] = useState<
     { key: string; label: string }[]
   >([]);
   const [coverImage, setCoverImage] = useState<File | null>(null);
-  const [coverImagePreview, setCoverImagePreview] = useState(post.coverImage);
+  const [coverImagePreview, setCoverImagePreview] = useState(blog.coverImage);
   const [isOpen, setIsOpen] = useState(false);
   const { isOpen: modalIsOpen, onOpen, onOpenChange } = useDisclosure();
 
@@ -83,7 +82,7 @@ const UpdateBlogModal = ({ post, refetchPosts }: IProps) => {
 
     const formData = new FormData();
     const values = {
-      userId: post.author._id,
+      userId: blog.author._id,
       title,
       content,
       category,
@@ -97,9 +96,9 @@ const UpdateBlogModal = ({ post, refetchPosts }: IProps) => {
     }
 
 
-    updateBlog({postId: post._id, payload: formData}, {
+    updateBlog({blogId: blog._id, payload: formData}, {
       onSuccess: () => {
-        refetchPosts();
+        refetchBlogs();
       },
     })
     onOpenChange();
@@ -108,14 +107,16 @@ const UpdateBlogModal = ({ post, refetchPosts }: IProps) => {
   return (
     <>
       <Button
+        isIconOnly
+        aria-label="Edit article"
         isLoading={isPending}
         color="primary"
         size="sm"
-        radius="sm"
+        radius="lg"
         variant="flat"
         onClick={handleOpen}
       >
-        {isPending ? "Updating...": "Update"}
+        {isPending ? null : <FiEdit3 className="size-4" aria-hidden />}
       </Button>
 
       <Modal
@@ -128,7 +129,7 @@ const UpdateBlogModal = ({ post, refetchPosts }: IProps) => {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Update Blog Post
+                Update Blog
               </ModalHeader>
               <ModalBody>
                 <div className="relative mb-4">
@@ -164,36 +165,10 @@ const UpdateBlogModal = ({ post, refetchPosts }: IProps) => {
                   placeholder="Blog Title"
                 />
 
-                {post.contentType === "html" && (
-                  <ReactQuill
-                    className="mb-4"
-                    value={content}
-                    onChange={setContent}
-                    required
-                    placeholder="Write your blog here..."
-                    modules={{
-                      toolbar: [
-                        [{ header: [1, 2, false] }],
-                        [
-                          "bold",
-                          "italic",
-                          "underline",
-                          "strike",
-                          "blockquote",
-                          "code-block",
-                        ],
-                        [
-                          { list: "ordered" },
-                          { list: "bullet" },
-                          { indent: "-1" },
-                          { indent: "+1" },
-                        ],
-                        ["link"],
-                        ["clean"],
-                      ],
-                    }}
-                    theme="snow"
-                  />
+                {blog.contentType === "html" && (
+                  <div className="mb-4">
+                    <RichTextEditor value={content} onChange={setContent} />
+                  </div>
                 )}
 
                 <div className="mb-4">

@@ -1,4 +1,9 @@
-import { forgetPassword, loginUser, registerUser } from "@/services/auth";
+import {
+  forgetPassword,
+  loginUser,
+  registerUser,
+  resetPassword,
+} from "@/services/auth";
 import { TLogin } from "@/types";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -57,6 +62,20 @@ export const useForgetPassword = () => {
             id: "password-reset",
           }
         );
+      }
+    },
+  });
+};
+
+export const useResetPassword = () => {
+  return useMutation<any, Error, { newPassword: string; token: string }>({
+    mutationKey: ["RESET_PASSWORD"],
+    mutationFn: async (payload) => await resetPassword(payload),
+    onSuccess: (data) => {
+      if (data?.success) {
+        toast.success("Password updated. You can sign in now.", {
+          id: "reset-password",
+        });
       }
     },
   });

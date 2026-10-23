@@ -1,51 +1,157 @@
-import { ReactNode } from "react";
-import { HiOutlineCreditCard, HiOutlineHome } from "react-icons/hi2";
-import { MdOutlineArticle, MdOutlineDashboard } from "react-icons/md";
-import { PiUsers } from "react-icons/pi";
-import { TbUserStar } from "react-icons/tb";
+import { cloneElement, isValidElement, ReactNode } from "react";
+import { HiOutlineHome } from "react-icons/hi2";
+import {
+  MdOutlineArticle,
+  MdOutlineCategory,
+  MdOutlineDashboard,
+  MdOutlineDeleteOutline,
+  MdOutlineFactCheck,
+} from "react-icons/md";
+import {
+  PiChartLineUp,
+  PiChatsCircle,
+  PiEnvelopeSimple,
+  PiListMagnifyingGlass,
+  PiUsers,
+} from "react-icons/pi";
 
-interface ILink {
+export interface ILink {
   id: string;
   label: string;
   href: string;
+  description: string;
   icon: ReactNode;
+  /** Sidebar heading this link sits under. Order of the groups follows first appearance. */
+  group?: string;
+  /** One word for the collapsed rail and tight spaces. Falls back to `label`. */
+  shortLabel?: string;
 }
+
+/**
+ * Section labels are kept explicit so the sidebar, the breadcrumb and the page
+ * title all read the same word for the same screen. Groups are ordered by
+ * how often an editor touches them: what the site shows, who is on it, then
+ * the record of what changed.
+ */
+export const ADMIN_GROUPS = [
+  "Overview",
+  "Content",
+  "People",
+  "Inbox",
+  "Configuration",
+] as const;
 
 export const adminLinks: ILink[] = [
   {
-    id: "11",
-    label: "Home",
-    href: "/",
-    icon: <HiOutlineHome size={18} />,
-  },
-  {
-    id: "12",
+    id: "dashboard",
     label: "Dashboard",
     href: "/admin/dashboard",
-    icon: <MdOutlineDashboard size={18} />,
+    description: "Traffic, engagement and growth",
+    icon: <MdOutlineDashboard />,
+    group: "Overview",
   },
   {
-    id: "13",
-    label: "Manage Blogs",
+    id: "analytics",
+    label: "Analytics",
+    href: "/admin/analytics",
+    description: "Day-by-day traffic and growth",
+    icon: <PiChartLineUp />,
+    group: "Overview",
+  },
+  {
+    id: "manage-blogs",
+    label: "Articles",
     href: "/admin/manage-blogs",
-    icon: <MdOutlineArticle size={18} />,
+    description: "Review, edit or remove articles",
+    icon: <MdOutlineArticle />,
+    group: "Content",
   },
   {
-    id: "14",
-    label: "Manage Users",
+    id: "manage-comments",
+    label: "Comments",
+    href: "/admin/manage-comments",
+    description: "Read and moderate discussions",
+    icon: <PiChatsCircle />,
+    group: "Content",
+  },
+  {
+    id: "categories",
+    label: "Categories",
+    href: "/admin/categories",
+    description: "Group articles by topic",
+    icon: <MdOutlineCategory />,
+    group: "Content",
+  },
+  {
+    id: "trash",
+    label: "Trash",
+    href: "/admin/trash",
+    description: "Removed articles and members",
+    icon: <MdOutlineDeleteOutline />,
+    group: "Content",
+  },
+  {
+    id: "manage-users",
+    label: "Members",
     href: "/admin/manage-users",
-    icon: <PiUsers size={18} />,
+    description: "Roles, status and moderation",
+    icon: <PiUsers />,
+    group: "People",
   },
   {
-    id: "15",
-    label: "Subscribers",
-    href: "/admin/subscribers",
-    icon: <TbUserStar size={18} />,
+    id: "messages",
+    label: "Messages",
+    href: "/admin/messages",
+    description: "Contact form submissions",
+    icon: <PiEnvelopeSimple />,
+    group: "Inbox",
   },
   {
-    id: "16",
-    label: "Payments",
-    href: "/admin/payments",
-    icon: <HiOutlineCreditCard size={18} />,
+    id: "moderation",
+    label: "Moderation queue",
+    shortLabel: "Queue",
+    href: "/admin/moderation",
+    description: "Work through everything waiting on you",
+    icon: <MdOutlineFactCheck />,
+    group: "Inbox",
+  },
+  {
+    id: "activity-log",
+    label: "Activity log",
+    shortLabel: "Activity",
+    href: "/admin/activity-log",
+    description: "Who changed what, and when",
+    icon: <PiListMagnifyingGlass />,
+    group: "Configuration",
+  },
+];
+
+/**
+ * Nav icons are authored without a size so one place can scale them: the
+ * expanded rail draws them at 18, the collapsed rail and the drawer's header
+ * can ask for another size without touching the data.
+ */
+export const navIcon = (icon: ReactNode, size = 18): ReactNode =>
+  isValidElement<{ size?: number }>(icon) ? cloneElement(icon, { size }) : icon;
+
+/**
+ * Resolves the sidebar entry for a path. The longest matching href wins, so
+ * `/admin/manage-users/<id>` stays under Members and a future nested route
+ * cannot fall through to Dashboard.
+ */
+export const findAdminLink = (pathname?: string | null): ILink | undefined =>
+  adminLinks
+    .filter(
+      (link) => pathname === link.href || pathname?.startsWith(`${link.href}/`),
+    )
+    .sort((a, b) => b.href.length - a.href.length)[0];
+
+export const adminBackLinks: ILink[] = [
+  {
+    id: "back",
+    label: "Back to site",
+    href: "/",
+    description: "Leave the admin panel",
+    icon: <HiOutlineHome />,
   },
 ];

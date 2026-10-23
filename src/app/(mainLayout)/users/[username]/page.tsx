@@ -1,241 +1,143 @@
+import { AdSlot } from "@/components/adsense";
+import ProfileHeader from "@/components/modules/profile/profile-header";
+import ProfileArticleList from "@/components/modules/profile/profile-article-list";
+import ButtonLink from "@/components/ui/button-link";
 import Container from "@/components/ui/container";
 import FollowUnFollowButton from "@/components/ui/follow-unfollow-button";
-import { getPostsByUserId } from "@/services/post";
-import { getUserByUsername } from "@/services/user";
-import { IPost, IUser } from "@/types";
-import { Avatar } from "@nextui-org/avatar";
-import { Button } from "@nextui-org/button";
-import { Metadata } from "next";
-import Link from "next/link";
-import { AiOutlineSmallDash } from "react-icons/ai";
-import { BsTwitterX } from "react-icons/bs";
-import {
-  FaFacebook,
-  FaGithub,
-  FaInstagram,
-  FaLinkedin,
-  FaYoutube,
-} from "react-icons/fa";
-import { FiMapPin } from "react-icons/fi";
-import { GoPencil } from "react-icons/go";
-import { IoDiamondOutline } from "react-icons/io5";
-import { MdVerified } from "react-icons/md";
-import { PiCalendarDotsLight } from "react-icons/pi";
-import { TbArrowBadgeDown } from "react-icons/tb";
 import ProfileShareDropdown from "@/components/ui/profile-share-dropdown";
-import AdBanner from "@/components/adsense/ad-banner";
+import { getBlogsByUserId } from "@/services/blog";
+import { getUserByUsername } from "@/services/user";
+import { IBlog, IUser } from "@/types";
+import { Metadata } from "next";
+import { BiSupport } from "react-icons/bi";
+
+/** Articles requested on the first paint; the rest load a page at a time. */
+const PROFILE_PAGE_SIZE = 8;
 
 type Props = {
-  params: { username: string };
+  params: Promise<{ username: string }>;
 };
 
+const usernameFromRoute = (routeUsername: string) =>
+  routeUsername.split("40")[1] || routeUsername;
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const actualUsername = params.username.split("40")[1];
-  const data = await getUserByUsername(actualUsername);
-  const { fullName, profilePicture } = (data.data as IUser) ?? {};
+  const { username: routeUsername } = await params;
+  const actualUsername = usernameFromRoute(routeUsername);
+  const data = await getUserByUsername(actualUsername).catch(() => null);
+  const { fullName, profilePicture } = (data?.data as IUser) ?? {};
+
+  if (!fullName) {
+    return { title: "Member not found" };
+  }
 
   return {
-    title: `${fullName}'s Profile`,
-    description: `Explore ${fullName}'s profile on TechTips Hub. Discover their shared insights, tutorials, and contributions to the tech community.`,
-    keywords: `${fullName}, TechTips Hub, user profile, tech community, articles, tutorials`,
+    title: `${fullName} (@${actualUsername})`,
+    description: `Read articles by ${fullName} on TechTipsHub — tutorials and field notes from the tech community.`,
     openGraph: {
-      title: `${fullName}'s Profile`,
-      description: `Check out ${fullName}'s profile on TechTips Hub. See their latest articles, contributions, and interests in the tech world.`,
-      url: `https://techtipshub.vercel.app/users/@${actualUsername}`,
+      title: `${fullName} (@${actualUsername})`,
+      description: `Read articles by ${fullName} on TechTipsHub.`,
+      url: `/users/@${actualUsername}`,
       images: profilePicture ? [{ url: profilePicture }] : [],
     },
   };
 }
 
-const GetUserByIdPage = async ({
-  params,
-}: {
-  params: { username: string };
-}) => {
-  const data = await getUserByUsername(params.username.split("40")[1]);
+const GetUserByIdPage = async ({ params }: Props) => {
+  const { username: routeUsername } = await params;
+  const data = await getUserByUsername(usernameFromRoute(routeUsername));
 
-  const {
-    username,
-    _id,
-    profilePicture,
-    fullName,
-    isVerified,
-    isPremiumUser,
-    totalFollowers,
-    totalFollowing,
-    location,
-    bio,
-    designation,
-    createdAt,
-    totalPosts,
-    socialLinks,
-  } = (data.data as IUser) ?? {};
+  const user = (data?.data as IUser) ?? undefined;
 
-  const postsData = await getPostsByUserId(_id);
-  const posts = postsData?.data as IPost[];
+  if (!user?._id || user.isDeleted) {
+    return (
+      <section className="py-16 lg:py-24">
+        <Container>
+          <div className="mx-auto max-w-md text-center">
+            <p className="tth-label text-primary-accessible">
+              404
+            </p>
+            <h1 className="mt-3 text-2xl font-bold tracking-tight">
+              We could not find that member
+            </h1>
+            <p className="mt-2 text-default-600">
+              The profile may have been removed, or the link may be wrong.
+            </p>
+            <div className="mt-7 flex flex-wrap justify-center gap-3">
+              <ButtonLink href="/" radius="lg" color="primary">
+                Back to the feed
+              </ButtonLink>
+              <ButtonLink
+                href="/contact"
+                radius="lg"
+                variant="bordered"
+                startContent={<BiSupport />}
+              >
+                Contact support
+              </ButtonLink>
+            </div>
+          </div>
+        </Container>
+      </section>
+    );
+  }
+
+  const blogsData = await getBlogsByUserId(user._id, {
+    limit: String(PROFILE_PAGE_SIZE),
+    page: "1",
+  }).catch(() => null);
+  const blogs = Array.isArray(blogsData?.data)
+    ? (blogsData.data as IBlog[])
+    : [];
+  const totalBlogs = Number.isFinite(Number(blogsData?.meta?.total))
+    ? Number(blogsData?.meta?.total)
+    : blogs.length;
 
   return (
-    <section className="py-10">
+    <section className="py-10 lg:py-14">
       <Container>
-        <div className="lg:border border-default/50 lg:py-8 lg:px-14 rounded-xl space-y-8 w-full">
-          <div className="w-full flex items-start justify-between">
-            <div className="flex flex-col space-y-4 lg:space-y-0 lg:flex-row items-start lg:space-x-6">
-              <Avatar
-                color="primary"
-                className="w-28 h-28 lg:size-40 object-cover"
-                radius="full"
-                src={profilePicture}
-                isBordered
-              />
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <h1 className="text-3xl font-bold">{fullName}</h1>
-                  {designation && <p>{designation}</p>}
-                </div>
-
-                <div className="flex items-center space-x-4">
-                  {isVerified && (
-                    <div className="flex space-x-2 items-center">
-                      <MdVerified className="text-lg text-primary" />
-                      <span>Verified</span>
-                    </div>
-                  )}
-                  {isPremiumUser ? (
-                    <div className="flex space-x-2 items-center">
-                      <IoDiamondOutline className="text-lg text-primary" />
-                      <span>Premium User</span>
-                    </div>
-                  ) : (
-                    <div className="flex space-x-2 items-center">
-                      <TbArrowBadgeDown className="text-2xl text-primary" />
-                      <span>Basic User</span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex items-center space-x-4">
-                  <Button
-                    as={Link}
-                    href={`/@${username}/following`}
-                    size="sm"
-                    variant="flat"
-                    radius="full"
-                  >
-                    {totalFollowing} Following
-                  </Button>
-                  <Button
-                    as={Link}
-                    href={`/@${username}/followers`}
-                    size="sm"
-                    variant="flat"
-                    radius="full"
-                  >
-                    {totalFollowers} Followers
-                  </Button>
-                  <Button size="sm" variant="flat" radius="full">
-                    {totalPosts} Blog Posts
-                  </Button>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4 absolute right-2 lg:static">
-              <ProfileShareDropdown />
-
-              <FollowUnFollowButton id={_id} />
-            </div>
-          </div>
-
-          <div className="border border-default/50 p-4 py-6 lg:p-6 rounded-lg flex flex-col space-y-4 lg:space-y-0 lg:flex-row lg:items-center lg:justify-center lg:space-x-14 w-full">
-            <ul className="flex items-center space-x-6 text-lg text-default-600">
-              {socialLinks &&
-                socialLinks.map((social) => (
-                  <li key={social.platform}>
-                    <a
-                      href={social.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {(social.platform === "Linkedin" && <FaLinkedin />) ||
-                        (social.platform === "Twitter" && <BsTwitterX />) ||
-                        (social.platform === "Github" && <FaGithub />) ||
-                        (social.platform === "Facebook" && <FaFacebook />) ||
-                        (social.platform === "Instagram" && <FaInstagram />) ||
-                        (social.platform === "Youtube" && <FaYoutube />)}
-                    </a>
-                  </li>
-                ))}
-            </ul>
-
-            {location && (
-              <div className="text-default-600 flex space-x-2 items-center">
-                <FiMapPin className="text-lg" />
-                <span>{location}</span>
-              </div>
-            )}
-
-            <div className="text-default-600 flex space-x-2 items-center">
-              <PiCalendarDotsLight className="text-lg" />
-              <span>
-                Member Since, {createdAt && new Date(createdAt).toDateString()}
-              </span>
-            </div>
-          </div>
-
-          <div className="border border-default/50 p-4 lg:p-6 rounded-lg space-y-6">
-            <h2 className="text-xl font-bold">About Me</h2>
-            {bio && <p>{bio}</p>}
-          </div>
-
-          <div className="border border-default/50 p-4 lg:p-6 rounded-lg space-y-6">
-            <h2 className="text-xl font-bold">Recent Activity</h2>
-
-            <div>
-              {posts &&
-                posts?.map((post) => (
-                  <Link
-                    href={`/blogs/${post.slug}`}
-                    key={post._id}
-                    className="flex space-x-2 lg:space-x-10 mt-2"
-                  >
-                    <div className="flex flex-col items-center space-y-1 basis-[25%] lg:basis-auto">
-                      <span className="text-xs text-center lg:text-sm lg:text-start">
-                        {new Date(post.createdAt).toDateString()}
-                      </span>
-                      <AiOutlineSmallDash className="rotate-90 text-primary text-lg" />
-                    </div>
-                    <div className="space-y-1 flex-1 lg:flex-auto border-b border-default/50 pb-2">
-                      <div className="text-default-500 flex items-center space-x-4">
-                        <div className="space-x-2 flex items-center">
-                          <GoPencil />
-                          <span>Wrote an article</span>
-                        </div>
-                        {post.isPremium && (
-                          <Button
-                            radius="full"
-                            size="sm"
-                            color="secondary"
-                            variant="flat"
-                          >
-                            Premium
-                          </Button>
-                        )}
-                      </div>
-                      <h3 className="text-base md:text-lg font-semibold ">
-                        {post.title}
-                      </h3>
-                    </div>
-                  </Link>
-                ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-8">
-          <AdBanner
-            dataAdFormat="auto"
-            dataAdSlot="9749465109"
-            dataFullWidthResponsive={true}
+        <div>
+          <ProfileHeader
+            user={user}
+            blogCount={totalBlogs}
+            actions={
+              <>
+                <ProfileShareDropdown />
+                {user._id && <FollowUnFollowButton id={user._id} />}
+              </>
+            }
           />
+
+          <section className="mt-10" aria-labelledby="profile-articles">
+            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+              <h2
+                id="profile-articles"
+                className="text-xl font-bold tracking-tight"
+              >
+                Articles
+              </h2>
+              <p className="text-sm tabular-nums text-default-600">
+                {totalBlogs === 1
+                  ? "1 published article · newest first"
+                  : `${totalBlogs.toLocaleString()} published articles · newest first`}
+              </p>
+            </div>
+
+            <div className="mt-5">
+              <ProfileArticleList
+                userId={user._id}
+                initialBlogs={blogs}
+                total={totalBlogs}
+                emptyMessage={`${user.fullName || "This member"} has not published an article yet.`}
+              />
+            </div>
+          </section>
+
+          {/* A profile with fewer than three published articles has no list to
+              frame an ad: nothing to put the unit after. */}
+          {totalBlogs >= 3 && (
+            <AdSlot variant="display" placement="member-profile-end" />
+          )}
         </div>
       </Container>
     </section>

@@ -1,7 +1,4 @@
-import {
-  FeedButtonsForSideBar,
-  FeedButtonsForSmallDevice,
-} from "@/components/modules/feed/feed-buttons";
+import { FeedButtonsForSmallDevice } from "@/components/modules/feed/feed-buttons";
 import LeftSideBar from "@/components/modules/feed/left-sidebar";
 import RightSideBar from "@/components/modules/feed/right-sidebar";
 import { Navbar } from "@/components/shared/navbar";
@@ -14,23 +11,23 @@ const FeedLayout = ({ children }: IProps) => {
   return (
     <>
       <Navbar />
-      <section className="w-full">
-        <div className="flex flex-col lg:flex-row lg:justify-between items-start w-full">
-          {/* Left side bar */}
-          <LeftSideBar />
+      {/* Same width and gutters as the header and the footer, so the rails and
+          the reading column sit on the site's one axis. */}
+      <div className="mx-auto flex w-full max-w-page items-start px-4 sm:px-6 lg:px-8">
+        {/* Left rail: persistent navigation, pinned to the viewport */}
+        <LeftSideBar />
 
-          {/* Main content */}
-          <div className="basis-full w-full lg:w-auto lg:basis-[46%] 2xl:basis-[40%] py-4 px-2 lg:px-0">
-            <div className="flex items-center space-x-4 mb-4 lg:hidden">
-              <FeedButtonsForSmallDevice />
-            </div>
-            {children}
+        {/* Main content: the reading column */}
+        <main className="min-w-0 flex-1 px-0 py-6 lg:px-8">
+          <div className="mb-5 flex items-center gap-3 lg:hidden">
+            <FeedButtonsForSmallDevice />
           </div>
+          <div className="mx-auto w-full max-w-read">{children}</div>
+        </main>
 
-          {/* Right side bar */}
-          <RightSideBar />
-        </div>
-      </section>
+        {/* Right rail: categories + site links, pinned to the viewport */}
+        <RightSideBar />
+      </div>
     </>
   );
 };

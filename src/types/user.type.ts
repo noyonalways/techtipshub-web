@@ -4,7 +4,6 @@ export type TLoggedInUser = {
   name: string;
   username: string;
   profilePicture: string;
-  isPremiumUser: boolean;
   role: TUserRole;
   iat: number;
   exp: number;
@@ -43,11 +42,10 @@ export interface IUser {
   totalFollowing: number;
   dateOfBirth: string;
   isVerified: boolean;
-  isPremiumUser: boolean;
   isDeleted: boolean;
   socialLinks: TSocialLink[];
   createdAt: string;
   updatedAt: string;
-  totalPosts: number;
+  totalBlogs: number;
   __v: number;
 }

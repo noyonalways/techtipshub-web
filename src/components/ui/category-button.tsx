@@ -1,7 +1,7 @@
 "use client";
 
 import { ICategory } from "@/types";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/react";
 import { useRouter } from "next/navigation";
 
 interface IProps extends ICategory {}
@@ -14,14 +14,15 @@ const CategoryButton = ({ name }: IProps) => {
   };
 
   return (
-    <Button
-      onClick={() => handleOnClick(name)}
-      variant="flat"
-      radius="full"
-      size="sm"
-    >
-      {name}
-    </Button>
+      <Button
+        className="bg-default-100 font-medium text-foreground hover:bg-default-200"
+        onClick={() => handleOnClick(name)}
+        radius="full"
+        size="sm"
+        variant="flat"
+      >
+        {name}
+      </Button>
   );
 };
 

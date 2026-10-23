@@ -1,23 +1,16 @@
 "use client";
 
-import { Button } from "@nextui-org/button";
-import {
-  Modal,
-  ModalHeader,
-  ModalBody,
-  useDisclosure,
-  ModalContent,
-} from "@nextui-org/modal";
+import { Button, Modal, ModalBody, ModalContent, ModalHeader, useDisclosure } from "@heroui/react";
 import Link from "next/link";
 import { ReactNode } from "react";
 
 interface IProps {
   redirect: string;
   buttonContent: ReactNode;
+  className?: string;
 }
 
-const AuthenticationModal = ({ redirect, buttonContent, ...props }: IProps) => {
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+const AuthenticationModal = ({ redirect, buttonContent, ...props }: IProps) => {  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   return (
     <>
       <Button onPress={onOpen} {...props} >
@@ -31,31 +24,29 @@ const AuthenticationModal = ({ redirect, buttonContent, ...props }: IProps) => {
                 Authentication Required
               </ModalHeader>
               <ModalBody>
-                <p className="text-default-500">
+                <p className="text-default-600">
                   You are not currently logged in. Please login first to
                   continue.
                 </p>
                 <div className="mb-4 mt-2 flex gap-2">
                   <Button
-                    variant="flat"
-                    color="primary"
-                    className="flex-1"
-                    radius="sm"
                     as={Link}
+                    className="flex-1 font-semibold"
+                    color="primary"
                     href={`/signup?redirect=${redirect}`}
+                    radius="sm"
                   >
-                    Register
+                    Sign up
                   </Button>
 
                   <Button
-                  variant="flat"
-                    color="secondary"
-                    className="flex-1"
-                    radius="sm"
                     as={Link}
+                    className="flex-1 border border-default-300 font-medium text-foreground hover:bg-default-100"
                     href={`/login?redirect=${redirect}`}
+                    radius="sm"
+                    variant="bordered"
                   >
-                    Login
+                    Log in
                   </Button>
                 </div>
               </ModalBody>

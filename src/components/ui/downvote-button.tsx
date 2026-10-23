@@ -1,24 +1,24 @@
 "use client";
 
 import { useUser } from "@/context/user.provider";
-import { useVoteOnPost } from "@/hooks/post.hook";
-import { Button, ButtonProps } from "@nextui-org/button";
+import { useVoteOnBlog } from "@/hooks/blog.hook";
+import { Button, ButtonProps } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { ReactNode } from "react";
 import { AuthenticationModal } from "../modals";
 
 interface IProps extends ButtonProps {
   children: ReactNode;
-  postId: string;
+  blogId: string;
   slug?: string;
 }
 
-const DownVoteButton = ({ children, postId, slug,  ...props }: IProps) => {
+const DownVoteButton = ({ children, blogId, slug,  ...props }: IProps) => {
   const { user } = useUser();
-  const { mutate: upVote, isPending } = useVoteOnPost();
+  const { mutate: upVote, isPending } = useVoteOnBlog();
 
   const handleDownvote = () => {
-    upVote({ postId: postId, voteType: "downvote" });
+    upVote({ blogId: blogId, voteType: "downvote" });
   };
 
   return (

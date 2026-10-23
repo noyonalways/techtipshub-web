@@ -1,74 +1,82 @@
-import AdBanner from "@/components/adsense/ad-banner";
-import CommentCard from "@/components/comment-card";
-import CommentForm from "@/components/modules/post/comment-form";
-import ShowHTMLFormat from "@/components/modules/post/show-html-format";
-import BlogCommentButton from "@/components/ui/blog-comment-button";
-import BlogShareDropdown from "@/components/ui/blog-share-dropdown";
+import { AdSlot } from "@/components/adsense";
+import ArticleHeader from "@/components/modules/blog/article-header";
+import ArticleState from "@/components/modules/blog/article-state";
+import {
+  ArticleAuthor,
+  ArticleEndMatter,
+  ArticleTags,
+  BackToTop,
+} from "@/components/modules/blog/article-end-matter";
+import BlogComments from "@/components/modules/blog/blog-comments";
+import LockedArticle from "@/components/modules/blog/locked-article";
+import ReadingProgress from "@/components/modules/blog/reading-progress";
+import { splitAfterIntro } from "@/components/modules/blog/split-article-intro";
 import Container from "@/components/ui/container";
-import DownVoteButton from "@/components/ui/downvote-button";
-import FollowUnFollowButton from "@/components/ui/follow-unfollow-button";
-import PrintBlogButton from "@/components/ui/print-blog-button";
-import UpVoteButton from "@/components/ui/upvote-button";
-import { poppins } from "@/config/fonts";
-import { getAllPosts, getCommentsByPostId, getPostBySlug } from "@/services/post";
-import { IPost } from "@/types";
+import { siteConfig } from "@/config/site";
+import { getAccessToken } from "@/lib/fetch-with-auth";
+import {
+  getAllBlogs,
+  getBlogBySlug,
+  getCommentsByBlogId,
+} from "@/services/blog";
+import { IBlog } from "@/types";
 import { IComment } from "@/types/comment.type";
-import { Avatar } from "@nextui-org/avatar";
-import { Button } from "@nextui-org/button";
-import { Image as NextImage } from "@nextui-org/image";
-import { Textarea } from "@nextui-org/input";
+import { jwtTokenDecode } from "@/utils";
 import type { Metadata } from "next";
-import Link from "next/link";
-import { AiOutlineComment } from "react-icons/ai";
-import { BiBookmark, BiDownvote, BiUpvote } from "react-icons/bi";
-import { IoDiamondOutline } from "react-icons/io5";
 import Image from "next/image";
 
 type Props = {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 };
 
 export const revalidate = 43200; // Revalidate every 12 hours (43200 seconds)
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const data = await getPostBySlug(params?.slug);
-  const { title, content, coverImage } = (data?.data as IPost) ?? {};
+  const { slug } = await params;
+  const data = await getBlogBySlug(slug);
+  const { title, content, coverImage } = (data?.data as IBlog) ?? {};
 
-  const description = content?.substring(0, 150) + "...";
-  const blogUrl = `https://techtipshub.vercel.app/blogs/${params?.slug}`;
+  const description = content ? content.substring(0, 150) + "..." : undefined;
+  const blogUrl = `${siteConfig.url}/blogs/${slug}`;
+  // Blogs without an upload fall back to the brand cover, so a shared link
+  // still shows the house mark rather than no image at all.
+  const ogImage = coverImage
+    ? [{ url: coverImage, alt: title }]
+    : [{ url: "/brand/og-image.png", width: 1200, height: 630, alt: siteConfig.name }];
 
   return {
     title: title,
     description: description,
-    keywords: `${title}, TechTips Hub, blog post, technology, tutorial`,
+    alternates: { canonical: blogUrl },
+    keywords: `${title}, TechTipsHub, blog post, technology, tutorial`,
     openGraph: {
       title: title,
       description: description,
       url: blogUrl,
-      images: [{ url: coverImage }],
-      siteName: "TechTips Hub",
+      images: ogImage,
+      siteName: siteConfig.name,
       type: "article",
     },
     twitter: {
       card: "summary_large_image",
       title: title,
       description: description,
-      images: [coverImage],
+      images: ogImage.map((image) => image.url),
     },
   };
 }
 
 export async function generateStaticParams() {
   try {
-    const response = await getAllPosts({ limit: "100" });
-    const posts = response?.data as IPost[];
-    
-    if (!posts || !Array.isArray(posts)) {
+    const response = await getAllBlogs({ limit: "100" });
+    const blogs = response?.data as IBlog[];
+
+    if (!blogs || !Array.isArray(blogs)) {
       return [];
     }
 
-    return posts.map((post) => ({
-      slug: post.slug,
+    return blogs.map((blog) => ({
+      slug: blog.slug,
     }));
   } catch (error) {
     console.error("Error generating static params for blogs:", error);
@@ -76,279 +84,162 @@ export async function generateStaticParams() {
   }
 }
 
-const DynamicBlogPage = async ({ params }: { params: { slug: string } }) => {
-  const data = await getPostBySlug(params?.slug);
+const readingMinutes = (html?: string) => {
+  if (!html) return null;
+  const words = html.replace(/<[^>]+>/g, " ").split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 220));
+};
+
+const DynamicBlogPage = async ({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) => {
+  const { slug: routeSlug } = await params;
+  const data = await getBlogBySlug(routeSlug);
   const {
     _id,
     coverImage,
     title,
     author,
-    contentType,
     createdAt,
-    isPremium,
     content,
+    isLocked,
     tags,
     totalViews,
-    upVotes,
-    downVotes,
     totalComments,
-    slug,
-  } = (data?.data as IPost) ?? {};
+    category,
+  } = (data?.data as IBlog) ?? {};
 
-  let comments;
+  let comments: IComment[] = [];
   if (data?.success) {
-    const res = await getCommentsByPostId(_id);
-    comments = res?.data as IComment[];
+    const res = await getCommentsByBlogId(_id);
+    comments = ((res?.data as IComment[]) ?? []).filter(
+      (comment) => !comment.isDeleted,
+    );
   }
 
+  const minutes = readingMinutes(content);
+  const loginHref = `/login?redirect=blogs/${routeSlug}`;
+
+  // The author panel hides its Follow control on the reader's own article, and
+  // the whole page is cached, so this has to be read per request rather than
+  // baked into the rendered HTML.
+  let viewerId: string | undefined;
+  try {
+    const token = await getAccessToken();
+    if (token) viewerId = (jwtTokenDecode(token) as { _id?: string })?._id;
+  } catch {
+    viewerId = undefined;
+  }
+  const isOwnArticle = Boolean(viewerId && author?._id === viewerId);
+
+  if (!data?.success) {
+    return (
+      <section className="pb-16">
+        <Container>
+          <ArticleState
+            kind={data?.statusCode === 404 ? "notFound" : "auth"}
+            loginHref={loginHref}
+          />
+        </Container>
+      </section>
+    );
+  }
+
+  // The in-article unit goes between the opening paragraph and the rest. A
+  // body with no safe paragraph break renders whole, with the ad after it.
+  // Both halves keep their own class so the body's type rules stay continuous.
+  const introSplit = isLocked ? null : splitAfterIntro(content);
+
   return (
-    <section className="pb-10">
+    <section className="pb-16">
+      <ReadingProgress targetId="article-body" />
       <Container>
-        <>
-          {!data?.success ? (
-            <>
-              {data?.statusCode === 401 && (
-                <div className="text center space-y-4 w-full flex flex-col items-center justify-center h-[calc(100vh-410px)]">
-                  <p className="text-center text-default-600">
-                    Accessing premium content requires logging in.
-                  </p>
-                  <Button
-                    as={Link}
-                    href={`/login?redirect=blogs/${params?.slug}`}
-                    radius="full"
-                    variant="solid"
-                    color="primary"
-                  >
-                    Login
-                  </Button>
-                </div>
-              )}
-              {data?.statusCode === 403 && (
-                <div className="text center space-y-4 w-full flex flex-col items-center justify-center h-[calc(100vh-410px)]">
-                  <p className="text-center text-default-600">
-                    {data?.message}
-                  </p>
-                  <Button
-                    as={Link}
-                    href="/subscriptions"
-                    radius="full"
-                    variant="solid"
-                    color="primary"
-                  >
-                    Get Premium
-                  </Button>
-                </div>
-              )}
-              {data?.statusCode === 404 && (
-                <div className="text center space-y-4 w-full flex flex-col items-center justify-center h-[calc(100vh-410px)]">
-                  <p className="text-center text-default-600">Blog not found</p>
-                  <Button
-                    as={Link}
-                    href={`/`}
-                    radius="full"
-                    variant="solid"
-                    color="primary"
-                  >
-                    Back to Feed
-                  </Button>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex justify-center mt-4 w-full print:max-w-xl print:mx-auto rounded-md overflow-hideen">
+        <article
+          id="article-body"
+          className="mx-auto max-w-read scroll-mt-20 pt-4 print:max-w-xl print:pt-0"
+        >
+          <div id="article-start" className="scroll-mt-24">
+            <ArticleHeader
+              slug={routeSlug}
+              title={title}
+              author={author}
+              category={category}
+              createdAt={createdAt}
+              minutes={isLocked ? null : minutes}
+              views={totalViews ?? 0}
+            />
+          </div>
+
+          {coverImage && (
+            <figure className="mt-8 print:hidden">
+              <div className="relative aspect-[16/9] overflow-hidden rounded-[10px] border border-default/60 bg-default-100 sm:aspect-[2/1]">
                 <Image
-                  className="w-full h-full"
+                  className="object-cover"
                   src={coverImage}
-                  alt={`${title}-cover-image`}
-                  width={800}
-                  height={400}
+                  alt={title}
+                  fill
+                  priority
+                  sizes="(min-width: 768px) 46rem, 100vw"
                 />
               </div>
-              <div className="space-y-14 print:space-y-8">
-                <div className="space-y-6">
-                  <h1
-                    className={`${poppins.className} text-3xl lg:text-4xl font-bold text-center`}
-                  >
-                    {title}
-                  </h1>
-                  <div className="flex justify-center lg:justify-center items-center space-x-2 lg:space-x-4 mx-auto w-full max-w-xl">
-                    <Link
-                      href={`/users/@${author?.username}`}
-                      className="flex items-center space-x-4"
-                    >
-                      <Avatar
-                        className="h-8 w-8 object-cover"
-                        radius="full"
-                        src={author?.profilePicture}
-                        name={author?.fullName}
-                        isBordered
-                      />
-                      <h3 className="font-medium text-sm lg:text-lg">
-                        {author?.fullName}
-                      </h3>
-                    </Link>
-                    <span className="text-default-500">-</span>
-                    <div className="text-default-500 text-xs lg:text-base">
-                      {new Date(createdAt)?.toDateString()}
-                    </div>
-
-                    <div className="print:hidden">
-                      <FollowUnFollowButton id={author?._id} />
-                    </div>
-                  </div>
-
-                  <div
-                    className={`flex flex-col lg:flex-row justify-center items-center gap-4 print:hidden`}
-                  >
-                    <div className="flex items-center space-x-2">
-                      {isPremium && (
-                        <Button
-                          color="secondary"
-                          variant="flat"
-                          radius="full"
-                          startContent={
-                            <IoDiamondOutline className="text-lg" />
-                          }
-                        >
-                          Premium Content
-                        </Button>
-                      )}
-
-                      {totalViews > 0 && (
-                        <Button size="md" variant="flat" radius="full">
-                          {totalViews} Views
-                        </Button>
-                      )}
-                    </div>
-
-                    <div className="flex items-center space-x-2 print:hidden">
-                      <Button
-                        size="md"
-                        variant="light"
-                        radius="full"
-                        startContent={<BiDownvote />}
-                      >
-                        {downVotes} votes
-                      </Button>
-                      <Button
-                        size="md"
-                        variant="light"
-                        radius="full"
-                        startContent={<BiUpvote />}
-                      >
-                        {upVotes} votes
-                      </Button>
-                      <Button
-                        size="md"
-                        variant="light"
-                        radius="full"
-                        startContent={<AiOutlineComment />}
-                      >
-                        {totalComments} comments
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="prose dark:prose-invert max-w-full">
-                  <div dangerouslySetInnerHTML={{ __html: content }} />
-                </div>
-
-                {/* {(contentType === "html" && (
-                  <ShowHTMLFormat content={content} />
-                )) ||
-                  (contentType === "text" && (
-                    <p className="text-default-600 text-base lg:text-lg whitespace-pre-line">
-                      {content}
-                    </p>
-                  ))} */}
-
-                <div className="space-y-10">
-                  <div className="border border-default/50 py-2 px-2 rounded-full w-full max-w-fit mx-auto flex justify-center items-center print:hidden">
-                    <div className="border-r border-default/30 ">
-                      <DownVoteButton
-                        postId={_id}
-                        className="text-3xl mr-2"
-                        radius="full"
-                        variant="light"
-                        isIconOnly
-                        slug={slug}
-                      >
-                        <BiDownvote className="text-lg" />
-                      </DownVoteButton>
-                    </div>
-
-                    <div className="border-r border-default/30 ">
-                      <UpVoteButton
-                        postId={_id}
-                        className="text-3xl mx-2"
-                        radius="full"
-                        variant="light"
-                        isIconOnly
-                        slug={slug}
-                      >
-                        <BiUpvote className="text-lg" />
-                      </UpVoteButton>
-                    </div>
-
-                    <div className="border-r border-default/30 ">
-                      <BlogCommentButton />
-                    </div>
-
-                    <div className="border-r border-default/30">
-                      <Button
-                        className="text-2xl mx-2"
-                        variant="light"
-                        isIconOnly
-                        radius="full"
-                      >
-                        <BiBookmark />
-                      </Button>
-                    </div>
-
-                    <div className="border-r border-default/30">
-                      <BlogShareDropdown />
-                    </div>
-
-                    <div>
-                      <PrintBlogButton blog={data?.data} />
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 justify-center w-full max-w-3xl flex-wrap mx-auto">
-                    {tags?.map((tag) => (
-                      <Button key={tag} variant="flat" radius="sm" size="sm">
-                        {tag}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <AdBanner
-                    dataAdFormat="auto"
-                    dataAdSlot="9749465109"
-                    dataFullWidthResponsive={true}
-                  />
-                </div>
-
-                {/* comments */}
-                <div>
-                  <h2 className="text-2xl font-semibold mb-4">Comments</h2>
-                  <CommentForm postId={_id} slug={slug} />
-
-                  <div className="mt-8 space-y-4">
-                    {comments &&
-                      comments?.map((comment) => (
-                        <CommentCard key={comment._id} {...comment} />
-                      ))}
-                  </div>
-                </div>
-              </div>
-            </div>
+            </figure>
           )}
-        </>
+
+          {isLocked ? (
+            <LockedArticle loginHref={loginHref} />
+          ) : introSplit ? (
+            <>
+              <div
+                className="tth-article mt-10 print:mt-0"
+                dangerouslySetInnerHTML={{ __html: introSplit[0] }}
+              />
+              <AdSlot
+                variant="inArticle"
+                placement="article-after-intro"
+                className="mt-10 print:hidden"
+              />
+              <div
+                className="tth-article tth-article-continued"
+                dangerouslySetInnerHTML={{ __html: introSplit[1] }}
+              />
+            </>
+          ) : (
+            <>
+              <div
+                className="tth-article mt-10 print:mt-0"
+                dangerouslySetInnerHTML={{ __html: content ?? "" }}
+              />
+              <AdSlot
+                variant="inArticle"
+                placement="article-after-intro"
+                className="mt-10 print:hidden"
+              />
+            </>
+          )}
+
+          <ArticleEndMatter blog={data.data as IBlog} />
+
+          <ArticleTags tags={tags} />
+
+          <ArticleAuthor author={author} isOwnArticle={isOwnArticle} />
+
+          <div className="mt-14 print:hidden">
+            <AdSlot variant="display" placement="article-before-comments" />
+          </div>
+
+          <div className="mt-14">
+            <BlogComments
+              blogId={_id}
+              comments={comments}
+              totalComments={totalComments ?? 0}
+              redirectPath={`blogs/${routeSlug}`}
+            />
+          </div>
+
+          <BackToTop />
+        </article>
       </Container>
     </section>
   );

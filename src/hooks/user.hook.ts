@@ -1,3 +1,4 @@
+import { readMemberPage } from "@/services/admin/members";
 import {
   blockUser,
   deleteUserAccount,
@@ -10,7 +11,8 @@ import {
   updateSocialLinks,
 } from "@/services/user";
 import { TSocialLink } from "@/types";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import type { IAdminMembersParams } from "@/types/admin.type";
+import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 // follow a user
@@ -50,11 +52,23 @@ export const useUnfollowUser = () => {
 };
 
 // get all users
-export const useGetAllUsers = () => {
-  return useQuery({
-    queryKey: ["GET_ALL_USERS"],
-    queryFn: async () => await getAllUsers(),
+// Params are part of the cache key: each page, search and filter combination
+// keeps its own entry. Callers that pass nothing still get the "first
+// response" shape other screens read (`["GET_ALL_USERS"]`).
+// `rows` and `meta` are the same answer already unpacked, so a table can page.
+export const useGetAllUsers = (params?: Record<string, unknown>) => {
+  const query = useQuery({
+    queryKey: params ? ["GET_ALL_USERS", params] : ["GET_ALL_USERS"],
+    queryFn: async () => await getAllUsers(params),
+    placeholderData: keepPreviousData,
   });
+
+  const { rows, meta } = readMemberPage(
+    query.data,
+    params as IAdminMembersParams | undefined,
+  );
+
+  return { ...query, rows, meta };
 };
 
 // block user
@@ -150,7 +164,6 @@ export const useUpdateProfile = () => {
     },
   });
 };
-
 
 // update logged in user profile social links
 export const useUpdateSocialLinks = () => {

@@ -1,13 +1,7 @@
 "use client";
 
-import { Button } from "@nextui-org/button";
-import {
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-} from "@nextui-org/dropdown";
-import { SharedSelection } from "@nextui-org/system";
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/react";
+import { SharedSelection } from "@heroui/system";
 import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 
@@ -73,6 +67,7 @@ const GenderDropdown: React.FC<IProps> = ({ name, label }) => {
 
         <DropdownMenu
           aria-label="Gender selection"
+          classNames={{ base: "border border-default-100" }}
           variant="flat"
           disallowEmptySelection
           selectionMode="single"

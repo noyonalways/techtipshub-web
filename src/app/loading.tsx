@@ -1,14 +1,26 @@
-import { Button } from "@nextui-org/button";
-import { FaCircleNotch } from "react-icons/fa6";
+import { siteConfig } from "@/config/site";
 
-interface IProps {}
-
-const RootLoading = ({}: IProps) => {
+/**
+ * Root loading state. A quiet, branded mark rather than a full-screen spinner:
+ * it is only visible for a moment and should not flash white.
+ */
+const RootLoading = () => {
   return (
-    <div className="w-screen h-screen flex items-center justify-center">
-      <Button isIconOnly className="text-3xl" size="lg"color="primary" variant="light">
-        <FaCircleNotch className="animate-spin" />
-      </Button>
+    <div
+      className="flex min-h-dvh items-center justify-center bg-background"
+      role="status"
+      aria-live="polite"
+    >
+      <div className="flex flex-col items-center gap-4">
+        <span
+          aria-hidden
+          className="size-8 animate-spin rounded-full border-2 border-default/60 border-t-primary"
+        />
+        <span className="font-[family-name:var(--type-editorial)] text-sm font-semibold tracking-tight text-default-600">
+          {siteConfig.name}
+        </span>
+        <span className="sr-only">Loading</span>
+      </div>
     </div>
   );
 };

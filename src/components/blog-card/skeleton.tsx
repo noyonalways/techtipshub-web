@@ -1,47 +1,24 @@
-import { Skeleton } from "@nextui-org/skeleton";
+import { Skeleton } from "@heroui/skeleton";
 
-interface IProps {}
-
-const BlogCardSkeleton = ({}: IProps) => {
+const BlogCardSkeleton = () => {
   return (
-    <div className="border border-default/50 p-6 rounded-xl space-y-4 w-full">
-      <div className="flex justify-between items-end">
-        <div className="flex space-x-4 items-center">
-          <Skeleton className="w-12 h-12 rounded-full" />{" "}
-          {/* Placeholder for Avatar */}
-          <div className="space-y-1">
-            <Skeleton className="w-32 h-5 rounded" /> {/* Author Name */}
-            <Skeleton className="w-24 h-4 rounded" />{" "}
-            {/* Author Username and Date */}
-          </div>
+    <div className="w-full py-1">
+      <div className="flex flex-col-reverse gap-4 sm:flex-row sm:items-start sm:gap-6">
+        <div className="min-w-0 flex-1 space-y-3">
+          <Skeleton className="h-5 w-24 rounded-full" />
+          <Skeleton className="h-6 w-full rounded" />
+          <Skeleton className="h-6 w-4/5 rounded" />
+          <Skeleton className="h-4 w-full rounded" />
+          <Skeleton className="h-4 w-2/3 rounded" />
         </div>
-        <Skeleton className="w-20 h-5 rounded-full" />{" "}
-        {/* Premium Tag Placeholder */}
-      </div>
-
-      {/* Blog Title and Content Section */}
-      <div className="flex flex-col-reverse lg:flex-row lg:items-start lg:space-x-4">
-        <div className="lg:flex-1 space-y-1">
-          <Skeleton className="w-full h-8 rounded" /> {/* Blog Title */}
-          <Skeleton className="w-full h-5 rounded" />{" "}
-          {/* Blog Content Preview */}
-        </div>
-        <div className="basis-full lg:basis-[28%] mb-3 lg:mb-0 rounded-xl">
-          <Skeleton className="w-full h-32 rounded" />{" "}
+        <div className="shrink-0 sm:w-40 lg:w-44">
+          <Skeleton className="aspect-[16/10] w-full rounded-lg" />
         </div>
       </div>
-
-      {/* Interaction Buttons Section */}
-      <div className="flex flex-col items-end lg:flex-row lg:items-center justify-between space-y-2 lg:space-y-0">
-        <div className="flex items-center space-x-1 lg:space-x-4">
-          <div className={`flex space-x-2 items-center`}>
-            <Skeleton className="w-[76px] lg:w-20 h-6 rounded" />
-            <Skeleton className="w-[76px] lg:w-20 h-6 rounded" />
-            <Skeleton className="w-[76px] lg:w-20 h-6 rounded" />
-            <Skeleton className="w-[76px] lg:w-20 h-6 rounded" />
-          </div>
-        </div>
-        <Skeleton className="w-24 h-6 rounded-full" />{" "}
+      <div className="mt-4 flex items-center gap-2">
+        <Skeleton className="size-6 rounded-full" />
+        <Skeleton className="h-3.5 w-28 rounded" />
+        <Skeleton className="h-3.5 w-20 rounded" />
       </div>
     </div>
   );

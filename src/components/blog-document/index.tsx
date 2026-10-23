@@ -9,11 +9,11 @@ import {
   Text,
   View,
 } from "@react-pdf/renderer";
-import { IPost } from "@/types";
+import { IBlog } from "@/types";
 import { format } from "date-fns";
 
 interface IProps {
-  blog: IPost;
+  blog: IBlog;
 }
 
 const styles = StyleSheet.create({
@@ -112,6 +112,15 @@ const fetchImageAsBase64 = async (url: string) => {
   });
 };
 
+/** The brand mark as a data URI, so the PDF cover does not depend on the network. */
+const BRAND_MARK =
+  "data:image/svg+xml;base64," +
+  (typeof btoa === "function"
+    ? btoa(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" rx="28" fill="#F2A93B"/><path d="M42 44h44v11H75v27H63V55H53v27H42V55z" fill="#141315"/></svg>',
+      )
+    : "");
+
 // Function to convert HTML string to PDF components
 const renderHtmlToPdf = (html: string) => {
   const parser = new DOMParser();
@@ -204,7 +213,7 @@ const BlogDocument = ({ blog }: IProps) => {
       <Document>
         {/* Cover Page */}
         <Page size="A4" style={styles.coverPage}>
-          <Image src="/tech-tips-hub-logo.png" style={styles.logo} />
+          <Image src={BRAND_MARK} style={styles.logo} />
           <Text style={styles.blogTitle}>{blog?.title || "Untitled"}</Text>
           <Text style={styles.coverAuthorDate}>
             By {blog?.author?.fullName || "Unknown"} • {formattedDate}

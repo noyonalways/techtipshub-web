@@ -1,53 +1,67 @@
 import "@/styles/globals.css";
 import clsx from "clsx";
 import { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { fontDisplay, fontSans } from "@/config/fonts";
 import { Providers } from "../providers";
 import { siteConfig } from "@/config/site";
 import AdSense from "@/components/adsense";
 import { GoogleTagManager, GoogleAnalytics } from "@next/third-parties/google";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-});
-
+/**
+ * Every crawlable identity asset lives in `/brand`. The metadata below is the
+ * only place that names them, so swapping the brand once means editing one
+ * block: og image, icons, manifest, theme colour.
+ */
 export const metadata: Metadata = {
-  metadataBase: new URL("https://techtipshub.vercel.app"), // <-- set your actual site domain here
-
+  metadataBase: new URL(siteConfig.url),
   title: {
-    default: siteConfig.name,
+    default: "TechTipsHub: practical writing for people who build software",
     template: `%s - ${siteConfig.name}`,
   },
   description: siteConfig.description,
+  applicationName: siteConfig.name,
+  alternates: { canonical: "/" },
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/brand/favicon.ico", sizes: "any" },
+      { url: "/brand/favicon.svg", type: "image/svg+xml" },
+      { url: "/brand/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/brand/favicon-16.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: [{ url: "/brand/apple-touch-icon.png", sizes: "180x180" }],
+    shortcut: "/brand/favicon.ico",
   },
+  manifest: "/brand/site.webmanifest",
   openGraph: {
+    type: "website",
+    siteName: siteConfig.name,
+    locale: "en_US",
+    url: "/",
+    title: "TechTipsHub: practical writing for people who build software",
+    description: siteConfig.description,
     images: [
       {
-        url: "/og-image.png",
+        url: "/brand/og-image.png",
         width: 1200,
         height: 630,
+        alt: `${siteConfig.name}, ${siteConfig.tagline}`,
       },
     ],
   },
   twitter: {
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-      },
-    ],
+    card: "summary_large_image",
+    title: "TechTipsHub: practical writing for people who build software",
+    description: siteConfig.description,
+    images: ["/brand/twitter-image.png"],
   },
 };
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "white" },
-    { media: "(prefers-color-scheme: dark)", color: "black" },
+    { media: "(prefers-color-scheme: light)", color: "#FCFAF6" },
+    { media: "(prefers-color-scheme: dark)", color: "#141315" },
   ],
+  colorScheme: "dark light",
 };
 
 export default function RootLayout({
@@ -66,7 +80,13 @@ export default function RootLayout({
       </head>
       <GoogleTagManager gtmId="G-M37M4689E8" />
       <GoogleAnalytics gaId="G-M37M4689E8" />
-      <body className={clsx(`bg-background antialiased ${inter.className}`)}>
+      <body
+        className={clsx(
+          "bg-background font-sans text-foreground antialiased",
+          fontSans.variable,
+          fontDisplay.variable,
+        )}
+      >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           {children}
         </Providers>

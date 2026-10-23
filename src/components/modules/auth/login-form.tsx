@@ -2,51 +2,32 @@
 
 import THForm from "@/components/form/th-from";
 import THInput from "@/components/form/th-input";
-import Loading from "@/components/loading";
 import { useUser } from "@/context/user.provider";
 import { useUserLogin } from "@/hooks/auth.hook";
+import { safeRedirectPath } from "@/lib/blog-routes";
 import { signInValidationSchema } from "@/schemas";
 import { TLogin } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { FieldValues, SubmitHandler } from "react-hook-form";
-import { FcCancel } from "react-icons/fc";
 import { PiEyeLight, PiEyeSlashLight } from "react-icons/pi";
+
+const label =
+  "mb-1 block tth-label-sm text-default-600";
 
 const LoginForm = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [isPassword, setIsPassword] = useState(true);
-  const [defaultValues, setDefaultValues] = useState({
-    email: "",
-    password: "",
-  });
 
   const { setIsLoading: setUserLoading } = useUser();
-  const { mutate: handleLogin, isPending, data } = useUserLogin();
+  const { mutate: handleLogin, isPending, data, isError, error } = useUserLogin();
 
-  const setAdminCredentials = () => {
-    setDefaultValues({
-      email: "admin@techtipshub.com",
-      password: "techtipsadmin",
-    });
-  };
-
-  const setUserCredentials = () => {
-    setDefaultValues({
-      email: "noyonrahman.dev@gmail.com",
-      password: "123456",
-    });
-  };
-
-  const handleClear = () => {
-    setDefaultValues({ email: "", password: "" });
-  };
-
-  const onSubmit: SubmitHandler<FieldValues> = (data) => {
-    handleLogin(data as TLogin);
+  const onSubmit: SubmitHandler<FieldValues> = (values) => {
+    handleLogin(values as TLogin);
     setUserLoading(true);
   };
 
@@ -55,95 +36,89 @@ const LoginForm = () => {
   useEffect(() => {
     if (!isPending && data?.success) {
       setUserLoading(false);
-      if (redirect) {
-        router.push(redirect);
-      } else {
-        router.push("/");
-      }
+      // Only same-site paths are followed, so a crafted `?redirect=` cannot
+      // send a freshly signed-in member somewhere else.
+      router.push(safeRedirectPath(redirect));
     }
   }, [isPending, data, redirect, router, setUserLoading]);
 
+  // The API returns a message for wrong credentials; surface it rather than
+  // leaving the form looking like nothing happened.
+  const errorMessage =
+    (data && !data.success && data.message) ||
+    (isError ? error?.message : undefined);
+
   return (
     <Suspense>
-      <THForm
-        onSubmit={onSubmit}
-        resolver={zodResolver(signInValidationSchema)}
-        defaultValues={defaultValues}
-        key={JSON.stringify(defaultValues)} // Force re-render when defaultValues change
-      >
-        {/* <div className="flex items-center justify-center space-x-2 mb-4">
-          <Button
-            onClick={setAdminCredentials}
-            type="button"
-            variant="bordered"
-            size="sm"
-            color="primary"
-            radius="full"
-          >
-            Admin
-          </Button>
-          <Button
-            onClick={setUserCredentials}
-            type="button"
-            variant="bordered"
-            size="sm"
-            color="primary"
-            radius="full"
-          >
-            User
-          </Button>
-          <Button
-            onClick={handleClear}
-            type="button"
-            variant="bordered"
-            size="sm"
-            color="danger"
-            radius="full"
-          >
-            Clear
-          </Button>
-        </div> */}
-        <div className="space-y-2">
-          <THInput
-            variant="faded"
-            label="Email"
-            isRequired
-            radius="sm"
-            name="email"
-            placeholder="Email Address"
-          />
-          <div className="relative">
+      <THForm onSubmit={onSubmit} resolver={zodResolver(signInValidationSchema)}>
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="email" className={label}>
+              Email
+            </label>
             <THInput
-              variant="faded"
-              label="Password"
-              isRequired
-              radius="sm"
-              name="password"
-              placeholder="Your Password"
-              type={isPassword ? "password" : "text"}
+              variant="bordered"
+              radius="lg"
+              name="email"
+              id="email"
+              placeholder="you@example.com"
             />
-            <Button
-              variant="light"
-              size="sm"
-              radius="full"
-              isIconOnly
-              onClick={() => setIsPassword(!isPassword)}
-              type="button"
-              className="absolute top-3 right-2 text-lg"
-            >
-              {isPassword ? <PiEyeLight /> : <PiEyeSlashLight />}
-            </Button>
           </div>
+
+          <div>
+            <div className="mb-1 flex items-baseline justify-between gap-2">
+              <label htmlFor="password" className={`${label} mb-0`}>
+                Password
+              </label>
+              <Link
+                href="/forget-password"
+                className="text-xs font-medium text-primary-accessible underline-offset-4 hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </div>
+            <div className="relative">
+              <THInput
+                variant="bordered"
+                radius="lg"
+                name="password"
+                id="password"
+                placeholder="Your password"
+                type={isPassword ? "password" : "text"}
+              />
+              <Button
+                variant="light"
+                size="sm"
+                radius="full"
+                isIconOnly
+                onClick={() => setIsPassword(!isPassword)}
+                type="button"
+                aria-label={isPassword ? "Show password" : "Hide password"}
+                className="absolute right-1 top-1/2 -translate-y-1/2 text-lg"
+              >
+                {isPassword ? <PiEyeLight /> : <PiEyeSlashLight />}
+              </Button>
+            </div>
+          </div>
+
+          {errorMessage && (
+            <p
+              role="alert"
+              className="rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger"
+            >
+              {errorMessage}
+            </p>
+          )}
 
           <Button
             isLoading={isPending}
             type="submit"
             color="primary"
             variant="solid"
-            radius="sm"
-            className="w-full"
+            radius="lg"
+            className="w-full font-semibold"
           >
-            {isPending ? "Logging..." : "Login"}
+            {isPending ? "Signing in…" : "Sign in"}
           </Button>
         </div>
       </THForm>
@@ -152,7 +127,7 @@ const LoginForm = () => {
 };
 
 const SuspendedLoginForm = () => (
-  <Suspense fallback={<Loading />}>
+  <Suspense fallback={<div className="h-64" />}>
     <LoginForm />
   </Suspense>
 );
