@@ -44,11 +44,18 @@ const ProfileShareDropdown = ({}: IProps) => {
   return (
     <Dropdown placement="bottom">
       <DropdownTrigger>
-        <Button size="sm" isIconOnly radius="full" variant="bordered">
+        <Button
+          aria-label="Share profile"
+          className="border border-default-300 text-foreground hover:bg-default-100"
+          size="sm"
+          isIconOnly
+          radius="full"
+          variant="bordered"
+        >
           <IoShareOutline className="text-lg" />
         </Button>
       </DropdownTrigger>
-      <DropdownMenu aria-label="Share Profile Actions">
+      <DropdownMenu aria-label="Share Profile Actions" classNames={{ base: "border border-default-100" }}>
         <DropdownItem
           key="profile-permalink"
           startContent={<PiLink />}

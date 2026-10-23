@@ -132,7 +132,7 @@ const TagInput = ({
                 event.stopPropagation();
                 removeTag(tag);
               }}
-              className="rounded p-0.5 text-default-500 hover:bg-default-200 hover:text-foreground"
+              className="rounded p-0.5 text-default-600 hover:bg-default-200 hover:text-foreground"
             >
               <LuX className="size-3.5" />
             </button>
@@ -152,19 +152,19 @@ const TagInput = ({
                 ? "Add another"
                 : "Type a tag, then press Enter"
           }
-          className="min-w-[8rem] flex-1 bg-transparent py-1 text-sm text-foreground outline-none placeholder:text-default-400 disabled:cursor-not-allowed"
+          className="min-w-[8rem] flex-1 bg-transparent py-1 text-sm text-foreground outline-none placeholder:text-default-600 disabled:cursor-not-allowed"
         />
       </div>
 
       {!full && unusedSuggestions.length > 0 && (
         <div className="mt-2 flex flex-wrap items-center gap-1.5">
-          <span className="text-xs text-default-500">Suggested:</span>
+          <span className="text-xs text-default-600">Suggested:</span>
           {unusedSuggestions.map((tag) => (
             <button
               key={tag}
               type="button"
               onClick={() => commitTags(tag)}
-              className="rounded-md border border-default-200 px-2 py-0.5 text-xs text-default-600 transition-colors hover:border-primary hover:text-primary"
+              className="rounded-md border border-default-200 px-2 py-0.5 text-xs text-default-600 transition-colors hover:border-primary-600 hover:text-primary-accessible"
             >
               {tag}
             </button>

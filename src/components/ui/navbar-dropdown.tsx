@@ -1,5 +1,8 @@
 "use client";
 
+import { manageBlogsPath } from "@/lib/blog-routes";
+
+
 import { protectedRoutes } from "@/constant";
 import { useUser } from "@/context/user.provider";
 import { logOutUser } from "@/services/auth";
@@ -47,7 +50,7 @@ const NavarDropdown: React.FC<IProps> = () => {
     },
     {
       label: "Manage Blogs",
-      href: "/settings/manage-blogs",
+      href: manageBlogsPath,
     }
   ];
 
@@ -63,7 +66,11 @@ const NavarDropdown: React.FC<IProps> = () => {
             src={user?.profilePicture}
           />
       </DropdownTrigger>
-      <DropdownMenu aria-label="Profile Actions" variant="flat">
+      <DropdownMenu
+        aria-label="Profile Actions"
+        classNames={{ base: "border border-default-100" }}
+        variant="flat"
+      >
         <DropdownItem key="user-email" className="h-14 gap-2">
           <p className="font-semibold">Signed in as</p>
           <p className="font-semibold">{user?.email}</p>
@@ -98,7 +105,7 @@ const NavarDropdown: React.FC<IProps> = () => {
         </>
 
         <DropdownItem key="logout" color="danger" onClick={handleLogoutUser}>
-          Log Out
+          Log out
         </DropdownItem>
       </DropdownMenu>
     </Dropdown>

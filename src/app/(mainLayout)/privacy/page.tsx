@@ -7,12 +7,12 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
-    "How TechTips Hub collects, uses, shares and protects your personal information, and the rights you have over your data.",
+    "How TechTipsHub collects, uses, shares and protects your personal information, and the rights you have over your data.",
   alternates: { canonical: "/privacy" },
   openGraph: {
     title: "Privacy Policy",
     description:
-      "How TechTips Hub collects, uses, shares and protects your personal information.",
+      "How TechTipsHub collects, uses, shares and protects your personal information.",
     url: "/privacy",
   },
 };
@@ -95,7 +95,7 @@ const sections: ILegalSection[] = [
         </p>
         <h3>Charges made in error</h3>
         <p>
-          TechTips Hub does not sell memberships or any other paid product, so we
+          TechTipsHub does not sell memberships or any other paid product, so we
           never ask for card or wallet details. If you contact us about a charge
           you believe was made in error, we record the details you send us (such
           as a transaction identifier) in order to investigate it.
@@ -153,7 +153,7 @@ const sections: ILegalSection[] = [
             posts there.
           </li>
           <li>
-            <strong>Payments.</strong> TechTips Hub does not process payments.
+            <strong>Payments.</strong> TechTipsHub does not process payments.
             If you contact us about a charge you believe was made in error, we
             keep the details you send us (such as a transaction identifier) so
             we can investigate it.
@@ -423,7 +423,7 @@ const sections: ILegalSection[] = [
     content: (
       <>
         <p>
-          TechTips Hub is a publishing platform. Your username, profile picture,
+          TechTipsHub is a publishing platform. Your username, profile picture,
           bio, social links, published articles, comments and votes are visible
           to anyone and may be indexed by search engines and copied by others.
           Treat anything you publish as public.
@@ -609,7 +609,7 @@ const sections: ILegalSection[] = [
           </a>
           . We prefer email because it gives us a written record, but you can
           also use the{" "}
-          <Link href="/contact-us">contact form</Link>.
+          <Link href="/contact">contact form</Link>.
         </p>
         <p>
           If you are not satisfied with our response, you may complain to your
@@ -627,7 +627,7 @@ const PrivacyPolicyPage = () => {
     <LegalPage
       currentHref="/privacy"
       sections={sections}
-      summary="This policy explains what information TechTips Hub collects, why we collect it, who we share it with, and the control you have over it."
+      summary="This policy explains what information TechTipsHub collects, why we collect it, who we share it with, and the control you have over it."
       title="Privacy Policy"
     />
   );

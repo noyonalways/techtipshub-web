@@ -1,37 +1,46 @@
+"use client";
+
 import BlogsTable from "@/components/blogs-table";
-import DashboardTitle from "@/components/dashboard-title";
+import AdminPageHeader from "@/components/modules/admin/kit/page-header";
+import AdminPageSpinner from "@/components/shared/admin-sidebar/admin-page-spinner";
+import { useAdminTitle } from "@/components/shared/admin-sidebar/use-admin-title";
 import ButtonLink from "@/components/ui/button-link";
-import { Metadata } from "next";
-import { FiArrowUpRight } from "react-icons/fi";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
+import { FiPlus } from "react-icons/fi";
 
-export const metadata: Metadata = {
-  title: "Manage Blogs | Admin Dashboard",
-  description:
-    "Admin panel for managing blogs, permissions, and access controls.",
-  keywords: "admin, manage users, user management, access control, dashboard",
-};
+/** `?sort=` seeds the table's starting tab, read verbatim. */
+function ManageBlogsTable() {
+  const searchParams = useSearchParams();
+  const initialSort = searchParams.get("sort") ?? undefined;
 
-const ManageBlogs = () => {
+  return <BlogsTable initialSort={initialSort} />;
+}
+
+const ManageBlogsPage = () => {
+  useAdminTitle("Articles");
+
   return (
     <div>
-      <DashboardTitle
-        title="Manage Blogs"
-        description="Every published article, newest first. Edit content or remove a post with a reason."
-        action={
+      <AdminPageHeader
+        section="Articles"
+        title="Articles"
+        description="Every published piece, newest first. Open one to read it, jump to the editor, or remove it with a reason."
+        actions={
           <ButtonLink
-            href="/"
+            href="/me/blogs/new"
             size="sm"
-            radius="lg"
-            variant="bordered"
-            endContent={<FiArrowUpRight />}
+            startContent={<FiPlus aria-hidden />}
           >
-            Open the feed
+            Write an article
           </ButtonLink>
         }
       />
-      <BlogsTable />
+      <Suspense fallback={<AdminPageSpinner label="Loading articles" />}>
+        <ManageBlogsTable />
+      </Suspense>
     </div>
   );
 };
 
-export default ManageBlogs;
+export default ManageBlogsPage;

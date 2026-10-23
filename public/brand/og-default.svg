@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <rect width="1200" height="630" fill="#141315"/>
+  <g transform="translate(80 88) scale(0.8)"><rect x="26" y="26" width="76" height="76" rx="14" fill="#F2A93B"/><path d="M42 44h44v11H75v27H63V55H53v27H42V55z" fill="#141315"/></g>
+  <text x="208" y="152" font-family="Fraunces" font-weight="700" font-size="56" letter-spacing="-1.6" fill="#FCFAF6">TechTips<tspan fill="#F2A93B">Hub</tspan></text>
+  <text x="210" y="182" font-family="Archivo, Inter, system-ui, sans-serif" font-weight="600" font-size="16" letter-spacing="3.2" fill="#9C948A">WRITING FOR BUILDERS</text>
+  <text x="78" y="352" font-family="Fraunces" font-weight="700" font-size="66" letter-spacing="-1.8" fill="#FCFAF6">Practical writing for people</text>
+  <text x="78" y="426" font-family="Fraunces" font-weight="700" font-size="66" letter-spacing="-1.8" fill="#FCFAF6">who <tspan fill="#F2A93B">build software</tspan>.</text>
+  <text x="80" y="488" font-family="Archivo, Inter, system-ui, sans-serif" font-weight="400" font-size="25" fill="#9C948A">Tutorials, explainers and honest tool comparisons from developers.</text>
+  <line x1="80" y1="544" x2="1120" y2="544" stroke="#302B31" stroke-width="2"/>
+  <text x="80" y="586" font-family="Archivo, Inter, system-ui, sans-serif" font-weight="500" font-size="21" fill="#9C948A">techtipshub.vercel.app</text>
+  <g transform="translate(1078 558)"><rect x="26" y="26" width="76" height="76" rx="14" fill="none"/><path d="M42 44h44v11H75v27H63V55H53v27H42V55z" fill="#F2A93B"/></g>
+</svg>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useDeletePostByUserUsingId } from "@/hooks/post.hook";
+import { useDeleteBlogByUserUsingId } from "@/hooks/blog.hook";
 import {
   Button,
   Modal,
@@ -21,17 +21,17 @@ interface IProps {
 
 const UserDeleteBlogModal = ({ id, title }: IProps) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const { mutate: deletePost, isPending } = useDeletePostByUserUsingId();
+  const { mutate: deleteBlog, isPending } = useDeleteBlogByUserUsingId();
   const router = useRouter();
 
   const handleDelete = () => {
-    deletePost(id, {
+    deleteBlog(id, {
       onSuccess: (data) => {
         if (!data?.success) return;
         // Let the list drop the row now; the refresh below reconciles with the
         // server a moment later.
         window.dispatchEvent(
-          new CustomEvent("post:deleted", { detail: { id } }),
+          new CustomEvent("blog:deleted", { detail: { id } }),
         );
         router.refresh();
       },
@@ -45,10 +45,11 @@ const UserDeleteBlogModal = ({ id, title }: IProps) => {
         type="button"
         onClick={onOpen}
         disabled={isPending}
-        className="inline-flex items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-medium text-default-700 transition-colors hover:bg-danger/10 hover:text-danger disabled:opacity-60"
+        className="inline-flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium text-default-600 transition-colors hover:bg-danger/10 hover:text-danger focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-300 disabled:opacity-60"
       >
-        <FiTrash2 aria-hidden className="size-4" />
+        <FiTrash2 aria-hidden className="size-3.5" />
         {isPending ? "Deleting…" : "Delete"}
+        <span className="sr-only">{title ? ` “${title}”` : ""}</span>
       </button>
 
       <Modal size="md" isOpen={isOpen} onOpenChange={onOpenChange}>

@@ -1,4 +1,4 @@
-import { poppins } from "@/config/fonts";
+import { siteConfig } from "@/config/site";
 
 /**
  * Root loading state. A quiet, branded mark rather than a full-screen spinner:
@@ -16,10 +16,8 @@ const RootLoading = () => {
           aria-hidden
           className="size-8 animate-spin rounded-full border-2 border-default/60 border-t-primary"
         />
-        <span
-          className={`${poppins.className} text-sm font-semibold tracking-tight text-default-500`}
-        >
-          TechTips Hub
+        <span className="font-[family-name:var(--type-editorial)] text-sm font-semibold tracking-tight text-default-600">
+          {siteConfig.name}
         </span>
         <span className="sr-only">Loading</span>
       </div>

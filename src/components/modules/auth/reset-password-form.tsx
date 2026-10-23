@@ -12,7 +12,7 @@ import { FieldValues, SubmitHandler } from "react-hook-form";
 import { FiCheckCircle, FiEye, FiEyeOff } from "react-icons/fi";
 
 const label =
-  "mb-1 block text-xs font-semibold uppercase tracking-wider text-default-500";
+  "mb-1 block tth-label-sm text-default-600";
 
 type TokenState = "reading" | "ready" | "missing";
 
@@ -89,7 +89,7 @@ const PasswordField = ({
         type="button"
         onClick={() => setVisible((value) => !value)}
         aria-label={visible ? "Hide password" : "Show password"}
-        className="absolute right-3 top-[2.15rem] text-default-400 transition-colors hover:text-foreground"
+        className="absolute right-3 top-[2.15rem] text-default-600 transition-colors hover:text-foreground"
       >
         {visible ? <FiEyeOff /> : <FiEye />}
       </button>
@@ -175,7 +175,13 @@ const ResetPasswordForm = () => {
           >
             Sign in
           </Button>
-          <Button as={Link} href="/" radius="lg" variant="bordered">
+          <Button
+            as={Link}
+            className="border border-default-300 font-medium text-foreground hover:bg-default-100"
+            href="/"
+            radius="lg"
+            variant="bordered"
+          >
             Back to the feed
           </Button>
         </div>
@@ -215,7 +221,7 @@ const ResetPasswordForm = () => {
           />
         </div>
 
-        <p className="text-xs text-default-500">
+        <p className="text-xs text-default-600">
           Use at least 6 characters. A passphrase you don’t use anywhere else is
           strongest.
         </p>

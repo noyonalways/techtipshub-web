@@ -6,10 +6,10 @@
  * value used by `<time dateTime="…">`; `lastUpdatedLabel` is what readers see.
  */
 export const legalConfig = {
-  operator: "TechTips Hub",
+  operator: "TechTipsHub",
   siteUrl: "https://techtipshub.vercel.app",
   contactEmail:
-    process.env.NEXT_PUBLIC_CONTACT_EMAIL || "noyonrahman2003@gmail.com",
+    process.env.NEXT_PUBLIC_CONTACT_EMAIL || "contact.techtipshub@noyonrahman.com",
   /**
    * Legal entity behind the site. AdSense and data-protection law require a
    * named entity, so this must be filled in before the policies are relied
@@ -50,7 +50,7 @@ export const legalPages: ILegalPageLink[] = [
     href: "/terms",
     title: "Terms and Conditions",
     description:
-      "The rules for using TechTips Hub, publishing content and commenting.",
+      "The rules for using TechTipsHub, publishing content and commenting.",
   },
   {
     label: "Cookie Policy",
@@ -78,6 +78,6 @@ export const legalPages: ILegalPageLink[] = [
     href: "/community-guidelines",
     title: "Community Guidelines",
     description:
-      "What is welcome in posts and comments, and how moderation works.",
+      "What is welcome in blogs and comments, and how moderation works.",
   },
 ];

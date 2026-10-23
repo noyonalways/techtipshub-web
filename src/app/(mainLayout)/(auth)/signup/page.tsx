@@ -7,13 +7,13 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Sign Up",
   description:
-    "Join TechTips Hub to read every article, share your own tutorials and join the discussion. Creating a free account is all it takes.",
+    "Join TechTipsHub to read every article, share your own tutorials and join the discussion. Creating a free account is all it takes.",
   keywords:
-    "TechTips Hub, sign up, register, create account, tech tips, tutorials, tech insights, tech community",
+    "TechTipsHub, sign up, register, create account, tech tips, tutorials, tech insights, tech community",
   openGraph: {
-    title: "Sign Up",
+    title: "Sign up",
     description:
-      "Create a free TechTips Hub account to read every article, publish your own tutorials and join the discussion.",
+      "Create a free TechTipsHub account to read every article, publish your own tutorials and join the discussion.",
     url: "https://techtipshub.vercel.app/signup",
   },
 };
@@ -48,7 +48,7 @@ const SignUpPage = () => {
           Already have an account?{" "}
           <Link
             href="/login"
-            className="font-semibold text-primary underline-offset-4 hover:underline"
+            className="font-semibold text-primary-accessible underline-offset-4 hover:underline"
           >
             Sign in
           </Link>
@@ -58,7 +58,7 @@ const SignUpPage = () => {
       <div className="space-y-6">
         <SignUpForm />
         <SocialLogin />
-        <p className="text-xs leading-relaxed text-default-500">
+        <p className="text-xs leading-relaxed text-default-600">
           By creating an account you agree to our{" "}
           <Link
             href="/terms"

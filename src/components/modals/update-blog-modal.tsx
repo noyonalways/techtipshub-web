@@ -1,8 +1,8 @@
 "use client";
 
-import { useUpdateBlogByAdmin } from "@/hooks/post.hook";
+import { useUpdateBlogByAdmin } from "@/hooks/blog.hook";
 import { getAllCategories } from "@/services/category";
-import { ICategory, IPost } from "@/types";
+import { ICategory, IBlog } from "@/types";
 import {
   Button,
   Image,
@@ -21,20 +21,20 @@ import { FiEdit3 } from "react-icons/fi";
 import RichTextEditor from "@/components/editor/rich-text-editor";
 
 interface IProps {
-  post: IPost;
-  refetchPosts: () => void;
+  blog: IBlog;
+  refetchBlogs: () => void;
 }
 
-const UpdateBlogModal = ({ post, refetchPosts }: IProps) => {
-  const [title, setTitle] = useState(post?.title);
-  const [content, setContent] = useState(post?.content);
-  const [category, setCategory] = useState(post.category?._id);
-  const [tags, setTags] = useState(post.tags?.join(", ") || "");
+const UpdateBlogModal = ({ blog, refetchBlogs }: IProps) => {
+  const [title, setTitle] = useState(blog?.title);
+  const [content, setContent] = useState(blog?.content);
+  const [category, setCategory] = useState(blog.category?._id);
+  const [tags, setTags] = useState(blog.tags?.join(", ") || "");
   const [categories, setCategories] = useState<
     { key: string; label: string }[]
   >([]);
   const [coverImage, setCoverImage] = useState<File | null>(null);
-  const [coverImagePreview, setCoverImagePreview] = useState(post.coverImage);
+  const [coverImagePreview, setCoverImagePreview] = useState(blog.coverImage);
   const [isOpen, setIsOpen] = useState(false);
   const { isOpen: modalIsOpen, onOpen, onOpenChange } = useDisclosure();
 
@@ -82,7 +82,7 @@ const UpdateBlogModal = ({ post, refetchPosts }: IProps) => {
 
     const formData = new FormData();
     const values = {
-      userId: post.author._id,
+      userId: blog.author._id,
       title,
       content,
       category,
@@ -96,9 +96,9 @@ const UpdateBlogModal = ({ post, refetchPosts }: IProps) => {
     }
 
 
-    updateBlog({postId: post._id, payload: formData}, {
+    updateBlog({blogId: blog._id, payload: formData}, {
       onSuccess: () => {
-        refetchPosts();
+        refetchBlogs();
       },
     })
     onOpenChange();
@@ -129,7 +129,7 @@ const UpdateBlogModal = ({ post, refetchPosts }: IProps) => {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Update Blog Post
+                Update Blog
               </ModalHeader>
               <ModalBody>
                 <div className="relative mb-4">
@@ -165,7 +165,7 @@ const UpdateBlogModal = ({ post, refetchPosts }: IProps) => {
                   placeholder="Blog Title"
                 />
 
-                {post.contentType === "html" && (
+                {blog.contentType === "html" && (
                   <div className="mb-4">
                     <RichTextEditor value={content} onChange={setContent} />
                   </div>

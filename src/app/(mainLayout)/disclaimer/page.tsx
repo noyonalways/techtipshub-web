@@ -6,12 +6,12 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Disclaimer",
   description:
-    "The limits of the technical information, code samples and advertising published on TechTips Hub.",
+    "The limits of the technical information, code samples and advertising published on TechTipsHub.",
   alternates: { canonical: "/disclaimer" },
   openGraph: {
     title: "Disclaimer",
     description:
-      "The limits of the technical information, code samples and advertising published on TechTips Hub.",
+      "The limits of the technical information, code samples and advertising published on TechTipsHub.",
     url: "/disclaimer",
   },
 };
@@ -23,7 +23,7 @@ const sections: ILegalSection[] = [
     content: (
       <>
         <p>
-          The content on TechTips Hub is published for general information and
+          The content on TechTipsHub is published for general information and
           education. It is written in good faith and based on the authors&rsquo;
           experience, but it is not tailored to your project, infrastructure,
           legal position or skill level.
@@ -189,7 +189,7 @@ const sections: ILegalSection[] = [
           <a href={`mailto:${legalConfig.contactEmail}`}>
             {legalConfig.contactEmail}
           </a>{" "}
-          or through the <Link href="/contact-us">contact form</Link>.
+          or through the <Link href="/contact">contact form</Link>.
         </p>
       </>
     ),

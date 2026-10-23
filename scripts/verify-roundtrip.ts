@@ -1,14 +1,14 @@
-// The guarantee that matters: no existing post may lose or change content.
+// The guarantee that matters: no existing blog may lose or change content.
 // Tag-level deltas are expected (Quill's spans, <pre><code>), so this checks
 // that the readable text and the emphasis are preserved.
 import { generateHTML, generateJSON } from "@tiptap/html";
 import {
   schemaExtensions,
-  serializePostHTML,
+  serializeBlogHTML,
 } from "../src/components/editor/extensions.ts";
 
 const BASE = process.env.BASE_API || "http://localhost:5000/api/v1";
-const res = await fetch(`${BASE}/posts?limit=100`);
+const res = await fetch(`${BASE}/blogs?limit=100`);
 const json = (await res.json()) as { data: Array<{ slug: string; content: string }> };
 
 const text = (h: string) =>
@@ -29,9 +29,9 @@ const words = (h: string) => text(h).replace(/\s+/g, "");
 let textSame = 0;
 const problems: string[] = [];
 
-for (const post of json.data) {
-  const before = post.content || "";
-  const after = serializePostHTML(
+for (const blog of json.data) {
+  const before = blog.content || "";
+  const after = serializeBlogHTML(
     generateHTML(generateJSON(before, schemaExtensions), schemaExtensions),
   );
   const tb = words(before);
@@ -75,9 +75,9 @@ for (const post of json.data) {
   if (!boldText(after).includes(boldText(before)))
     issues.push("bold text lost");
 
-  if (issues.length) problems.push(`${post.slug.slice(0, 45)}: ${issues.join(", ")}`);
+  if (issues.length) problems.push(`${blog.slug.slice(0, 45)}: ${issues.join(", ")}`);
   else textSame++;
 }
 
-console.log(`posts: ${json.data.length}   preserved: ${textSame}`);
+console.log(`blogs: ${json.data.length}   preserved: ${textSame}`);
 for (const p of problems) console.log("  - " + p);

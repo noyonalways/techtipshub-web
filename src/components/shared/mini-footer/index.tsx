@@ -4,8 +4,8 @@ import Link from "next/link";
 // as dead `href="#"` links or links to generic platform homepages.
 const links = [
   { label: "Feed", href: "/" },
-  { label: "About", href: "/about-us" },
-  { label: "Contact", href: "/contact-us" },
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
 ];
 
 const legalLinks = [
@@ -34,7 +34,7 @@ const MiniFooter = () => {
       </div>
 
       <div className="space-y-3">
-        <div className="flex flex-wrap gap-x-3 gap-y-1 border-t border-default/50 pt-4 text-xs text-default-500">
+        <div className="flex flex-wrap gap-x-3 gap-y-1 border-t border-default/50 pt-4 text-xs text-default-600">
           {legalLinks.map((link) => (
             <Link
               key={link.href}
@@ -45,8 +45,8 @@ const MiniFooter = () => {
             </Link>
           ))}
         </div>
-        <p className="text-xs text-default-500">
-          &copy; {new Date().getFullYear()} TechTips Hub. All rights reserved.
+        <p className="text-xs text-default-600">
+          &copy; {new Date().getFullYear()} TechTipsHub. All rights reserved.
         </p>
       </div>
     </div>

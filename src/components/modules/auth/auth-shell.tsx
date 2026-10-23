@@ -1,5 +1,4 @@
 import Container from "@/components/ui/container";
-import { poppins } from "@/config/fonts";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { BiCheck } from "react-icons/bi";
@@ -45,17 +44,17 @@ const AuthShell = ({
           <div className="min-w-0">
             <Link
               href="/"
-              className="mb-8 inline-flex w-fit items-center gap-1.5 text-sm font-medium text-default-500 transition-colors hover:text-primary"
+              className="mb-8 inline-flex w-fit items-center gap-1.5 text-sm font-medium text-default-600 transition-colors hover:text-primary-accessible"
             >
               <HiOutlineArrowLeft aria-hidden className="size-3.5" />
               Back to the feed
             </Link>
 
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+            <p className="tth-label text-primary-accessible">
               {eyebrow}
             </p>
             <h1
-              className={`${poppins.className} mt-3 text-pretty text-3xl font-semibold leading-tight tracking-tight md:text-[2.5rem]`}
+              className="mt-3 text-pretty font-[family-name:var(--type-editorial)] text-3xl font-semibold leading-[1.1] tracking-[-0.01em] md:text-[2.5rem]"
             >
               {title}
             </h1>
@@ -74,7 +73,7 @@ const AuthShell = ({
           {points.length > 0 && (
             <aside className="lg:border-l lg:border-default/60 lg:pl-14 xl:pl-20">
               <div className="lg:sticky lg:top-[calc(var(--header-height)+4rem)]">
-                <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-default-500">
+                <h2 className="tth-label">
                   What you get
                 </h2>
                 <ul className="mt-5 space-y-5">
@@ -82,7 +81,7 @@ const AuthShell = ({
                     <li key={point.title} className="flex gap-3">
                       <BiCheck
                         aria-hidden
-                        className="mt-0.5 size-4 shrink-0 text-primary"
+                        className="mt-0.5 size-4 shrink-0 text-primary-accessible"
                       />
                       <div>
                         <p className="text-sm font-semibold">{point.title}</p>
@@ -94,18 +93,18 @@ const AuthShell = ({
                   ))}
                 </ul>
 
-                <p className="mt-8 border-t border-default/60 pt-5 text-sm leading-relaxed text-default-500">
+                <p className="mt-8 border-t border-default/60 pt-5 text-sm leading-relaxed text-default-600">
                   Questions before you join? Read the{" "}
                   <Link
                     href="/community-guidelines"
-                    className="font-medium text-primary underline-offset-4 hover:underline"
+                    className="font-medium text-primary-accessible underline-offset-4 hover:underline"
                   >
                     community guidelines
                   </Link>{" "}
                   or{" "}
                   <Link
-                    href="/contact-us"
-                    className="font-medium text-primary underline-offset-4 hover:underline"
+                    href="/contact"
+                    className="font-medium text-primary-accessible underline-offset-4 hover:underline"
                   >
                     get in touch
                   </Link>

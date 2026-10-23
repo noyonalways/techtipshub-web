@@ -25,7 +25,7 @@ const SocialLogin = () => {
 
   return (
     <div>
-      <div className="flex items-center gap-3 text-xs uppercase tracking-wider text-default-400">
+      <div className="flex items-center gap-3 tth-label-sm text-default-600">
         <span className="h-px flex-1 bg-default/60" aria-hidden />
         or
         <span className="h-px flex-1 bg-default/60" aria-hidden />
@@ -38,7 +38,7 @@ const SocialLogin = () => {
             fullWidth
             radius="lg"
             variant="bordered"
-            className="font-medium"
+            className="border border-default-300 font-medium text-foreground hover:bg-default-100"
             startContent={provider.icon}
             onClick={() => {
               signIn(provider.id, { callbackUrl: "/" });

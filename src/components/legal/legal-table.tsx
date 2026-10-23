@@ -16,14 +16,14 @@ interface IProps {
 const LegalTable = ({ label, children }: IProps) => {
   return (
     <div>
-      <div className="mb-2 text-xs text-default-500 sm:hidden">
+      <div className="mb-2 text-xs text-default-600 sm:hidden">
         Swipe sideways to see every column.
       </div>
       <div
         role="region"
         aria-label={label}
         tabIndex={0}
-        className="legal-table-scroll rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+        className="legal-table-scroll rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-300"
       >
         {children}
       </div>

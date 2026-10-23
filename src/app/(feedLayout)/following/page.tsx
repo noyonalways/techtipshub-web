@@ -1,7 +1,7 @@
 import BlogCard from "@/components/blog-card";
-import FollowingFeedPosts from "@/components/modules/following-feed";
-import { getFollowingUsersPosts } from "@/services/post";
-import { IPost } from "@/types";
+import FollowingFeedBlogs from "@/components/modules/following-feed";
+import { getFollowingUsersBlogs } from "@/services/blog";
+import { IBlog } from "@/types";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -9,11 +9,11 @@ export const metadata: Metadata = {
   description:
     "Stay updated with the latest tech tips, tutorials, and articles. Explore our feed to discover trending posts and expert insights across various technology topics.",
   keywords:
-    "TechTips Hub, tech feed, latest articles, tutorials, technology, programming, web development, software, gadgets",
+    "TechTipsHub, tech feed, latest articles, tutorials, technology, programming, web development, software, gadgets",
   openGraph: {
     title: "Feed",
     description:
-      "Discover the latest tech tips, tutorials, and trends on the TechTips Hub feed. Stay informed with expert insights and curated content.",
+      "Discover the latest tech tips, tutorials, and trends on the TechTipsHub feed. Stay informed with expert insights and curated content.",
   },
 };
 
@@ -24,7 +24,7 @@ interface IProps {
   }>;
 }
 
-export default async function FollowingUsersPosts({ searchParams }: IProps) {
+export default async function FollowingUsersBlogs({ searchParams }: IProps) {
   const { search, category } = await searchParams;
 
   const params = {
@@ -32,8 +32,8 @@ export default async function FollowingUsersPosts({ searchParams }: IProps) {
     category: category,
   };
 
-  const data = await getFollowingUsersPosts(params);
-  const posts = data?.data as IPost[];
+  const data = await getFollowingUsersBlogs(params);
+  const blogs = data?.data as IBlog[];
 
-  return <FollowingFeedPosts initialPosts={posts} />;
+  return <FollowingFeedBlogs initialBlogs={blogs} />;
 }

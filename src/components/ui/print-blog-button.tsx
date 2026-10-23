@@ -3,13 +3,13 @@
 // components/PrintBlogButton.tsx
 "use client";
 
-import { IPost } from "@/types";
+import { IBlog } from "@/types";
 import { Button } from "@heroui/react";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 
 interface IProps {
-  blog: IPost;
+  blog: IBlog;
 }
 
 // Dynamically import PDFDownloadButton with SSR disabled

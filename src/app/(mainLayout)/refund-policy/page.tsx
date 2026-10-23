@@ -6,12 +6,12 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Refund and Cancellation Policy",
   description:
-    "TechTips Hub is free to use and sells nothing. How to report a charge made in error, and how we handle refunds.",
+    "TechTipsHub is free to use and sells nothing. How to report a charge made in error, and how we handle refunds.",
   alternates: { canonical: "/refund-policy" },
   openGraph: {
     title: "Refund and Cancellation Policy",
     description:
-      "TechTips Hub is free to use and sells nothing. How to report a charge made in error.",
+      "TechTipsHub is free to use and sells nothing. How to report a charge made in error.",
     url: "/refund-policy",
   },
 };
@@ -23,14 +23,14 @@ const sections: ILegalSection[] = [
     content: (
       <>
         <p>
-          TechTips Hub is free. There are no memberships, upgrades or paid tiers,
+          TechTipsHub is free. There are no memberships, upgrades or paid tiers,
           so nothing on this site is sold and no payment is ever required to
           read, comment, vote, follow or publish. Every account has the same
           abilities.
         </p>
         <p>
           This policy explains how we respond if you believe a charge connected
-          to TechTips Hub was taken in error. It is part of our{" "}
+          to TechTipsHub was taken in error. It is part of our{" "}
           <Link href="/terms">Terms and Conditions</Link> and does not reduce
           consumer rights that apply where you live.
         </p>
@@ -54,7 +54,7 @@ const sections: ILegalSection[] = [
           <li>
             If you are asked to pay to unlock content on a site using our name or
             branding, it is not us. Do not pay, and please{" "}
-            <Link href="/contact-us">tell us about it</Link>.
+            <Link href="/contact">tell us about it</Link>.
           </li>
         </ul>
       </>
@@ -66,11 +66,11 @@ const sections: ILegalSection[] = [
     content: (
       <>
         <p>
-          If a charge you believe relates to TechTips Hub was taken in error, you
+          If a charge you believe relates to TechTipsHub was taken in error, you
           are entitled to a full refund. This includes, for example:
         </p>
         <ul>
-          <li>an amount taken from a site impersonating TechTips Hub;</li>
+          <li>an amount taken from a site impersonating TechTipsHub;</li>
           <li>
             a duplicate or unexpected charge from an earlier paid offering that
             we can verify against our records; or
@@ -99,7 +99,7 @@ const sections: ILegalSection[] = [
             {legalConfig.contactEmail}
           </a>{" "}
           from the address on your account, or use the{" "}
-          <Link href="/contact-us">contact form</Link>, and include:
+          <Link href="/contact">contact form</Link>, and include:
         </p>
         <ul>
           <li>your username and account email;</li>
@@ -175,7 +175,7 @@ const RefundPolicyPage = () => {
     <LegalPage
       currentHref="/refund-policy"
       sections={sections}
-      summary="TechTips Hub is free and sells nothing. Here is how to report a charge made in error, and how we handle refunds."
+      summary="TechTipsHub is free and sells nothing. Here is how to report a charge made in error, and how we handle refunds."
       title="Refund and Cancellation Policy"
     />
   );

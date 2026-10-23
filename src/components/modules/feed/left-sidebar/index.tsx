@@ -1,12 +1,15 @@
 "use client";
 
+import { writeBlogPath } from "@/lib/blog-routes";
+
+
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useUser } from "@/context/user.provider";
 import { PiMagicWandLight, PiUsers } from "react-icons/pi";
 import { HiOutlinePencilSquare } from "react-icons/hi2";
 import { FiBookOpen, FiInfo, FiMail } from "react-icons/fi";
-import AdBanner from "@/components/adsense/ad-banner";
+import { AdSlot } from "@/components/adsense";
 
 interface NavItem {
   href: string;
@@ -35,9 +38,9 @@ const exploreItems: NavItem[] = [
     label: "Community",
     icon: <FiBookOpen className="text-lg" />,
   },
-  { href: "/about-us", label: "About", icon: <FiInfo className="text-lg" /> },
+  { href: "/about", label: "About", icon: <FiInfo className="text-lg" /> },
   {
-    href: "/contact-us",
+    href: "/contact",
     label: "Contact",
     icon: <FiMail className="text-lg" />,
   },
@@ -49,7 +52,7 @@ const NavLink = ({ item, active }: { item: NavItem; active: boolean }) => (
     aria-current={active ? "page" : undefined}
     className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
       active
-        ? "bg-primary/10 text-primary"
+        ? "bg-primary/10 text-primary-accessible"
         : "text-default-700 hover:bg-default-100 hover:text-foreground"
     }`}
   >
@@ -68,7 +71,7 @@ const NavSection = ({
   children: React.ReactNode;
 }) => (
   <div className="space-y-1">
-    <p className="px-3 pb-1 text-[0.6875rem] font-semibold uppercase tracking-wider text-default-400">
+    <p className="px-3 pb-1 tth-label-sm text-default-600">
       {title}
     </p>
     {children}
@@ -88,11 +91,11 @@ const LeftSideBar = () => {
         <nav aria-label="Feed navigation" className="space-y-6">
           {user && (
             <Link
-              href="/write-blog"
+              href={writeBlogPath}
               className="flex items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-opacity hover:opacity-90"
             >
               <HiOutlinePencilSquare className="text-lg" aria-hidden />
-              Write a post
+              Write a blog
             </Link>
           )}
 
@@ -120,9 +123,12 @@ const LeftSideBar = () => {
         {/* Keeps the sidebar ad inside the sticky column, where it has always
             lived. The block claims the space under the navigation and caps
             itself so the rail never needs an internal scrollbar. */}
-        <div className="flex min-h-0 flex-1 flex-col justify-end gap-4 pt-6">
+        <div className="flex min-h-0 flex-1 flex-col gap-4 pt-6">
           <div className="tth-rail-ad">
-            <AdBanner />
+            <AdSlot
+              placement="left-rail"
+              className="mt-0 rounded-[10px] border border-default/60 bg-default-50/30 px-3 pb-2"
+            />
           </div>
         </div>
       </div>

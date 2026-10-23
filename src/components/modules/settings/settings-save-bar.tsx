@@ -41,7 +41,7 @@ const SettingsSaveBar = ({
         </span>
       )}
       {!dirty && !isPending && hint && (
-        <span className="mr-auto text-xs text-default-500">{hint}</span>
+        <span className="mr-auto text-xs text-default-600">{hint}</span>
       )}
       <Button
         radius="lg"

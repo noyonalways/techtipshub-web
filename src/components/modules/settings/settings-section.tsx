@@ -41,7 +41,7 @@ const SettingsSection = ({
             {title}
           </h2>
           {description && (
-            <p className="mt-0.5 text-sm leading-relaxed text-default-500">
+            <p className="mt-0.5 text-sm leading-relaxed text-default-600">
               {description}
             </p>
           )}

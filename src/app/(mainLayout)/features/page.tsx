@@ -1,10 +1,9 @@
-import AdSlot from "@/components/adsense/ad-slot";
-import AdBanner from "@/components/adsense/ad-banner";
+import { AdSlot } from "@/components/adsense";
 import PageHero from "@/components/editorial/page-hero";
 import ButtonLink from "@/components/ui/button-link";
 import Container from "@/components/ui/container";
 import { getAllCategories } from "@/services/category";
-import { getAllPosts } from "@/services/post";
+import { getAllBlogs } from "@/services/blog";
 import type { ICategory } from "@/types";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -14,12 +13,12 @@ import { FiArrowUpRight } from "react-icons/fi";
 export const metadata: Metadata = {
   title: "Write and publish",
   description:
-    "Share your tech knowledge on TechTips Hub: publish tutorials, reach readers who build software, and keep a public portfolio of your work.",
+    "Share your tech knowledge on TechTipsHub: publish tutorials, reach readers who build software, and keep a public portfolio of your work.",
   keywords:
-    "TechTips Hub, tech community, tech writing, knowledge sharing, tech tutorials, learning platform",
+    "TechTipsHub, tech community, tech writing, knowledge sharing, tech tutorials, learning platform",
   alternates: { canonical: "/features" },
   openGraph: {
-    title: "Write and publish on TechTips Hub",
+    title: "Write and publish on TechTipsHub",
     description:
       "Share your tech knowledge, learn from experts, and become part of our growing community.",
     url: "/features",
@@ -57,12 +56,12 @@ const steps = [
 ];
 
 const CommunityPage = async () => {
-  const [postsResult, categoriesResult] = await Promise.all([
-    getAllPosts({ limit: "1" }).catch(() => null),
+  const [blogsResult, categoriesResult] = await Promise.all([
+    getAllBlogs({ limit: "1" }).catch(() => null),
     getAllCategories().catch(() => null),
   ]);
 
-  const articleCount = Number(postsResult?.meta?.total) || 0;
+  const articleCount = Number(blogsResult?.meta?.total) || 0;
   const categories = (categoriesResult?.data as ICategory[]) || [];
 
   return (
@@ -72,11 +71,11 @@ const CommunityPage = async () => {
         <Container>
           <div className="grid items-end gap-10 py-14 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-16 lg:py-24">
             <PageHero
-              eyebrow="Write for TechTips Hub"
+              eyebrow="Write for TechTipsHub"
               title={
                 <>
                   Share your tech knowledge with people who{" "}
-                  <span className="text-primary">build</span>
+                  <span className="text-primary-accessible">build</span>
                 </>
               }
               lede="Publish tutorials and explainers, reach readers who actually try the code, and keep a public portfolio of everything you have written."
@@ -105,7 +104,7 @@ const CommunityPage = async () => {
                   <dd className="text-2xl font-semibold tabular-nums tracking-tight">
                     {articleCount.toLocaleString()}
                   </dd>
-                  <dt className="mt-0.5 text-xs uppercase tracking-wider text-default-500">
+                  <dt className="mt-0.5 tth-label-sm text-default-600">
                     Articles published
                   </dt>
                 </div>
@@ -115,7 +114,7 @@ const CommunityPage = async () => {
                   <dd className="text-2xl font-semibold tabular-nums tracking-tight">
                     {categories.length.toLocaleString()}
                   </dd>
-                  <dt className="mt-0.5 text-xs uppercase tracking-wider text-default-500">
+                  <dt className="mt-0.5 tth-label-sm text-default-600">
                     Topics to write in
                   </dt>
                 </div>
@@ -134,11 +133,11 @@ const CommunityPage = async () => {
           <div className="lg:pt-2">
             <h2
               id="what-you-get"
-              className="text-xs font-semibold uppercase leading-6 tracking-[0.14em] text-default-500"
+              className="tth-label leading-6"
             >
               What you get
             </h2>
-            <p className="mt-3 max-w-[16rem] text-sm leading-relaxed text-default-500">
+            <p className="mt-3 max-w-[16rem] text-sm leading-relaxed text-default-600">
               Free, with no sign-up funnel or gatekeeping. The platform stays out
               of the way of the writing.
             </p>
@@ -193,7 +192,7 @@ const CommunityPage = async () => {
         >
           <h2
             id="how-it-works"
-            className="text-xs font-semibold uppercase leading-6 tracking-[0.14em] text-default-500 lg:pt-2"
+            className="tth-label leading-6 lg:pt-2"
           >
             How it works
           </h2>
@@ -204,7 +203,7 @@ const CommunityPage = async () => {
                 key={step.title}
                 className="grid gap-x-8 gap-y-1 border-b border-default/60 py-6 sm:grid-cols-[3rem_minmax(0,1fr)]"
               >
-                <span className="text-xs font-semibold tabular-nums tracking-wider text-primary sm:pt-1">
+                <span className="text-xs font-semibold tabular-nums tracking-wider text-primary-accessible sm:pt-1">
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <div>
@@ -227,11 +226,11 @@ const CommunityPage = async () => {
             <div className="lg:pt-2">
               <h2
                 id="topics"
-                className="text-xs font-semibold uppercase leading-6 tracking-[0.14em] text-default-500"
+                className="tth-label leading-6"
               >
                 What we publish
               </h2>
-              <p className="mt-3 max-w-[16rem] text-sm leading-relaxed text-default-500">
+              <p className="mt-3 max-w-[16rem] text-sm leading-relaxed text-default-600">
                 Write in any of these, or pitch a new one.
               </p>
             </div>
@@ -240,7 +239,7 @@ const CommunityPage = async () => {
                 <li key={category._id}>
                   <Link
                     href={`/?category=${encodeURIComponent(category.name)}`}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-default/60 px-3.5 py-1.5 text-sm text-default-700 transition-colors hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-default/60 px-3.5 py-1.5 text-sm text-default-700 transition-colors hover:border-primary-600/50 hover:bg-primary/5 hover:text-primary-accessible"
                   >
                     {category.name}
                     <FiArrowUpRight aria-hidden className="size-3.5 opacity-50" />
@@ -251,7 +250,12 @@ const CommunityPage = async () => {
           </section>
         )}
 
-        {/* Closing note */}
+        {/* Closing note: the primary conversion target, so the ad sits above it
+            rather than pushing it down the page. */}
+        <div className="pb-4">
+          <AdSlot variant="display" placement="features-topics-end" />
+        </div>
+
         <section className="py-16 lg:py-20">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-pretty text-2xl font-semibold tracking-tight md:text-3xl">
@@ -262,7 +266,7 @@ const CommunityPage = async () => {
               Read the{" "}
               <Link
                 href="/community-guidelines"
-                className="font-medium text-primary underline-offset-4 hover:underline"
+                className="font-medium text-primary-accessible underline-offset-4 hover:underline"
               >
                 community guidelines
               </Link>{" "}
@@ -272,19 +276,12 @@ const CommunityPage = async () => {
               <ButtonLink href="/signup" radius="lg" color="primary">
                 Create a free account
               </ButtonLink>
-              <ButtonLink href="/about-us" radius="lg" variant="bordered">
+              <ButtonLink href="/about" radius="lg" variant="bordered">
                 About the publication
               </ButtonLink>
             </div>
           </div>
         </section>
-
-        {/* Existing ad unit — position preserved. */}
-        <div className="pb-10">
-          <AdSlot>
-            <AdBanner />
-          </AdSlot>
-        </div>
       </Container>
     </div>
   );

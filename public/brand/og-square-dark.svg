@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" width="1200" height="1200">
+  <rect width="1200" height="1200" fill="#141315"/>
+  <g transform="translate(300 240) scale(4.7)"><rect x="26" y="26" width="76" height="76" rx="14" fill="#F2A93B"/><path d="M42 44h44v11H75v27H63V55H53v27H42V55z" fill="#141315"/></g>
+  <text x="600" y="1004" text-anchor="middle" font-family="Fraunces" font-weight="700" font-size="88" letter-spacing="-2" fill="#FCFAF6">TechTips<tspan fill="#F2A93B">Hub</tspan></text>
+  <text x="600" y="1058" text-anchor="middle" font-family="Archivo, Inter, system-ui, sans-serif" font-weight="600" font-size="25" letter-spacing="5" fill="#9C948A">WRITING FOR BUILDERS</text>
+</svg>

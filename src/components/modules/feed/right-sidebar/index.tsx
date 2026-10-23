@@ -6,7 +6,7 @@ import { Skeleton } from "@heroui/react";
 import Categories from "./categories";
 import { getAllCategories } from "@/services/category";
 import { ICategory } from "@/types";
-import AdBanner from "@/components/adsense/ad-banner";
+import { AdSlot } from "@/components/adsense";
 
 const RightSideBar = () => {
   const [categories, setCategories] = useState<ICategory[] | null>(null);
@@ -48,11 +48,14 @@ const RightSideBar = () => {
           )}
         </div>
 
-        <div className="flex min-h-0 flex-1 flex-col justify-end gap-4">
+        <div className="flex min-h-0 flex-1 flex-col gap-4">
           <MiniFooter />
-          {/* Existing sidebar ad unit — position frozen. */}
+          {/* Sidebar ad unit, kept last so it sits below the categories. */}
           <div className="tth-rail-ad">
-            <AdBanner />
+            <AdSlot
+              placement="right-rail"
+              className="mt-0 rounded-[10px] border border-default/60 bg-default-50/30 px-3 pb-2"
+            />
           </div>
         </div>
       </div>

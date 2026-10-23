@@ -21,7 +21,7 @@ const options = [
 ];
 
 const label =
-  "mb-1 block text-xs font-semibold uppercase tracking-wider text-default-500";
+  "mb-1 block tth-label-sm text-default-600";
 
 const SignUpForm = () => {
   const [isPassword, setIsPassword] = useState(true);

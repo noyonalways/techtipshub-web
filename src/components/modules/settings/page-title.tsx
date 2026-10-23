@@ -16,7 +16,7 @@ const PageTitle = ({ title, description, action }: IProps) => {
     <div className="flex flex-col gap-3 border-b border-default/60 pb-5 sm:flex-row sm:items-end sm:justify-between">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
-        <p className="mt-1 text-sm text-default-500">{description}</p>
+        <p className="mt-1 text-sm text-default-600">{description}</p>
       </div>
       {action && <div className="shrink-0">{action}</div>}
     </div>

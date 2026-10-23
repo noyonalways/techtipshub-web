@@ -6,12 +6,12 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Community Guidelines",
   description:
-    "What is welcome in TechTips Hub articles and comments, our rules on AI-generated content and copyright, and how moderation works.",
+    "What is welcome in TechTipsHub articles and comments, our rules on AI-generated content and copyright, and how moderation works.",
   alternates: { canonical: "/community-guidelines" },
   openGraph: {
     title: "Community Guidelines",
     description:
-      "What is welcome in TechTips Hub articles and comments, and how moderation works.",
+      "What is welcome in TechTipsHub articles and comments, and how moderation works.",
     url: "/community-guidelines",
   },
 };
@@ -23,7 +23,7 @@ const sections: ILegalSection[] = [
     content: (
       <>
         <p>
-          TechTips Hub is a place for people who build software to share what
+          TechTipsHub is a place for people who build software to share what
           they have learned. These guidelines cover everything you publish here:
           articles, drafts that become public, comments, your username, profile
           picture, bio and social links.
@@ -173,7 +173,7 @@ const sections: ILegalSection[] = [
           </li>
           <li>
             <strong>Impersonation.</strong> Pretending to be another person, a
-            company, or a TechTips Hub editor.
+            company, or a TechTipsHub editor.
           </li>
           <li>
             <strong>Copyright infringement.</strong> Republishing someone
@@ -231,7 +231,7 @@ const sections: ILegalSection[] = [
           <a href={`mailto:${legalConfig.contactEmail}`}>
             {legalConfig.contactEmail}
           </a>{" "}
-          or through the <Link href="/contact-us">contact form</Link>. Include
+          or through the <Link href="/contact">contact form</Link>. Include
           the URL, what rule you believe is broken, and any context that helps us
           assess it. Reports are confidential; we do not tell the reported user
           who raised them.

@@ -1,4 +1,5 @@
-import AdBanner from "@/components/adsense/ad-banner";
+import { manageBlogsPath, writeBlogPath } from "@/lib/blog-routes";
+import { AdSlot } from "@/components/adsense";
 import ProfileHeader from "@/components/modules/profile/profile-header";
 import ProfileArticleList from "@/components/modules/profile/profile-article-list";
 import ButtonLink from "@/components/ui/button-link";
@@ -6,8 +7,8 @@ import Container from "@/components/ui/container";
 import EditProfileDropdown from "@/components/ui/edit-profile-dropdown";
 import ProfileShareDropdown from "@/components/ui/profile-share-dropdown";
 import { getProfileInfo } from "@/services/auth";
-import { getPostsByUserId } from "@/services/post";
-import { IPost, IUser } from "@/types";
+import { getBlogsByUserId } from "@/services/blog";
+import { IBlog, IUser } from "@/types";
 import { Metadata } from "next";
 import { BiSupport } from "react-icons/bi";
 
@@ -30,10 +31,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: `${fullName}'s Profile`,
-    description: `Explore ${fullName}'s profile on TechTips Hub — their articles, activity and links.`,
+    description: `Explore ${fullName}'s profile on TechTipsHub — their articles, activity and links.`,
     openGraph: {
       title: `${fullName}'s Profile`,
-      description: `Check out ${fullName}'s profile on TechTips Hub.`,
+      description: `Check out ${fullName}'s profile on TechTipsHub.`,
       url: `/profile/@${actualUsername}`,
     },
   };
@@ -60,7 +61,7 @@ const DynamicProfilePage = async () => {
                 Sign in again
               </ButtonLink>
               <ButtonLink
-                href="/contact-us"
+                href="/contact"
                 radius="lg"
                 variant="bordered"
                 startContent={<BiSupport />}
@@ -74,25 +75,25 @@ const DynamicProfilePage = async () => {
     );
   }
 
-  const postsData = await getPostsByUserId(user._id, {
+  const blogsData = await getBlogsByUserId(user._id, {
     limit: String(PROFILE_PAGE_SIZE),
     page: "1",
   }).catch(() => null);
   // Includes the signed-out case, where the service returns an empty list.
-  const posts = Array.isArray(postsData?.data)
-    ? (postsData.data as IPost[])
+  const blogs = Array.isArray(blogsData?.data)
+    ? (blogsData.data as IBlog[])
     : [];
-  const totalPosts = Number.isFinite(Number(postsData?.meta?.total))
-    ? Number(postsData?.meta?.total)
-    : posts.length;
+  const totalBlogs = Number.isFinite(Number(blogsData?.meta?.total))
+    ? Number(blogsData?.meta?.total)
+    : blogs.length;
 
   return (
     <section className="py-10 lg:py-14">
       <Container>
-        <div className="mx-auto max-w-4xl">
+        <div>
           <ProfileHeader
             user={user}
-            postCount={totalPosts}
+            blogCount={totalBlogs}
             actions={
               <>
                 <ProfileShareDropdown />
@@ -111,15 +112,15 @@ const DynamicProfilePage = async () => {
               Edit profile details
             </ButtonLink>
             <ButtonLink
-              href="/settings/manage-blogs"
+              href={manageBlogsPath}
               radius="lg"
               variant="bordered"
               className="justify-between"
             >
               Manage articles
             </ButtonLink>
-            <ButtonLink href="/write-blog" radius="lg" color="primary">
-              Write a new post
+            <ButtonLink href={writeBlogPath} radius="lg" color="primary">
+              Write a new blog
             </ButtonLink>
           </div>
 
@@ -131,34 +132,38 @@ const DynamicProfilePage = async () => {
               >
                 Your articles
               </h2>
-              <p className="text-sm tabular-nums text-default-500">
-                {totalPosts === 0
+              <p className="text-sm tabular-nums text-default-600">
+                {totalBlogs === 0
                   ? "Nothing published yet"
-                  : `${totalPosts.toLocaleString()} published · newest first`}
+                  : `${totalBlogs.toLocaleString()} published · newest first`}
               </p>
             </div>
 
             <div className="mt-5">
               <ProfileArticleList
                 userId={user._id}
-                initialPosts={posts}
-                total={totalPosts}
-                emptyMessage="You have not published anything yet. Your first post starts here."
+                initialBlogs={blogs}
+                total={totalBlogs}
+                emptyMessage="You have not published anything yet. Your first blog starts here."
               />
             </div>
 
-            {totalPosts === 0 && (
+            {totalBlogs === 0 && (
               <div className="mt-5">
-                <ButtonLink href="/write-blog" radius="lg" color="primary">
+                <ButtonLink href={writeBlogPath} radius="lg" color="primary">
                   Start writing
                 </ButtonLink>
               </div>
             )}
           </section>
 
-          <div className="mt-12">
-            <AdBanner />
-          </div>
+          {/* A profile with fewer than three published articles has no list to
+              frame an ad: nothing to put the unit after. */}
+          {totalBlogs >= 3 && (
+            <div className="mt-12">
+              <AdSlot variant="display" placement="own-profile-end" />
+            </div>
+          )}
         </div>
       </Container>
     </section>

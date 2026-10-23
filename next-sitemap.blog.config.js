@@ -10,14 +10,14 @@ const config = {
     const paths = [];
 
     try {
-      const res = await fetch(`${process.env.BASE_API}/posts?limit=100`);
+      const res = await fetch(`${process.env.BASE_API}/blogs?limit=100`);
       const json = await res.json();
-      const posts = json.data;
+      const blogs = json.data;
 
-      posts.forEach((post) => {
+      blogs.forEach((blog) => {
         paths.push({
-          loc: `/blogs/${post.slug}`,
-          lastmod: new Date(post.updatedAt || post.createdAt).toISOString(),
+          loc: `/blogs/${blog.slug}`,
+          lastmod: new Date(blog.updatedAt || blog.createdAt).toISOString(),
           changefreq: "daily",
           priority: 0.7,
         });

@@ -4,7 +4,7 @@ import { LuImagePlus } from "react-icons/lu";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 import { ChangeEvent, useState } from "react";
 import { toast } from "sonner";
-import { useUpdateCommentByUser } from "@/hooks/post.hook";
+import { useUpdateCommentByUser } from "@/hooks/blog.hook";
 import {
   Button,
   Modal,
@@ -62,6 +62,7 @@ const CommentUpdateModal = ({commentId, content}: IProps) => {
       <Button
         isLoading={isPending}
         onClick={onOpen}
+        className="text-primary-accessible"
         variant="light"
         size="sm"
         radius="full"

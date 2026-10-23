@@ -107,7 +107,7 @@ const ProfileCard = ({
         <p className="truncate text-lg font-semibold tracking-tight">
           {fullName || "Your name"}
         </p>
-        <p className="truncate text-sm text-default-500">
+        <p className="truncate text-sm text-default-600">
           {designation || "Add a designation"}
           {location ? ` · ${location}` : ""}
         </p>
@@ -129,7 +129,7 @@ const ProfileCard = ({
           {username && (
             <Link
               href={`/profile/@${username}`}
-              className="inline-flex items-center gap-1 text-sm font-medium text-primary underline-offset-4 hover:underline"
+              className="inline-flex items-center gap-1 text-sm font-medium text-primary-accessible underline-offset-4 hover:underline"
             >
               Preview profile
               <HiOutlineArrowUpRight aria-hidden className="size-3.5" />
@@ -137,7 +137,7 @@ const ProfileCard = ({
           )}
         </div>
 
-        <p className="mt-2 text-xs text-default-500">
+        <p className="mt-2 text-xs text-default-600">
           Square image, at least 500 × 500 px, up to 5 MB.
           {selectedImage ? " Save changes to apply it." : ""}
         </p>
@@ -163,7 +163,7 @@ function PhotoButtons({
         size="sm"
         radius="lg"
         variant="bordered"
-        className="font-medium"
+        className="border border-default-300 font-medium text-foreground hover:bg-default-100"
         startContent={<FiCamera aria-hidden className="size-4" />}
         onPress={() => inputRef.current?.click()}
       >

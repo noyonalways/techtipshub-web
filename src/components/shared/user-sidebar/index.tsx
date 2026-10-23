@@ -1,5 +1,7 @@
 "use client";
 
+import { manageBlogsPath, writeBlogPath } from "@/lib/blog-routes";
+
 import { useUser } from "@/context/user.provider";
 import { Avatar } from "@heroui/react";
 import Link from "next/link";
@@ -7,14 +9,14 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { FiEdit3, FiMenu, FiX } from "react-icons/fi";
 import { HiOutlineArrowLeft, HiOutlineArrowRight } from "react-icons/hi2";
-import { sectionPages, userLinks } from "./user-links";
+import { userLinks } from "./user-links";
 
 /**
  * Which settings page the path belongs to.
  *
- * The article editor lives under `manage-blogs` (`/settings/edit/<slug>`), so
- * it keeps that section's nav entry highlighted, but it names itself in the
- * header and the "On this page" note rather than the parent's copy.
+ * The settings rail only covers account settings now: writing and the article
+ * list live in the account area (`/me/blogs`), which is its own page without
+ * this sidebar. Nothing here should highlight for those paths.
  */
 const resolvePage = (pathname: string | null) => {
   const section =
@@ -25,12 +27,7 @@ const resolvePage = (pathname: string | null) => {
       )
       .at(-1) ?? null;
 
-  const isArticleEditor = Boolean(pathname?.startsWith("/settings/edit/"));
-
-  return {
-    section,
-    page: (isArticleEditor && sectionPages.editor) || section,
-  };
+  return { section, page: section };
 };
 
 /**
@@ -57,13 +54,18 @@ const UserSidebar = () => {
     setOpenForPath(next ? pathname : null);
   };
 
-  const { section: current, page } = resolvePage(pathname);
+  const { section: current } = resolvePage(pathname);
+  // The article list opens from this rail but is not itself a settings page.
+  const page: { label: string; description?: string } | null =
+    pathname?.startsWith(manageBlogsPath) && !current
+      ? { label: "My articles" }
+      : current;
 
   return (
     <>
       {/* Mobile trigger */}
-      <div className="border-b border-default/60 lg:hidden">
-        <div className="mx-auto flex w-full max-w-6xl items-center gap-3 px-4 py-3 sm:px-6">
+      <div className="-mx-4 border-b border-default/60 sm:-mx-6 lg:hidden">
+        <div className="flex w-full items-center gap-3 py-3">
           <button
             type="button"
             onClick={toggle}
@@ -78,7 +80,7 @@ const UserSidebar = () => {
             )}
             Settings
           </button>
-          <span className="truncate text-sm text-default-500">
+          <span className="truncate text-sm text-default-600">
             {page?.label ?? "Profile"}
           </span>
         </div>
@@ -92,7 +94,7 @@ const UserSidebar = () => {
       >
         <nav
           aria-label="Account settings"
-          className="flex flex-col gap-6 px-4 py-5 lg:px-4 lg:py-6"
+          className="flex flex-col gap-6 py-5 lg:py-6 lg:pr-4"
         >
           {/* Identity */}
           <div className="flex items-center gap-3 border-b border-default/60 pb-5">
@@ -109,14 +111,14 @@ const UserSidebar = () => {
               <p className="truncate text-sm font-semibold">
                 {user?.name || user?.username || "Your account"}
               </p>
-              <p className="truncate text-xs text-default-500">
+              <p className="truncate text-xs text-default-600">
                 {user?.username ? `@${user.username}` : user?.email}
               </p>
             </div>
           </div>
 
           <div>
-            <p className="px-3 pb-1.5 text-[0.6875rem] font-semibold uppercase tracking-wider text-default-400">
+            <p className="px-3 pb-1.5 tth-label-sm text-default-600">
               Account
             </p>
             <ul className="space-y-0.5">
@@ -129,7 +131,7 @@ const UserSidebar = () => {
                       aria-current={active ? "page" : undefined}
                       className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                         active
-                          ? "bg-primary/10 text-primary"
+                          ? "bg-primary/10 text-primary-accessible"
                           : "text-default-700 hover:bg-default-100 hover:text-foreground"
                       }`}
                     >
@@ -146,7 +148,7 @@ const UserSidebar = () => {
 
           {page?.description && (
             <div className="rounded-lg bg-default-50 px-3 py-2.5 dark:bg-default-100/10">
-              <p className="text-[0.6875rem] font-semibold uppercase tracking-wider text-default-400">
+              <p className="tth-label-sm text-default-600">
                 On this page
               </p>
               <p className="mt-1 text-xs leading-relaxed text-default-600">
@@ -166,11 +168,11 @@ const UserSidebar = () => {
               </Link>
             )}
             <Link
-              href="/write-blog"
+              href={writeBlogPath}
               className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-default-700 transition-colors hover:bg-default-100 hover:text-foreground"
             >
               <FiEdit3 aria-hidden className="size-4" />
-              Write a new post
+              Write a new blog
             </Link>
             <Link
               href="/"

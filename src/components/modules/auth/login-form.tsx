@@ -4,6 +4,7 @@ import THForm from "@/components/form/th-from";
 import THInput from "@/components/form/th-input";
 import { useUser } from "@/context/user.provider";
 import { useUserLogin } from "@/hooks/auth.hook";
+import { safeRedirectPath } from "@/lib/blog-routes";
 import { signInValidationSchema } from "@/schemas";
 import { TLogin } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,7 +16,7 @@ import { FieldValues, SubmitHandler } from "react-hook-form";
 import { PiEyeLight, PiEyeSlashLight } from "react-icons/pi";
 
 const label =
-  "mb-1 block text-xs font-semibold uppercase tracking-wider text-default-500";
+  "mb-1 block tth-label-sm text-default-600";
 
 const LoginForm = () => {
   const searchParams = useSearchParams();
@@ -35,7 +36,9 @@ const LoginForm = () => {
   useEffect(() => {
     if (!isPending && data?.success) {
       setUserLoading(false);
-      router.push(redirect || "/");
+      // Only same-site paths are followed, so a crafted `?redirect=` cannot
+      // send a freshly signed-in member somewhere else.
+      router.push(safeRedirectPath(redirect));
     }
   }, [isPending, data, redirect, router, setUserLoading]);
 
@@ -69,7 +72,7 @@ const LoginForm = () => {
               </label>
               <Link
                 href="/forget-password"
-                className="text-xs font-medium text-primary underline-offset-4 hover:underline"
+                className="text-xs font-medium text-primary-accessible underline-offset-4 hover:underline"
               >
                 Forgot password?
               </Link>

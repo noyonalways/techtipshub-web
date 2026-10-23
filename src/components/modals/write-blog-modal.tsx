@@ -31,7 +31,7 @@ const WriteBlogModal = ({}: IProps) => {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Create Blog Post
+                Create Blog
               </ModalHeader>
               <ModalBody>
                 {/* <WriteBlog onClose={onOpenChange} /> */}

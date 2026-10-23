@@ -46,6 +46,6 @@ export interface IUser {
   socialLinks: TSocialLink[];
   createdAt: string;
   updatedAt: string;
-  totalPosts: number;
+  totalBlogs: number;
   __v: number;
 }

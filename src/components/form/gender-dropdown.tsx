@@ -67,6 +67,7 @@ const GenderDropdown: React.FC<IProps> = ({ name, label }) => {
 
         <DropdownMenu
           aria-label="Gender selection"
+          classNames={{ base: "border border-default-100" }}
           variant="flat"
           disallowEmptySelection
           selectionMode="single"

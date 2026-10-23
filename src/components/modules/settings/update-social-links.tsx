@@ -113,7 +113,7 @@ const UpdateSocialLinks = ({ socialLinks = [] }: IProps) => {
             title="Social profiles"
             description="Linked from your public profile header. Leave a field empty to drop that link."
             action={
-              <span className="text-xs tabular-nums text-default-500">
+              <span className="text-xs tabular-nums text-default-600">
                 {savedCount} of {allowedSocialLinks.length} linked
               </span>
             }
@@ -126,12 +126,12 @@ const UpdateSocialLinks = ({ socialLinks = [] }: IProps) => {
                     className="mb-1 flex items-center justify-between gap-2 text-xs font-semibold text-default-600"
                   >
                     <span className="flex items-center gap-2">
-                      <span aria-hidden className="text-default-400">
+                      <span aria-hidden className="text-default-600">
                         {socialLink.icon}
                       </span>
                       {socialLink.label}
                     </span>
-                    <span className="font-normal text-default-400">
+                    <span className="font-normal text-default-600">
                       {socialLink.hint}
                     </span>
                   </label>

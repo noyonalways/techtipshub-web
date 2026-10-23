@@ -59,7 +59,7 @@ const SignupAvatarPicker = () => {
 
   return (
     <div>
-      <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-default-500">
+      <span className="mb-1 block tth-label-sm text-default-600">
         Profile photo <span className="font-normal">(optional)</span>
       </span>
 
@@ -69,14 +69,14 @@ const SignupAvatarPicker = () => {
             // eslint-disable-next-line @next/next/no-img-element
             <img src={preview} alt="" className="size-full object-cover" />
           ) : (
-            <LuImagePlus className="size-4 text-default-400" aria-hidden />
+            <LuImagePlus className="size-4 text-default-600" aria-hidden />
           )}
         </span>
 
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="rounded-lg border border-default/60 px-3 py-2 text-sm font-medium text-default-700 transition-colors hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
+          className="rounded-lg border border-default/60 px-3 py-2 text-sm font-medium text-default-700 transition-colors hover:border-primary-600/50 hover:bg-primary/5 hover:text-primary-accessible"
         >
           {file ? "Replace photo" : "Choose a photo"}
         </button>
@@ -85,7 +85,7 @@ const SignupAvatarPicker = () => {
           <button
             type="button"
             onClick={clear}
-            className="inline-flex items-center gap-1 rounded-lg px-2 py-2 text-sm text-default-500 transition-colors hover:text-danger"
+            className="inline-flex items-center gap-1 rounded-lg px-2 py-2 text-sm text-default-600 transition-colors hover:text-danger"
           >
             <LuTrash2 className="size-3.5" aria-hidden />
             Remove

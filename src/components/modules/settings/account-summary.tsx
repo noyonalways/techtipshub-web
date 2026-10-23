@@ -1,3 +1,4 @@
+import { manageBlogsPath } from "@/lib/blog-routes";
 import StatTile from "@/components/modules/settings/stat-tile";
 import type { IAccountSummary } from "@/services/settings";
 import { FiEye } from "react-icons/fi";
@@ -25,7 +26,7 @@ const AccountSummary = ({ summary }: { summary: IAccountSummary }) => {
           value={summary.articles.toLocaleString()}
           hint="published and public"
           icon={<MdOutlineArticle className="size-3.5" />}
-          href="/settings/manage-blogs"
+          href={manageBlogsPath}
         />
         <StatTile
           label="Reads"

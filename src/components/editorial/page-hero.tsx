@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 interface IProps {
-  /** Small uppercase label above the heading. */
+  /** Small label above the heading. Sentence case: the heading carries the voice. */
   eyebrow: string;
   /** Render as h1 on the page's first hero, h2 further down. */
   as?: "h1" | "h2";
@@ -15,9 +15,10 @@ interface IProps {
 /**
  * The opening block for editorial pages.
  *
- * Deliberately left-aligned and narrow: the previous centred heroes read like
- * generic marketing pages and left huge empty fields either side. A left edge
- * shared with the body below it is what makes these pages feel authored.
+ * Left-aligned and narrow: the heading shares its left edge with the body
+ * below it, which is what makes these pages feel authored rather than
+ * centred marketing templates. The heading uses the display serif; the lede
+ * stays in the interface face so it reads as text, not as a slogan.
  */
 const PageHero = ({
   eyebrow,
@@ -28,14 +29,15 @@ const PageHero = ({
   className = "",
 }: IProps) => (
   <header className={`max-w-3xl ${className}`}>
-    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+    <p className="flex items-center gap-2.5 text-xs font-medium tracking-[0.02em] text-default-600">
+      <span aria-hidden className="h-px w-6 bg-primary" />
       {eyebrow}
     </p>
-    <Heading className="mt-4 text-pretty text-4xl font-semibold leading-[1.1] tracking-tight text-balance md:text-[2.75rem]">
+    <Heading className="mt-5 text-pretty font-[family-name:var(--type-editorial)] text-4xl font-semibold leading-[1.05] tracking-[-0.015em] text-balance md:text-[3.25rem]">
       {title}
     </Heading>
     {lede && (
-      <div className="mt-5 max-w-2xl text-lg leading-relaxed text-default-600">
+      <div className="mt-6 max-w-2xl text-lg leading-relaxed text-default-600">
         {lede}
       </div>
     )}

@@ -20,9 +20,9 @@ interface IProps {
 const StatTile = ({ label, value, hint, icon, href, compact = false }: IProps) => {
   const body = (
     <>
-      <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-default-500">
+      <div className="flex items-center gap-2 tth-label-sm text-default-600">
         {icon && (
-          <span aria-hidden className="text-default-400">
+          <span aria-hidden className="text-default-600">
             {icon}
           </span>
         )}
@@ -36,7 +36,7 @@ const StatTile = ({ label, value, hint, icon, href, compact = false }: IProps) =
         {value}
       </p>
       {hint && (
-        <p className="mt-0.5 truncate text-xs text-default-500">{hint}</p>
+        <p className="mt-0.5 truncate text-xs text-default-600">{hint}</p>
       )}
     </>
   );
@@ -47,7 +47,7 @@ const StatTile = ({ label, value, hint, icon, href, compact = false }: IProps) =
   return href ? (
     <Link
       href={href}
-      className={`${classes} hover:border-primary/40 hover:bg-primary/[0.03]`}
+      className={`${classes} hover:border-primary-600/50 hover:bg-primary/[0.03]`}
     >
       {body}
     </Link>

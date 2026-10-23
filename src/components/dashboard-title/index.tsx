@@ -2,7 +2,8 @@
 
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-import { adminLinks } from "@/components/shared/admin-sidebar/admin-links";
+import AdminPageHeader from "@/components/modules/admin/kit/page-header";
+import { findAdminLink } from "@/components/shared/admin-sidebar/admin-links";
 
 interface IProps {
   title: string;
@@ -10,33 +11,34 @@ interface IProps {
   description?: string;
   /** Buttons or links aligned to the right of the heading. */
   action?: ReactNode;
+  /** Same as `action`, for callers that pass several controls. */
+  actions?: ReactNode;
+  /** Small inline facts under the title, e.g. counts. */
+  meta?: ReactNode;
 }
 
 /**
- * Heading block for admin screens. Compact, with the section name as the
- * eyebrow so the current location is obvious inside the shell.
+ * Heading block for admin screens. The breadcrumb carries the section, so the
+ * eyebrow above the title is gone: it repeated the breadcrumb in larger type.
  */
-const DashboardTitle = ({ title, description, action }: IProps) => {
+const DashboardTitle = ({
+  title,
+  description,
+  action,
+  actions,
+  meta,
+}: IProps) => {
   const pathname = usePathname();
-  const section =
-    adminLinks.find((link) => pathname?.startsWith(link.href))?.label ??
-    "Admin";
+  const section = findAdminLink(pathname)?.label;
 
   return (
-    <div className="mb-6 flex flex-col gap-4 border-b border-default/60 pb-5 sm:flex-row sm:items-end sm:justify-between">
-      <div className="min-w-0">
-        <p className="text-[0.6875rem] font-semibold uppercase tracking-wider text-primary">
-          {section}
-        </p>
-        <h1 className="mt-1 text-2xl font-bold tracking-tight">{title}</h1>
-        {description && (
-          <p className="mt-1 max-w-2xl text-sm text-default-500">
-            {description}
-          </p>
-        )}
-      </div>
-      {action && <div className="flex shrink-0 items-center gap-2">{action}</div>}
-    </div>
+    <AdminPageHeader
+      title={title}
+      description={description}
+      actions={actions ?? action}
+      meta={meta}
+      section={section}
+    />
   );
 };
 

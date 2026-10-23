@@ -1,23 +1,20 @@
-import type { ReactNode } from "react";
+"use client";
+
+import AdSlot, { type AdSlotProps } from "./adsense-slot";
 
 /**
- * Frame for an ad unit inside editorial pages.
- *
- * AdSense renders a white creative regardless of theme, so an unframed `<ins>`
- * reads as a glitch on a dark page. The label plus hairline border declares the
- * space as advertising and keeps it visually contained. The child keeps its own
- * height (AdSense controls it), so the frame grows with the slot.
+ * Legacy wrapper kept so pages that imported `ad-slot` keep compiling. It no
+ * longer nests an <AdBanner>; extra props are passed straight to <AdSlot>.
+ * `children` is accepted and ignored, because the old call sites used it.
  */
-const AdSlot = ({ children }: { children: ReactNode }) => (
-  <aside
-    aria-label="Advertisement"
-    className="overflow-hidden rounded-xl border border-default/60 bg-default-50/40"
-  >
-    <p className="border-b border-default/60 px-3 py-1.5 text-[0.625rem] font-semibold uppercase tracking-wider text-default-400">
-      Advertisement
-    </p>
-    <div className="bg-background">{children}</div>
-  </aside>
-);
+type AdSlotWrapperProps = Partial<AdSlotProps> & {
+  children?: React.ReactNode;
+};
 
-export default AdSlot;
+export default function AdSlotWrapper({
+  variant = "display",
+  placement = "legacy",
+  className,
+}: AdSlotWrapperProps) {
+  return <AdSlot variant={variant} placement={placement} className={className} />;
+}

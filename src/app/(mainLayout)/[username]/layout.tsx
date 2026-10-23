@@ -41,7 +41,7 @@ const FollowersFollowingLayout = async ({ params, children }: IProps) => {
                 {username && (
                   <Link
                     href={`/users/@${username}`}
-                    className="inline-block text-sm text-default-500 transition-colors hover:text-primary"
+                    className="inline-block text-sm text-default-600 transition-colors hover:text-primary-accessible"
                   >
                     @{username}
                   </Link>
@@ -58,7 +58,7 @@ const FollowersFollowingLayout = async ({ params, children }: IProps) => {
               {_id && <FollowUnFollowButton id={_id} />}
 
               {createdAt && (
-                <p className="flex items-center gap-2 text-sm text-default-500">
+                <p className="flex items-center gap-2 text-sm text-default-600">
                   <PiCalendarDotsLight className="size-4" aria-hidden />
                   Member since {new Date(createdAt).toLocaleDateString("en-GB", {
                     month: "short",
@@ -70,7 +70,7 @@ const FollowersFollowingLayout = async ({ params, children }: IProps) => {
               {username && (
                 <Link
                   href={`/users/@${username}`}
-                  className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+                  className="text-sm font-medium text-primary-accessible underline-offset-4 hover:underline"
                 >
                   View full profile
                 </Link>

@@ -7,10 +7,13 @@ type Tone = "neutral" | "success" | "warning" | "danger" | "primary";
 
 const tones: Record<Tone, string> = {
   neutral: "border-default/60 bg-default-50 text-default-600",
-  success: "border-success/30 bg-success/10 text-success",
-  warning: "border-warning/30 bg-warning/10 text-warning",
+  // Status text needs one step darker in light than the status fill colour:
+  // success DEFAULT and warning DEFAULT are tuned for 3:1 fills, not 4.5:1
+  // body text, so both carry an explicit darker light-mode step.
+  success: "border-success/30 bg-success/10 text-success-700 dark:text-success",
+  warning: "border-warning/30 bg-warning/10 text-warning-700 dark:text-warning",
   danger: "border-danger/30 bg-danger/10 text-danger",
-  primary: "border-primary/30 bg-primary/10 text-primary",
+  primary: "border-primary/30 bg-primary/10 text-primary-accessible",
 };
 
 interface IProps {

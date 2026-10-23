@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Choose a new password",
-  description: "Set a new password for your TechTips Hub account.",
+  description: "Set a new password for your TechTipsHub account.",
   robots: { index: false, follow: false },
 };
 
@@ -39,7 +39,7 @@ const ResetPasswordPage = () => {
           Need a new link?{" "}
           <Link
             href="/forget-password"
-            className="font-semibold text-primary underline-offset-4 hover:underline"
+            className="font-semibold text-primary-accessible underline-offset-4 hover:underline"
           >
             Request another email
           </Link>

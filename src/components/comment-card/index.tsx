@@ -5,7 +5,7 @@ import { Image } from "@heroui/image";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { MdModeEdit, MdDelete } from "react-icons/md";
-import UpdateDeleteComment from "../modules/post/update-delete-comment";
+import UpdateDeleteComment from "../modules/blog/update-delete-comment";
 
 interface IProps extends IComment {}
 
@@ -41,11 +41,11 @@ const CommentCard = ({ user, content, createdAt, images, _id }: IProps) => {
         />
         <div className="flex flex-col items-start">
           <h3 className="font-medium">{user?.fullName}</h3>
-          <span className="text-default-500 text-xs">{timeAgo}</span>
+          <span className="text-default-600 text-xs">{timeAgo}</span>
         </div>
       </Link>
 
-      <p className="text-default-500 text-base my-4">{content}</p>
+      <p className="text-default-600 text-base my-4">{content}</p>
       {images && images.length > 0 && (
         <div className={`grid gap-4 max-w-lg ${gridCols}`}>
           {images?.map((image, index) => (

@@ -7,12 +7,12 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Login",
   description:
-    "Log in to TechTips Hub to access personalized content and manage your account. Stay updated with the latest tech insights.",
+    "Log in to TechTipsHub to access personalized content and manage your account. Stay updated with the latest tech insights.",
   openGraph: {
     url: "https://techtipshub.vercel.app/login",
     title: "Login",
     description:
-      "Access your TechTips Hub account for personalized content and latest updates.",
+      "Access your TechTipsHub account for personalized content and latest updates.",
   },
 };
 
@@ -46,7 +46,7 @@ const LoginPage = () => {
           Don&apos;t have an account?{" "}
           <Link
             href="/signup"
-            className="font-semibold text-primary underline-offset-4 hover:underline"
+            className="font-semibold text-primary-accessible underline-offset-4 hover:underline"
           >
             Create one free
           </Link>

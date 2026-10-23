@@ -11,12 +11,12 @@ import { HiOutlineArrowRight } from "react-icons/hi2";
 
 export const metadata: Metadata = {
   title: "Profile Settings",
-  description: "Manage your TechTips Hub profile settings.",
-  keywords: "Profile, Settings, TechTips Hub",
+  description: "Manage your TechTipsHub profile settings.",
+  keywords: "Profile, Settings, TechTipsHub",
 };
 
 /**
- * Account settings: who you are on TechTips Hub, what that account has
+ * Account settings: who you are on TechTipsHub, what that account has
  * produced, and the links that hang off it.
  */
 const SettingsPage = async () => {
@@ -36,7 +36,7 @@ const SettingsPage = async () => {
           user?.username ? (
             <Link
               href={`/profile/@${user.username}`}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-default/60 px-3 py-2 text-sm font-medium transition-colors hover:border-primary/40 hover:text-primary"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-default/60 px-3 py-2 text-sm font-medium transition-colors hover:border-primary-600/50 hover:text-primary-accessible"
             >
               View public profile
               <HiOutlineArrowRight aria-hidden className="size-3.5" />
@@ -58,7 +58,7 @@ const SettingsPage = async () => {
           {profileData?.statusCode === 401 && (
             <Link
               href="/login?redirect=%2Fsettings"
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary underline-offset-4 hover:underline"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary-accessible underline-offset-4 hover:underline"
             >
               Sign in again
               <HiOutlineArrowRight aria-hidden className="size-3.5" />

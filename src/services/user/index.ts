@@ -62,7 +62,7 @@ export const unfollowUser = async (userId: string) => {
 export const getFollowersByUserId = async (userId: string) => {
   try {
     const res = await fetch(`${envConfig.baseApi}/users/${userId}/followers`, {
-      cache: "no-store"
+      cache: "no-store",
     });
 
     return await res?.json();
@@ -85,20 +85,26 @@ export const getFollowingByUserId = async (userId: string) => {
 };
 
 // get all users (admin only)
-export const getAllUsers = async () => {
+// `GET /admin/users` is built on QueryBuilder, so it already understands `page`,
+// `limit`, `searchTerm`, `sort`, `role` and `status`. Forwarding them is what
+// lets the members table page through more than its first page.
+// Throws with the API's own message on failure so the table shows an error.
+export const getAllUsers = async (params?: Record<string, unknown>) => {
   try {
-    const res = await axiosInstance.get("/users");
+    const res = await axiosInstance.get("/admin/users", { params });
 
     return res.data;
   } catch (err: any) {
-    throw new Error(err.message);
+    throw new Error(
+      err?.response?.data?.message || err?.message || "Members did not load.",
+    );
   }
 };
 
-// block a user by user id
+// block a user by user id (admin only)
 export const blockUser = async (userId: string) => {
   try {
-    const res = await axiosInstance.patch(`/users/${userId}/block`);
+    const res = await axiosInstance.patch(`/admin/users/${userId}/block`);
 
     return res.data;
   } catch (err: any) {
@@ -106,25 +112,23 @@ export const blockUser = async (userId: string) => {
   }
 };
 
-// unblock a user by user id
+// unblock a user by user id (admin only)
 export const unblockUser = async (userId: string) => {
   try {
-    const res = await axiosInstance.patch(`/users/${userId}/unblock`);
+    const res = await axiosInstance.patch(`/admin/users/${userId}/unblock`);
 
     return res.data;
   } catch (err: any) {
     throw new Error(err.message);
   }
 };
-
 
 // update logged in user profile
 export const updateProfile = async (payload: FormData) => {
   try {
     const res = await axiosInstance.patch(`/users/update-profile`, payload);
 
-
-    updateTag("loggedInUserProfile")
+    updateTag("loggedInUserProfile");
 
     return res.data;
   } catch (err: any) {
@@ -134,12 +138,15 @@ export const updateProfile = async (payload: FormData) => {
 
 // update logged in user profile social links
 export const updateSocialLinks = async (payload: {
-  socialLinks: TSocialLink[]
+  socialLinks: TSocialLink[];
 }) => {
   try {
-    const res = await axiosInstance.put(`/users/profile/update-social-links`, payload);
+    const res = await axiosInstance.put(
+      `/users/profile/update-social-links`,
+      payload,
+    );
 
-    updateTag("loggedInUserProfile")
+    updateTag("loggedInUserProfile");
 
     return res?.data;
   } catch (err: any) {
@@ -150,18 +157,18 @@ export const updateSocialLinks = async (payload: {
 // make user to admin (admin only)
 export const makeAdmin = async (id: string) => {
   try {
-    const res = await axiosInstance.patch(`/users/${id}/make-admin`);
+    const res = await axiosInstance.patch(`/admin/users/${id}/make-admin`);
 
     return res?.data;
   } catch (err: any) {
     return err?.response?.data;
   }
-}
+};
 
-// delete an user account (amin only)
+// delete an user account (admin only)
 export const deleteUserAccount = async (id: string) => {
   try {
-    const res = await axiosInstance.delete(`/users/${id}`);
+    const res = await axiosInstance.delete(`/admin/users/${id}`);
 
     return res?.data;
   } catch (err: any) {

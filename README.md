@@ -13,14 +13,14 @@
     <img src="https://i.ibb.co.com/8dwgWQk/tech-tips-hub-logo.png" alt="Logo" width="80" height="80" />
     <h3 align="center">
         <a href="https://techtipshub.vercel.app" target="_blank" >
-            TechTips Hub Web
+            TechTipsHub Web
         </a>
     </h3>
 </p>
 
 ## Description:
 
-**TechTips Hub** is an advanced blogging platform tailored for tech enthusiasts to read and write blogs. Users can access both free and premium blogs, with a monthly subscription offering exclusive content. The platform supports features like user registration, email verification, JWT-based authentication, upvoting/downvoting blogs, commenting with replies, and following/unfollowing users. It tracks important user interactions such as views, followers, and following, enhancing the social experience.
+**TechTipsHub** is an advanced blogging platform tailored for tech enthusiasts to read and write blogs. Users can access both free and premium blogs, with a monthly subscription offering exclusive content. The platform supports features like user registration, email verification, JWT-based authentication, upvoting/downvoting blogs, commenting with replies, and following/unfollowing users. It tracks important user interactions such as views, followers, and following, enhancing the social experience.
 
 ### **User Features:**
 
@@ -126,5 +126,5 @@ Let me know if you need any further modifications!
 
 ## Contact
 
-- Email: [noyonrahman2003@gmail.com](mailto:noyonrahman2003@gmail.com)
+- Email: [contact.techtipshub@noyonrahman.com](mailto:contact.techtipshub@noyonrahman.com)
 - LinkedIn: [Noyon Rahman](https://linkedin.com/in/noyonalways)

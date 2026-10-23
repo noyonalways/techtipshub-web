@@ -6,11 +6,11 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Reset Password",
   description:
-    "Reset the password for your TechTips Hub account. We will email you a secure link.",
+    "Reset the password for your TechTipsHub account. We will email you a secure link.",
   openGraph: {
     url: "https://techtipshub.vercel.app/forget-password",
     title: "Reset Password",
-    description: "Recover access to your TechTips Hub account.",
+    description: "Recover access to your TechTipsHub account.",
   },
 };
 
@@ -39,7 +39,7 @@ const ForgetPasswordPage = () => {
           Remembered it?{" "}
           <Link
             href="/login"
-            className="font-semibold text-primary underline-offset-4 hover:underline"
+            className="font-semibold text-primary-accessible underline-offset-4 hover:underline"
           >
             Back to sign in
           </Link>

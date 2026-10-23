@@ -82,7 +82,7 @@ const PasswordResetForm = () => {
         <div>
           <label
             htmlFor="email"
-            className="mb-1 block text-xs font-semibold uppercase tracking-wider text-default-500"
+            className="mb-1 block tth-label-sm text-default-600"
           >
             Email
           </label>

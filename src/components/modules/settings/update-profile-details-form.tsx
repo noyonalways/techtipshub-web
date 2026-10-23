@@ -1,5 +1,8 @@
 "use client";
 
+import { manageBlogsPath } from "@/lib/blog-routes";
+
+
 import THForm from "@/components/form/th-from";
 import THInput from "@/components/form/th-input";
 import THTextarea from "@/components/form/th-textarea";
@@ -20,7 +23,7 @@ interface IProps extends Partial<IUser> {
 }
 
 const fieldLabel =
-  "mb-1 block text-xs font-semibold uppercase tracking-wider text-default-500";
+  "mb-1 block tth-label-sm text-default-600";
 
 const MAX_BIO = 280;
 
@@ -72,7 +75,7 @@ const UpdateProfileDetailsForm = ({
               username ? (
                 <Link
                   href={`/profile/@${username}`}
-                  className="inline-flex items-center gap-1 text-sm font-medium text-primary underline-offset-4 hover:underline"
+                  className="inline-flex items-center gap-1 text-sm font-medium text-primary-accessible underline-offset-4 hover:underline"
                 >
                   View public profile
                   <HiOutlineArrowRight aria-hidden className="size-3.5" />
@@ -91,10 +94,10 @@ const UpdateProfileDetailsForm = ({
               onSelectImage={setSelectedImage}
             />
             {typeof articleCount === "number" && articleCount > 0 && (
-              <p className="mt-5 border-t border-default/60 pt-4 text-xs text-default-500">
+              <p className="mt-5 border-t border-default/60 pt-4 text-xs text-default-600">
                 Your name and photo appear on{" "}
                 <Link
-                  href="/settings/manage-blogs"
+                  href={manageBlogsPath}
                   className="font-medium text-foreground underline underline-offset-4"
                 >
                   {articleCount} published{" "}

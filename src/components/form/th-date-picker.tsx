@@ -16,11 +16,12 @@ export default function THDatePicker({
       name={name}
       render={({ formState: { errors }, field: { value, ...fields } }) => (
         <DatePicker
+          {...props}
+          classNames={{ calendar: "bg-content1" }}
           errorMessage={(errors[name]?.message as string | undefined) || ""}
           isInvalid={!!errors[name]}
           label={label}
           {...fields}
-          {...props}
         />
       )}
     />

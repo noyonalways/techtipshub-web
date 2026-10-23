@@ -1,9 +1,9 @@
 /**
- * Format a post timestamp for display. Returns `null` when the value is
+ * Format a blog timestamp for display. Returns `null` when the value is
  * missing or unparseable, so callers can omit the date instead of rendering
  * "Invalid Date".
  */
-export const formatPostDate = (value?: string | null): string | null => {
+export const formatBlogDate = (value?: string | null): string | null => {
   if (!value) return null;
 
   const date = new Date(value);

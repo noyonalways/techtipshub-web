@@ -11,7 +11,7 @@ const UserLoadingPage = () => {
   return (
     <section className="py-10 lg:py-14">
       <Container>
-        <div className="mx-auto max-w-4xl">
+        <div>
           <div className="border-b border-default/60 pb-8">
             <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-6">

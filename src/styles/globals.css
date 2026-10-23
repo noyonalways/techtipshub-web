@@ -86,20 +86,109 @@
   --color-danger-500: hsl(var(--heroui-danger-500));
   --color-danger: hsl(var(--heroui-danger));
 
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  /* next/font puts its family names on `--font-sans` and `--font-fraunces`
+     through the `<body>` variable classes. Declaring the token here keeps
+     Tailwind as its only owner, so no other generated token can shadow it. */
+  --font-sans: "Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
+
+  /* Display face for headlines, the wordmark and pull quotes. Read through
+     `font-[family-name:var(--type-editorial)]`, so it stays a plain variable
+     and never becomes a `--font-*` token that would also restyle every serif
+     fallback. Both tokens point at the literal family names next/font
+     registers on `<body>`: referencing its `--font-fraunces` /
+     `--font-sans` variables from inside a custom property resolves to nothing
+     in Chromium, which silently dropped the hero headline back to Inter. */
+  --type-editorial: "Fraunces", "Fraunces Fallback", Georgia, "Times New Roman", serif;
+
+  /* HeroUI converts the hex theme values in tailwind.config.js into the
+     `--heroui-*` channel variables, but resolves `foreground: <hex>` only into
+     `--heroui-primary-foreground` and leaves `--heroui-primary` behind. So
+     `text-primary-foreground` is correct (dark ink on amber), while
+     `text-primary` inherited `.text-primary { color: var(--color-primary) }`
+     from Tailwind's own palette, which is a Tailwind *blue*. Pointing the
+     utility at the same source the rest of the theme uses is the one-line fix,
+     and it means light and dark each get their own amber instead of a single
+     hard-coded hex. */
+  --color-primary: hsl(var(--heroui-primary));
+  --color-primary-foreground: hsl(var(--heroui-primary-foreground));
 
   /* Single source of truth for the sticky header height: the 4rem bar plus
      its 1px bottom border, which is the box the rails offset themselves by. */
   --header-height: calc(4rem + 1px);
+
+  /* Page widths. Every shell on the site measures from here, so the header,
+     the rails, the reading column and the footer all share one axis:
+     `max-w-page` for any full page (header, footer, feed, editorial, legal,
+     settings), `max-w-read` for a column of prose or an article screen. A page
+     can cap itself narrower than `max-w-page`, never wider. */
+  --container-page: 80rem;
+  --container-read: 48rem;
 }
 
 * {
   scrollbar-width: thin;
 }
 
-body {
-  background-color: var(--color-background);
-  color: var(--color-foreground);
+/* Everything below sits in `@layer base` on purpose.
+   CSS inside `@layer` always loses to CSS outside it. Left unwrapped, these
+   rules formed an unlayered sheet that outranked every Tailwind utility,
+   including HeroUI's own font reset, so `--font-editorial` and any utility
+   that shared a property with a rule here was silently overridden. Wrapping
+   keeps them low-priority defaults, which is what they are. Utility classes
+   marked `.tth-*` are single classes and win against these by source order. */
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+}
+
+/* Section labels: sentence case, 13px, medium weight, muted.
+   The rule lives here so labels across the site cannot drift apart; call
+   sites only add layout (`tth-label mt-2`). Copy passed to a label is written
+   as a sentence ("What you get"), never shouted in caps. */
+@layer components {
+  .tth-label {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0;
+    color: var(--color-default-600);
+  }
+
+  /* Same job where a label sits inside a dense table header. */
+  .tth-label-sm {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    color: var(--color-default-600);
+  }
+
+  /* A raised reading surface: the author panel at the end of an article, and
+     anywhere else one block needs to separate itself from the column without
+     becoming a nested card-of-cards. Warm `content1` fill, slate hairline,
+     10px media radius, no shadow (DESIGN.md: rules over boxes, shadow marks
+     elevation only). */
+  .tth-panel {
+    background-color: var(--color-content-1);
+    border: 1px solid var(--color-default-100);
+    border-radius: 10px;
+  }
+
+  /* Amber as *text*. One utility, two themes: amber 800 on paper reaches
+     7.5:1 and amber 400 on charcoal reaches 9.3:1. Each theme is declared
+     once; an earlier version repeated `.dark .text-primary-accessible` in
+     both blocks, so one rule silently won and future edits would have been
+     lost. */
+  .text-primary-accessible {
+    color: hsl(var(--heroui-primary-800));
+  }
+
+  .dark .text-primary-accessible,
+  .dark .group:hover .text-primary-accessible,
+  .dark .group:focus-visible .text-primary-accessible {
+    color: hsl(var(--heroui-primary-400));
+  }
 }
 
 /* Paragraphs inherit their container's colour by default. The old
@@ -124,8 +213,13 @@ body {
       layout ancestors on first render, so a parent-relative `100%`/`auto`
       chain cannot be trusted to stay viewport-bound.
 
-   The column therefore sizes itself from the viewport directly, and its
-   content is clamped so it can never overflow into a scrollbar. */
+   The column therefore sizes itself from the viewport directly. Anything
+   taller than the viewport, such as a full sidebar or an ad whose frame
+   grows after it fills, still scrolls inside that box rather than being cut
+   off, but the scrollbar is hidden: a thin track down the edge of a quiet
+   rail reads as debris, and the wheel, trackpad and keyboard still reach the
+   content. `min-height` repeats `height` so the box cannot be shrunk below
+   the viewport by the flex row that holds it. */
 .tth-rail {
   position: sticky;
   top: var(--header-height);
@@ -137,13 +231,25 @@ body {
   display: flex;
   flex-direction: column;
   height: calc(100dvh - var(--header-height));
+  min-height: calc(100dvh - var(--header-height));
   max-height: calc(100dvh - var(--header-height));
-  overflow: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
 }
 
-/* Sidebar adverts keep their reserved space but never stretch the rail. */
+.tth-rail > .tth-rail-inner::-webkit-scrollbar {
+  display: none;
+}
+
+/* A rail advert is a full-height block, never a squeezed one. Its wrapper used
+   to cap itself below the card's height and clip the overflow, which cut the
+   bottom off the unit as soon as the rail ran short. It now takes the height
+   its card needs; if the column is too short for everything, `.tth-rail-inner`
+   scrolls instead of cropping the advert. The clipping stays on the wrapper so
+   a creative that overflows its own frame cannot spill over the rail. */
 .tth-rail-ad {
-  max-height: 40vh;
+  flex: 0 0 auto;
   overflow: hidden;
 }
 
@@ -215,11 +321,12 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   Full-page composer surface (/write-blog).
+   Full-page composer surface (/me/blogs/new and the editor).
 
    The page supplies the column, so the editor has no card of its own: no
    border, no background, generous vertical space, and type sized for writing
-   rather than for reading small controls.
+   rather than for reading small controls. `.tth-writing-surface` sits on the
+   writing column itself, see `WritingPane` in editor-shell.tsx.
    -------------------------------------------------------------------------- */
 .tth-writing-surface .tth-editor-content .tth-prose {
   min-height: 50vh;
@@ -267,9 +374,21 @@ body {
   border-radius: 2px;
 }
 
-/* On the composer the toolbar is compact: no divider, tight controls. */
+/* On the composer the toolbar is compact: no divider, tight controls, and it
+   scrolls sideways on phones rather than wrapping onto several rows. */
 .tth-toolbar {
   row-gap: 0.25rem;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tth-toolbar::-webkit-scrollbar {
+  display: none;
+}
+
+.tth-toolbar > * {
+  flex: 0 0 auto;
 }
 
 /* --------------------------------------------------------------------------
@@ -302,20 +421,285 @@ body {
   border-radius: 9999px;
 }
 
-/* Phones: one row that scrolls sideways instead of wrapping onto several
-   rows, which would push the title below the fold. */
-@media (max-width: 40rem) {
-  .tth-toolbar {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
+/* --------------------------------------------------------------------------
+   Published article body (`.tth-article`, /blogs/[slug]).
 
-  .tth-toolbar::-webkit-scrollbar {
-    display: none;
-  }
+   A deliberate reading style instead of Tailwind Typography utilities: the
+   body is 17px Inter on ~1.75 line height, headings are Fraunces like the
+   title so one display voice runs from headline to subsection, and there is
+   clearly more air above a heading than below it. Space between blocks sits
+   below the site's section rhythm on purpose, so paragraphs read as one
+   column rather than a stack of blocks. `.tth-article-continued` is the half
+   after the in-article ad slot and adds no top margin, so the ad is what
+   separates the two.
+   -------------------------------------------------------------------------- */
+.tth-article {
+  color: var(--color-foreground);
+  font-size: 1rem;
+  line-height: 1.7;
+  overflow-wrap: break-word;
+  text-wrap: pretty;
+}
 
-  .tth-toolbar > * {
-    flex: 0 0 auto;
+@media (min-width: 40rem) {
+  .tth-article {
+    font-size: 1.0625rem;
+    line-height: 1.75;
+  }
+}
+
+/* Adjacent margins collapse, so each block only owns its top space. A code
+   block stays close to the line that introduces it. */
+.tth-article > * + * {
+  margin-top: 1.15em;
+}
+
+.tth-article > p + pre {
+  margin-top: 0.6em;
+}
+
+.tth-article h1,
+.tth-article h2,
+.tth-article h3,
+.tth-article h4 {
+  font-family: var(--type-editorial);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.22;
+  color: var(--color-foreground);
+  text-wrap: balance;
+}
+
+.tth-article h1 {
+  font-size: 1.6rem;
+  margin-top: 2.1em;
+}
+
+.tth-article h2 {
+  font-size: 1.4rem;
+  margin-top: 2.2em;
+  margin-bottom: 0.45em;
+}
+
+.tth-article h3 {
+  font-size: 1.2rem;
+  margin-top: 1.9em;
+  margin-bottom: 0.35em;
+}
+
+.tth-article h4 {
+  font-size: 1.05rem;
+  margin-top: 1.6em;
+  margin-bottom: 0.25em;
+}
+
+/* The body starts under its own picture, so the first block never carries a
+   heading's top margin. */
+.tth-article > :first-child {
+  margin-top: 0;
+}
+
+.tth-article a {
+  color: hsl(var(--heroui-primary-800));
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color 120ms ease;
+}
+
+.dark .tth-article a {
+  color: hsl(var(--heroui-primary-400));
+}
+
+.tth-article a:hover {
+  color: var(--color-foreground);
+}
+
+.tth-article a:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.tth-article strong,
+.tth-article b {
+  font-weight: 650;
+  color: var(--color-foreground);
+}
+
+.tth-article ul,
+.tth-article ol {
+  padding-left: 1.35em;
+}
+
+.tth-article ul {
+  list-style: disc;
+}
+
+.tth-article ol {
+  list-style: decimal;
+}
+
+.tth-article li {
+  padding-left: 0.2em;
+}
+
+.tth-article li + li {
+  margin-top: 0.35em;
+}
+
+.tth-article li > ul,
+.tth-article li > ol {
+  margin-top: 0.35em;
+}
+
+.tth-article li::marker {
+  color: var(--color-default-500);
+}
+
+/* A quote is a change of voice, not a card: one amber hairline on the left. */
+.tth-article blockquote {
+  border-left: 2px solid var(--color-primary);
+  padding: 0.1em 0 0.1em 1.1em;
+  color: var(--color-default-700);
+  font-size: 1.05em;
+  line-height: 1.6;
+}
+
+.tth-article blockquote p + p {
+  margin-top: 0.8em;
+}
+
+.tth-article blockquote cite,
+.tth-article blockquote footer {
+  display: block;
+  margin-top: 0.6em;
+  font-size: 0.8125rem;
+  font-style: normal;
+  color: var(--color-default-600);
+}
+
+/* The composer uses Fira Code through `--font-mono` on <body>; the literal
+   name is the fallback for pages that do not mount that variable. */
+.tth-article code {
+  font-family: "Fira Code", var(--font-mono), ui-monospace, SFMono-Regular,
+    Menlo, monospace;
+  font-size: 0.875em;
+  background-color: var(--color-content-2);
+  border: 1px solid color-mix(in srgb, var(--color-default-300) 60%, transparent);
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+  overflow-wrap: break-word;
+}
+
+/* Long lines scroll inside the block; the page itself never does. */
+.tth-article pre {
+  max-width: 100%;
+  overflow-x: auto;
+  background-color: var(--color-content-2);
+  border: 1px solid color-mix(in srgb, var(--color-default-300) 70%, transparent);
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  font-size: 0.8125rem;
+  line-height: 1.65;
+  tab-size: 2;
+}
+
+@media (min-width: 40rem) {
+  .tth-article pre {
+    font-size: 0.875rem;
+  }
+}
+
+.tth-article pre code {
+  background: none;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  font-size: inherit;
+  white-space: pre;
+  overflow-wrap: normal;
+}
+
+/* Media: 10px radius (the media scale), a hairline, never wider than the column. */
+.tth-article img,
+.tth-article video,
+.tth-article iframe {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--color-default-300) 70%, transparent);
+}
+
+.tth-article figure {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.tth-article figure img {
+  width: 100%;
+}
+
+.tth-article figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-default-600);
+}
+
+.tth-article table {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.tth-article th,
+.tth-article td {
+  border-bottom: 1px solid var(--color-default-200);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.tth-article th {
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--color-foreground);
+}
+
+.tth-article hr {
+  border: 0;
+  border-top: 1px solid var(--color-default-300);
+  margin: 2.25rem 0;
+}
+
+.tth-article pre::-webkit-scrollbar,
+.tth-article table::-webkit-scrollbar {
+  height: 0.375rem;
+}
+
+.tth-article pre::-webkit-scrollbar-thumb,
+.tth-article table::-webkit-scrollbar-thumb {
+  background: var(--color-default-300);
+  border-radius: 9999px;
+}
+
+/* Centred article column (`/blogs/[slug]`).
+ *
+ * The page is centred so the column sits in the middle of the viewport, but
+ * the prose itself stays left-aligned: centred paragraphs are hard to read
+ * past a couple of lines. Only the header is centred. */
+.tth-article {
+  text-align: left;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tth-article a {
+    transition: none;
   }
 }

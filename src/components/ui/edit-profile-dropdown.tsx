@@ -20,7 +20,11 @@ const EditProfileDropdown = ({}: IProps) => {
           Edit
         </Button>
       </DropdownTrigger>
-      <DropdownMenu aria-label="Profile Actions" variant="flat">
+      <DropdownMenu
+        aria-label="Profile Actions"
+        classNames={{ base: "border border-default-100" }}
+        variant="flat"
+      >
         <DropdownItem key="update-profile">
           <Link className="h-full w-full block" href={`/settings`}>
             Update Profile Details

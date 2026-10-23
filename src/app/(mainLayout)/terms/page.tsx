@@ -6,12 +6,12 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Terms and Conditions",
   description:
-    "The agreement that governs your use of TechTips Hub, including accounts, published content, acceptable use and liability.",
+    "The agreement that governs your use of TechTipsHub, including accounts, published content, acceptable use and liability.",
   alternates: { canonical: "/terms" },
   openGraph: {
     title: "Terms and Conditions",
     description:
-      "The agreement that governs your use of TechTips Hub, including accounts, content and liability.",
+      "The agreement that governs your use of TechTipsHub, including accounts, content and liability.",
     url: "/terms",
   },
 };
@@ -47,7 +47,7 @@ const sections: ILegalSection[] = [
     content: (
       <>
         <p>
-          TechTips Hub is an independent publication and community for people
+          TechTipsHub is an independent publication and community for people
           interested in software development. Visitors can browse the feed and
           read a preview of any article. Registered users can read every
           article, comment, vote, follow other users, manage a public profile and
@@ -241,7 +241,7 @@ const sections: ILegalSection[] = [
     content: (
       <>
         <p>
-          Using TechTips Hub is free. Every registered account can create their
+          Using TechTipsHub is free. Every registered account can create their
           own profile, follow other members, comment and vote. Browsing the feed
           and reading previews does not require an account.
         </p>
@@ -512,7 +512,7 @@ const sections: ILegalSection[] = [
           <a href={`mailto:${legalConfig.contactEmail}`}>
             {legalConfig.contactEmail}
           </a>{" "}
-          or through the <Link href="/contact-us">contact form</Link>.
+          or through the <Link href="/contact">contact form</Link>.
         </p>
       </>
     ),
@@ -524,7 +524,7 @@ const TermsPage = () => {
     <LegalPage
       currentHref="/terms"
       sections={sections}
-      summary="The agreement between you and TechTips Hub: accounts, published content, acceptable use and liability."
+      summary="The agreement between you and TechTipsHub: accounts, published content, acceptable use and liability."
       title="Terms and Conditions"
     />
   );

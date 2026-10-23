@@ -1,22 +1,48 @@
-import DashboardTitle from "@/components/dashboard-title";
-import UsersTable from "@/components/users-table";
-import { Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Manage Users | Admin Dashboard",
-  description:
-    "Admin panel for managing user accounts, permissions, and access controls.",
-  keywords: "admin, manage users, user management, access control, dashboard",
-};
+import AdminPageHeader from "@/components/modules/admin/kit/page-header";
+import AdminPageSpinner from "@/components/shared/admin-sidebar/admin-page-spinner";
+import { useAdminTitle } from "@/components/shared/admin-sidebar/use-admin-title";
+import ButtonLink from "@/components/ui/button-link";
+import UsersTable from "@/components/users-table";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
+import { RiDeleteBinLine } from "react-icons/ri";
+
+/**
+ * `?filter=blocked` opens the table on its blocked list, which is how the
+ * dashboard's blocked-accounts link lands. Read verbatim; the table decides
+ * whether the value names one of its filters.
+ */
+function ManageUsersTable() {
+  const searchParams = useSearchParams();
+  const initialFilter = searchParams.get("filter") ?? undefined;
+
+  return <UsersTable initialFilter={initialFilter} />;
+}
 
 const ManageUsersPage = () => {
+  useAdminTitle("Members");
+
   return (
     <div>
-      <DashboardTitle
-        title="Manage Users"
-        description="Search members, change roles and moderate accounts."
+      <AdminPageHeader
+        title="Members"
+        description="Search by name, username or email, filter by role and status, then open a member before changing their account."
+        actions={
+          <ButtonLink
+            href="/admin/trash"
+            variant="bordered"
+            size="sm"
+            startContent={<RiDeleteBinLine aria-hidden />}
+          >
+            Deleted accounts
+          </ButtonLink>
+        }
       />
-      <UsersTable />
+      <Suspense fallback={<AdminPageSpinner label="Loading members" />}>
+        <ManageUsersTable />
+      </Suspense>
     </div>
   );
 };

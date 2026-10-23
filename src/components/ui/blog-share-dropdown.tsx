@@ -49,7 +49,7 @@ const BlogShareDropdown = () => {
           <PiShareNetwork />
         </Button>
       </DropdownTrigger>
-      <DropdownMenu aria-label="Share Actions">
+      <DropdownMenu aria-label="Share Actions" classNames={{ base: "border border-default-100" }}>
         <DropdownItem
           key="permalink"
           startContent={<PiLink />}

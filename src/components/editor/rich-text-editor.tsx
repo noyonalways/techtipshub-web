@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import EditorView from "./editor-view";
 import Toolbar from "./toolbar";
-import { useBlogEditor, getPostHTML } from "./use-blog-editor";
+import { useBlogEditor, getBlogHTML } from "./use-blog-editor";
 
 export type BlogEditor = ReturnType<typeof useBlogEditor>;
 
@@ -85,7 +85,7 @@ export const useComposerEditor = ({
     // Compare against what the editor reports, not its raw HTML: the two differ
     // for lists and quotes, and an unequal compare would reset the document the
     // editor just produced (losing the caret position).
-    if (value === getPostHTML(editor)) return;
+    if (value === getBlogHTML(editor)) return;
 
     initial.current = value;
     editor.commands.setContent(value, { emitUpdate: false });
@@ -103,7 +103,7 @@ interface IProps {
   onChange: (html: string) => void;
   onBlur?: () => void;
   hasError?: boolean;
-  /** Read-only posts still use the editor's typography, without a toolbar. */
+  /** Read-only blogs still use the editor's typography, without a toolbar. */
   editable?: boolean;
 }
 

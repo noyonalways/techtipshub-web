@@ -35,14 +35,14 @@ const Tab = ({
     aria-current={active ? "page" : undefined}
     className={`-mb-px flex items-baseline gap-1.5 border-b-2 px-0.5 pb-3 text-sm font-medium transition-colors ${
       active
-        ? "border-primary text-primary"
+        ? "border-primary-600 text-primary-accessible"
         : "border-transparent text-default-600 hover:text-foreground"
     }`}
   >
     {label}
     {/* Counts only when the API supplied them. */}
     {typeof count === "number" && (
-      <span className="text-xs tabular-nums text-default-400">{count}</span>
+      <span className="text-xs tabular-nums text-default-600">{count}</span>
     )}
   </Link>
 );
@@ -65,7 +65,7 @@ const PeopleList = ({
         <h1 className="text-xl font-bold tracking-tight">{title}</h1>
         {typeof counts?.followers === "number" &&
           typeof counts?.following === "number" && (
-            <p className="text-sm tabular-nums text-default-500">
+            <p className="text-sm tabular-nums text-default-600">
               {counts.followers.toLocaleString()} followers ·{" "}
               {counts.following.toLocaleString()} following
             </p>
@@ -92,7 +92,7 @@ const PeopleList = ({
           <p className="text-sm font-medium">
             {activeTab === "followers" ? "No followers yet" : "Not following anyone yet"}
           </p>
-          <p className="mx-auto mt-1.5 max-w-xs text-sm text-default-500">
+          <p className="mx-auto mt-1.5 max-w-xs text-sm text-default-600">
             {emptyMessage}
           </p>
         </div>
@@ -118,13 +118,13 @@ const PeopleList = ({
                     {person.fullName || person.username}
                   </p>
                   {person.username && (
-                    <p className="truncate text-xs text-default-500">
+                    <p className="truncate text-xs text-default-600">
                       @{person.username}
                     </p>
                   )}
                 </div>
                 {person.designation && (
-                  <span className="hidden max-w-[40%] truncate text-xs text-default-500 sm:block">
+                  <span className="hidden max-w-[40%] truncate text-xs text-default-600 sm:block">
                     {person.designation}
                   </span>
                 )}

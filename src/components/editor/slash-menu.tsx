@@ -135,7 +135,7 @@ const SlashMenu = ({ editor }: IProps) => {
       aria-label="Insert block"
     >
       {empty ? (
-        <p className="px-4 py-3 text-sm text-default-500">No matching blocks</p>
+        <p className="px-4 py-3 text-sm text-default-600">No matching blocks</p>
       ) : (
         <div ref={listRef} className="max-h-80 overflow-y-auto py-1">
           {items.map((item, index) => {
@@ -161,7 +161,7 @@ const SlashMenu = ({ editor }: IProps) => {
                   <span className="block truncate text-sm font-medium text-foreground">
                     {item.title}
                   </span>
-                  <span className="block truncate text-xs text-default-500">
+                  <span className="block truncate text-xs text-default-600">
                     {item.hint}
                   </span>
                 </span>

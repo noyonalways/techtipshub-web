@@ -14,14 +14,15 @@ const CategoryButton = ({ name }: IProps) => {
   };
 
   return (
-    <Button
-      onClick={() => handleOnClick(name)}
-      variant="flat"
-      radius="full"
-      size="sm"
-    >
-      {name}
-    </Button>
+      <Button
+        className="bg-default-100 font-medium text-foreground hover:bg-default-200"
+        onClick={() => handleOnClick(name)}
+        radius="full"
+        size="sm"
+        variant="flat"
+      >
+        {name}
+      </Button>
   );
 };
 

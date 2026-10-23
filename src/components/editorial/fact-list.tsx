@@ -26,7 +26,7 @@ export const Fact = ({
   children: ReactNode;
 }) => (
   <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-b border-default/60 py-3.5 last:border-b-0">
-    <dt className="text-sm text-default-500">{term}</dt>
+    <dt className="text-sm text-default-600">{term}</dt>
     <dd className="text-sm font-medium tabular-nums">{children}</dd>
   </div>
 );
@@ -41,11 +41,11 @@ export const FactLink = ({
   children: ReactNode;
 }) => (
   <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-b border-default/60 py-3.5 last:border-b-0">
-    <dt className="text-sm text-default-500">{term}</dt>
+    <dt className="text-sm text-default-600">{term}</dt>
     <dd className="text-sm font-medium">
       <a
         href={href}
-        className="text-primary underline-offset-4 hover:underline"
+        className="text-primary-accessible underline-offset-4 hover:underline"
       >
         {children}
       </a>

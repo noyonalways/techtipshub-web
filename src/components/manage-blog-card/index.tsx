@@ -1,4 +1,5 @@
-import { IPost } from "@/types";
+import { editBlogPath } from "@/lib/blog-routes";
+import { IBlog } from "@/types";
 import Link from "next/link";
 import { FiEdit3, FiEye } from "react-icons/fi";
 import { HiOutlineChatBubbleLeftEllipsis } from "react-icons/hi2";
@@ -6,7 +7,7 @@ import { parseHtmlContent } from "@/utils";
 import { UserDeleteBlogModal } from "../modals";
 
 interface IProps {
-  post: IPost;
+  blog: IBlog;
 }
 
 const formatDate = (value?: string) =>
@@ -18,37 +19,67 @@ const formatDate = (value?: string) =>
       })
     : null;
 
-// A stable hue per category keeps a long list scannable without a legend.
-const categoryTone = (name: string) => {
-  let hash = 0;
-  for (const char of name) hash = (hash * 31 + char.charCodeAt(0)) % 360;
-  return `hsl(${hash} 62% 42%)`;
-};
-
-const ManageBlogCard = ({ post }: IProps) => {
-  const { title, content, coverImage, createdAt, category, slug, _id } =
-    post ?? {};
+/**
+ * One article in the account list.
+ *
+ * A row, because the writer is scanning for a title they recognise: the title
+ * is the largest thing here and the whole row is the way into the editor. The
+ * excerpt and the numbers sit under it as evidence, small enough that a list of
+ * twenty stays scannable rather than turning into twenty cards.
+ *
+ * Edit is the only action given weight, since it is the one this page exists
+ * for; View and Delete are quiet until the row is hovered or focused.
+ */
+const ManageBlogCard = ({ blog }: IProps) => {
+  const { title, content, coverImage, createdAt, updatedAt, category, slug, _id } =
+    blog ?? {};
 
   const parsedContent = parseHtmlContent(content ?? "");
   const excerpt =
-    parsedContent.length > 160
-      ? `${parsedContent.substring(0, 160).trimEnd()}…`
+    parsedContent.length > 180
+      ? `${parsedContent.substring(0, 180).trimEnd()}…`
       : parsedContent;
 
+  const views = blog.totalViews ?? 0;
+  const comments = blog.totalComments ?? 0;
+  // "Edited" earns its place only when it actually happened after publishing.
+  const edited =
+    updatedAt && createdAt
+      ? new Date(updatedAt).getTime() - new Date(createdAt).getTime() > 60_000
+      : false;
+
   return (
-    <article className="group grid gap-4 border-b border-default/60 py-5 sm:grid-cols-[minmax(0,1fr)_10rem] sm:gap-6">
-      <div className="min-w-0">
-        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-xs text-default-500">
+    <article className="group relative flex gap-4 border-b border-default-200 py-5 transition-colors focus-within:bg-default-50/60 hover:bg-default-50/60 dark:focus-within:bg-default-100/5 dark:hover:bg-default-100/5">
+      {coverImage ? (
+        <Link
+          href={editBlogPath(slug)}
+          tabIndex={-1}
+          aria-hidden
+          className="hidden w-28 shrink-0 overflow-hidden rounded-[10px] border border-default-200 sm:block"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={coverImage}
+            alt=""
+            className="aspect-[16/10] h-full w-full object-cover"
+            loading="lazy"
+          />
+        </Link>
+      ) : (
+        <div
+          aria-hidden
+          className="hidden w-28 shrink-0 rounded-[10px] border border-dashed border-default-200 sm:block"
+        />
+      )}
+
+      <div className="min-w-0 flex-1">
+        <p className="flex flex-wrap items-center gap-x-2 text-xs text-default-600">
           {category?.name && (
-            <span
-              className="rounded-full border px-2 py-0.5 font-medium"
-              style={{
-                borderColor: `${categoryTone(category.name)}33`,
-                color: categoryTone(category.name),
-                backgroundColor: `${categoryTone(category.name)}0d`,
-              }}
-            >
-              {category.name}
+            <span className="font-medium text-default-700">{category.name}</span>
+          )}
+          {category?.name && createdAt && (
+            <span aria-hidden className="text-default-300">
+              ·
             </span>
           )}
           {createdAt && (
@@ -56,89 +87,59 @@ const ManageBlogCard = ({ post }: IProps) => {
               {formatDate(createdAt)}
             </time>
           )}
-        </div>
+          {edited && <span className="text-default-600">· edited</span>}
+        </p>
 
-        <h3 className="mt-2 text-pretty text-lg font-semibold leading-snug tracking-tight">
+        <h3 className="mt-1 text-pretty text-base font-semibold leading-snug text-foreground">
           <Link
-            href={`/blogs/${slug}`}
-            className="transition-colors hover:text-primary"
+            href={editBlogPath(slug)}
+            className="rounded-sm underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-300"
           >
             {title}
           </Link>
         </h3>
 
         {excerpt && (
-          <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-default-600">
+          <p className="mt-1 line-clamp-1 text-sm leading-relaxed text-default-600">
             {excerpt}
           </p>
         )}
 
-        <dl className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-default-500">
-          <div className="flex items-center gap-1.5">
-            <FiEye aria-hidden className="size-3.5 text-default-400" />
-            <dt className="sr-only">Views</dt>
-            <dd className="tabular-nums">
-              {(post.totalViews ?? 0).toLocaleString()}{" "}
-              {(post.totalViews ?? 0) === 1 ? "view" : "views"}
-            </dd>
-          </div>
-          <div className="flex items-center gap-1.5">
+        <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-default-600">
+          <span className="inline-flex items-center gap-1.5">
+            <FiEye aria-hidden className="size-3.5 text-default-600" />
+            <span className="tabular-nums">
+              {views.toLocaleString()} {views === 1 ? "view" : "views"}
+            </span>
+          </span>
+          <span className="inline-flex items-center gap-1.5">
             <HiOutlineChatBubbleLeftEllipsis
               aria-hidden
-              className="size-3.5 text-default-400"
+              className="size-3.5 text-default-600"
             />
-            <dt className="sr-only">Comments</dt>
-            <dd className="tabular-nums">
-              {(post.totalComments ?? 0).toLocaleString()}{" "}
-              {(post.totalComments ?? 0) === 1 ? "comment" : "comments"}
-            </dd>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <dt className="sr-only">Status</dt>
-            <dd className="flex items-center gap-1.5 font-medium text-success">
-              <span aria-hidden className="size-1.5 rounded-full bg-current" />
-              Published
-            </dd>
-          </div>
-        </dl>
-      </div>
+            <span className="tabular-nums">
+              {comments.toLocaleString()}{" "}
+              {comments === 1 ? "comment" : "comments"}
+            </span>
+          </span>
+          <span className="text-success-700 dark:text-success">Published</span>
 
-      <div className="flex items-center gap-3 sm:flex-col sm:items-stretch sm:justify-start">
-        {coverImage && (
-          <Link
-            href={`/blogs/${slug}`}
-            className="w-24 shrink-0 overflow-hidden rounded-lg border border-default/60 sm:order-first sm:w-full"
-            tabIndex={-1}
-            aria-hidden
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={coverImage}
-              alt=""
-              className="aspect-[16/10] w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-              loading="lazy"
-            />
-          </Link>
-        )}
-
-        {/* The publish date already labels the card, so the author row was
-            repeating the only author who can appear on this page. */}
-        <div className="grid flex-1 grid-cols-3 items-center gap-1 sm:flex-none">
-          <Link
-            href={`/settings/edit/${slug}`}
-            className="inline-flex items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-sm font-medium text-default-700 transition-colors hover:bg-default-100 hover:text-primary sm:py-1.5"
-          >
-            <FiEdit3 aria-hidden className="size-4" />
-            Edit
-          </Link>
-          <Link
-            href={`/blogs/${slug}`}
-            className="inline-flex items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-sm font-medium text-default-700 transition-colors hover:bg-default-100 sm:py-1.5"
-          >
-            <FiEye aria-hidden className="size-4" />
-            View
-          </Link>
-          <UserDeleteBlogModal id={_id} title={title} />
+          <div className="ml-auto flex items-center gap-1">
+            <Link
+              href={editBlogPath(slug)}
+              className="inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-default-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-300"
+            >
+              <FiEdit3 aria-hidden className="size-3.5" />
+              Edit
+            </Link>
+            <Link
+              href={`/blogs/${slug}`}
+              className="inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium text-default-600 transition-colors hover:bg-default-100 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-300"
+            >
+              View
+            </Link>
+            <UserDeleteBlogModal id={_id} title={title} />
+          </div>
         </div>
       </div>
     </article>

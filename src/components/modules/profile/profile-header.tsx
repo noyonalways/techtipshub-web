@@ -18,14 +18,14 @@ interface IProps {
   user: Partial<IUser>;
   /** Share / follow / edit controls rendered beside the identity. */
   actions?: ReactNode;
-  /** Path of this profile, used for the "Blog posts" link. */
-  postsHref?: string;
+  /** Path of this profile, used for the "Blogs" link. */
+  blogsHref?: string;
   /**
-   * Authoritative article count. The stored `user.totalPosts` can lag behind
+   * Authoritative article count. The stored `user.totalBlogs` can lag behind
    * (or miss) the real number of published articles, so pages that have the
    * server's count pass it here.
    */
-  postCount?: number;
+  blogCount?: number;
 }
 
 const socialIcons: Record<string, ReactNode> = {
@@ -51,7 +51,7 @@ const Stat = ({
       <span className="text-lg font-bold tabular-nums tracking-tight">
         {(value ?? 0).toLocaleString()}
       </span>
-      <span className="mt-0.5 block text-xs uppercase tracking-wider text-default-500">
+      <span className="mt-0.5 block tth-label-sm text-default-600">
         {label}
       </span>
     </>
@@ -60,7 +60,7 @@ const Stat = ({
   return href ? (
     <Link
       href={href}
-      className="block px-4 py-3 transition-colors first:pl-0 sm:first:pl-0 hover:text-primary"
+      className="block px-4 py-3 transition-colors first:pl-0 sm:first:pl-0 hover:text-primary-accessible"
     >
       {inner}
     </Link>
@@ -74,7 +74,7 @@ const Stat = ({
  * and `/profile/@…` (signed-in visitor) share the same structure; only the
  * action slot differs.
  */
-const ProfileHeader = ({ user, actions, postsHref, postCount }: IProps) => {
+const ProfileHeader = ({ user, actions, blogsHref, blogCount }: IProps) => {
   const {
     _id,
     fullName,
@@ -84,7 +84,7 @@ const ProfileHeader = ({ user, actions, postsHref, postCount }: IProps) => {
     isVerified,
     totalFollowers,
     totalFollowing,
-    totalPosts,
+    totalBlogs,
     location,
     bio,
     createdAt,
@@ -121,7 +121,7 @@ const ProfileHeader = ({ user, actions, postsHref, postCount }: IProps) => {
               </h1>
               {isVerified && (
                 <span
-                  className="inline-flex items-center gap-1 text-primary"
+                  className="inline-flex items-center gap-1 text-primary-accessible"
                   title="Verified member"
                 >
                   <MdVerified aria-hidden className="size-5" />
@@ -130,7 +130,7 @@ const ProfileHeader = ({ user, actions, postsHref, postCount }: IProps) => {
               )}
             </div>
 
-            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-default-500">
+            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-default-600">
               {username && <span>@{username}</span>}
               {designation && (
                 <>
@@ -155,8 +155,9 @@ const ProfileHeader = ({ user, actions, postsHref, postCount }: IProps) => {
         )}
       </div>
 
-      {/* Statistics */}
-      <dl className="mt-7 flex flex-wrap divide-x divide-default/60 sm:-ml-4">
+      {/* Statistics. No negative offset here: a `-ml-4` pulled the row left of
+          the page column, so it hung past the main content edge. */}
+      <dl className="mt-7 flex min-w-0 flex-wrap divide-x divide-default/60">
         <Stat
           href={username ? `/@${username}/following` : undefined}
           value={totalFollowing}
@@ -167,14 +168,14 @@ const ProfileHeader = ({ user, actions, postsHref, postCount }: IProps) => {
           value={totalFollowers}
           label="Followers"
         />
-        <Stat href={postsHref} value={postCount ?? totalPosts} label="Posts" />
+        <Stat href={blogsHref} value={blogCount ?? totalBlogs} label="Blogs" />
       </dl>
 
       {/* Facts */}
       <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-default/60 pt-5 text-sm text-default-600">
         {location && (
           <span className="inline-flex items-center gap-2">
-            <FiMapPin aria-hidden className="size-4 text-default-400" />
+            <FiMapPin aria-hidden className="size-4 text-default-600" />
             {location}
           </span>
         )}
@@ -183,7 +184,7 @@ const ProfileHeader = ({ user, actions, postsHref, postCount }: IProps) => {
           <span className="inline-flex items-center gap-2">
             <PiCalendarDotsLight
               aria-hidden
-              className="size-4 text-default-400"
+              className="size-4 text-default-600"
             />
             Member since {memberSince}
           </span>
@@ -198,7 +199,7 @@ const ProfileHeader = ({ user, actions, postsHref, postCount }: IProps) => {
                   target="_blank"
                   rel="noopener noreferrer nofollow"
                   aria-label={link.platform}
-                  className="inline-flex size-8 items-center justify-center rounded-lg text-default-500 transition-colors hover:bg-default-100 hover:text-primary"
+                  className="inline-flex size-8 items-center justify-center rounded-lg text-default-600 transition-colors hover:bg-default-100 hover:text-primary-accessible"
                 >
                   {socialIcons[link.platform] ?? link.platform}
                 </a>
@@ -207,10 +208,10 @@ const ProfileHeader = ({ user, actions, postsHref, postCount }: IProps) => {
           </ul>
         )}
 
-        {_id && postsHref && (
+        {_id && blogsHref && (
           <Link
-            href={postsHref}
-            className="ml-auto inline-flex items-center gap-1.5 font-medium text-primary underline-offset-4 hover:underline"
+            href={blogsHref}
+            className="ml-auto inline-flex items-center gap-1.5 font-medium text-primary-accessible underline-offset-4 hover:underline"
           >
             <PiArticleLight aria-hidden className="size-4" />
             Read their writing

@@ -6,19 +6,18 @@ interface IProps {
 }
 
 /**
- * Account settings shell: the site header, a sticky settings rail and a
- * narrower content column than the public pages.
+ * Account settings shell: the site header, a sticky settings rail and the
+ * content column beside it. Sits on the same page width and gutters as the
+ * feed and the editorial pages, so the rail starts where the header does.
  */
 const SettingsLayout: React.FC<IProps> = ({ children }) => {
   return (
     <>
       <Navbar />
-      <div className="mx-auto flex w-full max-w-[88rem] flex-col lg:flex-row">
+      <div className="mx-auto flex w-full max-w-page flex-col px-4 sm:px-6 lg:flex-row lg:px-8">
         <UserSidebar />
         <main className="min-w-0 flex-1">
-          <div className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 lg:px-10 lg:py-12">
-            {children}
-          </div>
+          <div className="w-full py-8 lg:pl-10 lg:py-12">{children}</div>
         </main>
       </div>
     </>

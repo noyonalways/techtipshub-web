@@ -18,6 +18,7 @@ const FollowUnFollowButton: React.FC<IProps> = ({ id }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [redirectPath, setRedirectPath] = useState("");
   const { user: loggedInUser } = useUser();
+  const isOwnProfile = Boolean(loggedInUser && loggedInUser._id === id);
   const { mutate: followUser, isPending: isFollowPending } = useFollowUser();
   const { mutate: unFollowUser, isPending: isUnFollowPending } =
     useUnfollowUser();
@@ -67,18 +68,21 @@ const FollowUnFollowButton: React.FC<IProps> = ({ id }) => {
   // Authentication modal button props
   const props = {
     size: "sm",
-    radius: "full",
+    radius: "lg",
     variant: "bordered",
-    color: "primary",
     startContent: <GoPlus className="text-lg" />,
   };
+
+  // Readers who are looking at their own profile have nothing to follow, so
+  // the control is not shipped at all rather than shown permanently disabled.
+  if (isOwnProfile) return null;
 
   return (
     <>
       {isLoading ? (
         <Button
           size="sm"
-          radius="full"
+          radius="lg"
           variant="solid"
           color="primary"
           className="w-full"
@@ -91,12 +95,10 @@ const FollowUnFollowButton: React.FC<IProps> = ({ id }) => {
               {isFollowing ? (
                 <Button
                   onClick={handleUnFollow}
-                  isDisabled={loggedInUser?._id === id}
                   size="sm"
-                  radius="full"
+                  radius="lg"
                   variant="bordered"
-                  color="primary"
-                  className="w-full"
+                  className="w-full border border-default-300 text-foreground hover:bg-default-100"
                   startContent={<HiMinus className="text-lg" />}
                 >
                   Unfollow
@@ -104,14 +106,11 @@ const FollowUnFollowButton: React.FC<IProps> = ({ id }) => {
               ) : (
                 <Button
                   onClick={handleFollow}
-                  isDisabled={
-                    loggedInUser?._id === id || loggedInUser?.role === "Admin"
-                  }
+                  isDisabled={loggedInUser?.role === "Admin"}
                   size="sm"
-                  radius="full"
+                  radius="lg"
                   variant="bordered"
-                  color="primary"
-                  className="w-full"
+                  className="w-full border border-default-300 text-foreground hover:bg-default-100"
                   startContent={<GoPlus className="text-lg" />}
                 >
                   Follow
@@ -123,7 +122,7 @@ const FollowUnFollowButton: React.FC<IProps> = ({ id }) => {
               redirect={redirectPath}
               buttonContent={"Follow"}
               {...props}
-              className="w-full"
+              className="w-full border border-default-300 text-foreground hover:bg-default-100"
             />
           )}
         </>

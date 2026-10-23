@@ -1,28 +1,28 @@
 "use client";
 
-import AdBanner from "@/components/adsense/ad-banner";
+import { AdSlot } from "@/components/adsense";
 import BlogCard from "@/components/blog-card";
 import BlogCardSkeleton from "@/components/blog-card/skeleton";
-import { getAllPosts } from "@/services/post";
-import { IPost } from "@/types";
+import { getAllBlogs } from "@/services/blog";
+import { IBlog } from "@/types";
 import { useSearchParams } from "next/navigation";
 import { Fragment, useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 
 interface IProps {
-  initialPosts: IPost[];
+  initialBlogs: IBlog[];
 }
 
-const FeedPosts = ({ initialPosts }: IProps) => {
+const FeedBlogs = ({ initialBlogs }: IProps) => {
   const searchParams = useSearchParams();
 
   const [page, setPage] = useState(2);
-  const [posts, setPosts] = useState<IPost[]>(initialPosts);
+  const [blogs, setBlogs] = useState<IBlog[]>(initialBlogs);
   const [hasMore, setHasMore] = useState(true);
   const { ref, inView } = useInView();
 
-  // Function to load more posts
-  const loadMorePosts = async () => {
+  // Function to load more blogs
+  const loadMoreBlogs = async () => {
     if (!hasMore) return;
 
     const params: { page: string; limit: string; [key: string]: string } = {
@@ -37,34 +37,34 @@ const FeedPosts = ({ initialPosts }: IProps) => {
     if (category) params.category = category;
 
     try {
-      const data = await getAllPosts(params);
-      const newPosts = data?.data || [];
+      const data = await getAllBlogs(params);
+      const newBlogs = data?.data || [];
 
-      setPosts((prevPosts) => [...prevPosts, ...newPosts]);
+      setBlogs((prevBlogs) => [...prevBlogs, ...newBlogs]);
       setPage((prevPage) => prevPage + 1);
 
-      // Stop further fetching if fewer posts than the limit are returned
-      if (newPosts.length < 5) {
+      // Stop further fetching if fewer blogs than the limit are returned
+      if (newBlogs.length < 5) {
         setHasMore(false);
       }
     } catch (error) {
-      console.error("Failed to load more posts:", error);
+      console.error("Failed to load more blogs:", error);
       setHasMore(false);
     }
   };
 
-  // A new server query (search/category/page) ships a new `initialPosts`.
+  // A new server query (search/category/page) ships a new `initialBlogs`.
   // Reset pagination from that, so infinite scroll starts clean instead of
   // appending a second copy of page 2.
   useEffect(() => {
-    setPosts(initialPosts);
+    setBlogs(initialBlogs);
     setPage(2);
-    setHasMore(initialPosts.length > 0);
-  }, [initialPosts]);
+    setHasMore(initialBlogs.length > 0);
+  }, [initialBlogs]);
 
   useEffect(() => {
     if (inView && hasMore) {
-      loadMorePosts();
+      loadMoreBlogs();
     }
   }, [inView, hasMore]);
 
@@ -80,39 +80,44 @@ const FeedPosts = ({ initialPosts }: IProps) => {
   return (
     <div className="w-full">
       <header className="mb-6 border-b border-default/60 pb-4">
-        <h1 className="text-3xl font-bold tracking-tight">{heading}</h1>
-        <p className="mt-1 text-sm text-default-500">
+        <h1 className="font-[family-name:var(--type-editorial)] text-3xl font-semibold leading-[1.1] tracking-[-0.01em]">{heading}</h1>
+        <p className="mt-1 text-sm text-default-600">
           {searchTerm || categoryParam
             ? "Articles matching your filters, newest first."
-            : "New and noteworthy writing from the TechTips Hub community."}
+            : "New and noteworthy writing from the TechTipsHub community."}
         </p>
       </header>
       <div className="divide-y divide-default/60">
-        {posts?.map((post, index) => (
-          <Fragment key={post?._id}>
+        {blogs?.map((blog, index) => (
+          <Fragment key={blog?._id}>
             <div className="py-6 first:pt-0">
-              <BlogCard {...post} />
+              <BlogCard {...blog} />
             </div>
-            {posts.length > 4 && (index + 1) % 4 === 0 && (
-              <div className="py-6">
-                <AdBanner />
+            {/* One unit per four cards, after the fourth card. The leading
+                `blogs.length > 4` check keeps a short feed ad free. */}
+            {blogs.length > 4 && (index + 1) % 4 === 0 && (
+              <div className="pb-6">
+                <AdSlot
+                  placement="feed-inline"
+                  className="mt-0 rounded-[10px] border border-default/60 bg-default-50/30 px-3 pb-3"
+                />
               </div>
             )}
           </Fragment>
         ))}
       </div>
-      <div className="py-6 text-center text-sm text-default-500" ref={ref}>
+      <div className="py-6 text-center text-sm text-default-600" ref={ref}>
         {hasMore ? (
           <div className="space-y-6">
             <BlogCardSkeleton />
             <BlogCardSkeleton />
           </div>
         ) : (
-          posts.length > 0 && "You've reached the end of the feed."
+          blogs.length > 0 && "You've reached the end of the feed."
         )}
       </div>
     </div>
   );
 };
 
-export default FeedPosts;
+export default FeedBlogs;

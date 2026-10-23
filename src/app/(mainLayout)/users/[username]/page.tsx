@@ -1,14 +1,13 @@
-import AdSlot from "@/components/adsense/ad-slot";
-import AdBanner from "@/components/adsense/ad-banner";
+import { AdSlot } from "@/components/adsense";
 import ProfileHeader from "@/components/modules/profile/profile-header";
 import ProfileArticleList from "@/components/modules/profile/profile-article-list";
 import ButtonLink from "@/components/ui/button-link";
 import Container from "@/components/ui/container";
 import FollowUnFollowButton from "@/components/ui/follow-unfollow-button";
 import ProfileShareDropdown from "@/components/ui/profile-share-dropdown";
-import { getPostsByUserId } from "@/services/post";
+import { getBlogsByUserId } from "@/services/blog";
 import { getUserByUsername } from "@/services/user";
-import { IPost, IUser } from "@/types";
+import { IBlog, IUser } from "@/types";
 import { Metadata } from "next";
 import { BiSupport } from "react-icons/bi";
 
@@ -34,10 +33,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: `${fullName} (@${actualUsername})`,
-    description: `Read articles by ${fullName} on TechTips Hub — tutorials and field notes from the tech community.`,
+    description: `Read articles by ${fullName} on TechTipsHub — tutorials and field notes from the tech community.`,
     openGraph: {
       title: `${fullName} (@${actualUsername})`,
-      description: `Read articles by ${fullName} on TechTips Hub.`,
+      description: `Read articles by ${fullName} on TechTipsHub.`,
       url: `/users/@${actualUsername}`,
       images: profilePicture ? [{ url: profilePicture }] : [],
     },
@@ -55,7 +54,7 @@ const GetUserByIdPage = async ({ params }: Props) => {
       <section className="py-16 lg:py-24">
         <Container>
           <div className="mx-auto max-w-md text-center">
-            <p className="text-sm font-medium uppercase tracking-wider text-primary">
+            <p className="tth-label text-primary-accessible">
               404
             </p>
             <h1 className="mt-3 text-2xl font-bold tracking-tight">
@@ -69,7 +68,7 @@ const GetUserByIdPage = async ({ params }: Props) => {
                 Back to the feed
               </ButtonLink>
               <ButtonLink
-                href="/contact-us"
+                href="/contact"
                 radius="lg"
                 variant="bordered"
                 startContent={<BiSupport />}
@@ -83,24 +82,24 @@ const GetUserByIdPage = async ({ params }: Props) => {
     );
   }
 
-  const postsData = await getPostsByUserId(user._id, {
+  const blogsData = await getBlogsByUserId(user._id, {
     limit: String(PROFILE_PAGE_SIZE),
     page: "1",
   }).catch(() => null);
-  const posts = Array.isArray(postsData?.data)
-    ? (postsData.data as IPost[])
+  const blogs = Array.isArray(blogsData?.data)
+    ? (blogsData.data as IBlog[])
     : [];
-  const totalPosts = Number.isFinite(Number(postsData?.meta?.total))
-    ? Number(postsData?.meta?.total)
-    : posts.length;
+  const totalBlogs = Number.isFinite(Number(blogsData?.meta?.total))
+    ? Number(blogsData?.meta?.total)
+    : blogs.length;
 
   return (
     <section className="py-10 lg:py-14">
       <Container>
-        <div className="mx-auto max-w-4xl">
+        <div>
           <ProfileHeader
             user={user}
-            postCount={totalPosts}
+            blogCount={totalBlogs}
             actions={
               <>
                 <ProfileShareDropdown />
@@ -117,28 +116,28 @@ const GetUserByIdPage = async ({ params }: Props) => {
               >
                 Articles
               </h2>
-              <p className="text-sm tabular-nums text-default-500">
-                {totalPosts === 1
+              <p className="text-sm tabular-nums text-default-600">
+                {totalBlogs === 1
                   ? "1 published article · newest first"
-                  : `${totalPosts.toLocaleString()} published articles · newest first`}
+                  : `${totalBlogs.toLocaleString()} published articles · newest first`}
               </p>
             </div>
 
             <div className="mt-5">
               <ProfileArticleList
                 userId={user._id}
-                initialPosts={posts}
-                total={totalPosts}
+                initialBlogs={blogs}
+                total={totalBlogs}
                 emptyMessage={`${user.fullName || "This member"} has not published an article yet.`}
               />
             </div>
           </section>
 
-          <div className="mt-12">
-            <AdSlot>
-              <AdBanner />
-            </AdSlot>
-          </div>
+          {/* A profile with fewer than three published articles has no list to
+              frame an ad: nothing to put the unit after. */}
+          {totalBlogs >= 3 && (
+            <AdSlot variant="display" placement="member-profile-end" />
+          )}
         </div>
       </Container>
     </section>

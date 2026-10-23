@@ -3,7 +3,7 @@
 import { useEditor } from "@tiptap/react";
 import type { Editor } from "@tiptap/core";
 import { editorExtensions } from "./editor-extensions";
-import { serializePostHTML } from "./extensions";
+import { serializeBlogHTML } from "./extensions";
 
 interface IProps {
   value: string;
@@ -18,8 +18,8 @@ interface IProps {
  * value against the editor must compare against this — `editor.getHTML()` is
  * the un-serialised form and differs for lists and quotes.
  */
-export const getPostHTML = (editor: Editor) =>
-  serializePostHTML(editor.getHTML());
+export const getBlogHTML = (editor: Editor) =>
+  serializeBlogHTML(editor.getHTML());
 
 /**
  * Creates the blog editor.
@@ -83,9 +83,9 @@ export const useBlogEditor = ({ value, onChange, editable = true }: IProps) =>
         },
       },
       onUpdate: ({ editor }) => {
-        // `getHTML()` is the schema's own output; `serializePostHTML` only
+        // `getHTML()` is the schema's own output; `serializeBlogHTML` only
         // restores the paragraph/`<li>` shape the site has always stored.
-        onChange(getPostHTML(editor));
+        onChange(getBlogHTML(editor));
       },
     },
     [],

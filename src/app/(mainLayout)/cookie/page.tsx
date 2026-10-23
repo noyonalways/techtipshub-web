@@ -7,12 +7,12 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Cookie Policy",
   description:
-    "The cookies TechTips Hub uses for sign-in, analytics and advertising, how long they last, and how to control them.",
+    "The cookies TechTipsHub uses for sign-in, analytics and advertising, how long they last, and how to control them.",
   alternates: { canonical: "/cookie" },
   openGraph: {
     title: "Cookie Policy",
     description:
-      "The cookies TechTips Hub uses for sign-in, analytics and advertising, and how to control them.",
+      "The cookies TechTipsHub uses for sign-in, analytics and advertising, and how to control them.",
     url: "/cookie",
   },
 };
@@ -30,7 +30,7 @@ const sections: ILegalSection[] = [
           local storage, which this site uses for your theme choice.
         </p>
         <p>
-          This policy explains which cookies TechTips Hub sets, which are set by
+          This policy explains which cookies TechTipsHub sets, which are set by
           third parties such as Google, what each is for, and how you can
           control them. It should be read with our{" "}
           <Link href="/privacy">Privacy Policy</Link>.
@@ -63,7 +63,7 @@ const sections: ILegalSection[] = [
                 <td>
                   <code>tth_access_token</code>
                 </td>
-                <td>TechTips Hub</td>
+                <td>TechTipsHub</td>
                 <td>
                   Holds your signed-in session so you can publish, comment and
                   vote. HTTP-only and secure in production.
@@ -74,7 +74,7 @@ const sections: ILegalSection[] = [
                 <td>
                   <code>tth_refresh_token</code>
                 </td>
-                <td>TechTips Hub</td>
+                <td>TechTipsHub</td>
                 <td>
                   Renews your session when the access token expires. HTTP-only
                   and secure in production.
@@ -192,7 +192,7 @@ const sections: ILegalSection[] = [
     content: (
       <>
         <p>
-          Advertising through Google AdSense keeps TechTips Hub free to read.
+          Advertising through Google AdSense keeps TechTipsHub free to read.
           Google and its partners may set cookies to serve ads based on your
           earlier visits to this and other sites, to limit repetition and to
           measure performance.
@@ -290,7 +290,7 @@ const sections: ILegalSection[] = [
         </p>
         <ul>
           <li>
-            <strong>Payments.</strong> TechTips Hub is free and does not run a
+            <strong>Payments.</strong> TechTipsHub is free and does not run a
             checkout. If you follow a link to a payment or contribution page, or
             are redirected to one while reporting a charge made in error, that
             provider sets its own cookies on its domain under its own cookie and
@@ -400,7 +400,7 @@ const sections: ILegalSection[] = [
           <a href={`mailto:${legalConfig.contactEmail}`}>
             {legalConfig.contactEmail}
           </a>{" "}
-          or use the <Link href="/contact-us">contact form</Link>.
+          or use the <Link href="/contact">contact form</Link>.
         </p>
       </>
     ),
@@ -412,7 +412,7 @@ const CookiePolicyPage = () => {
     <LegalPage
       currentHref="/cookie"
       sections={sections}
-      summary="A plain-language list of the cookies behind sign-in, analytics and advertising on TechTips Hub, with the controls available to you."
+      summary="A plain-language list of the cookies behind sign-in, analytics and advertising on TechTipsHub, with the controls available to you."
       title="Cookie Policy"
     />
   );

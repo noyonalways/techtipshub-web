@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <rect width="1200" height="630" fill="#141315"/>
+  <g transform="translate(96 150)">
+             <rect x="0" y="0" width="228" height="228" rx="16" fill="none" stroke="#F2A93B" stroke-width="8"/>
+             <rect x="78" y="78" width="72" height="72" rx="6" fill="#F2A93B"/>
+           </g>
+           <rect x="392" y="168" width="560" height="16" rx="4" fill="#FCFAF6" opacity="0.85"/><rect x="392" y="212" width="520" height="16" rx="4" fill="#FCFAF6" opacity="0.26"/><rect x="392" y="256" width="220" height="16" rx="4" fill="#F2A93B" opacity="1"/><rect x="392" y="300" width="440" height="16" rx="4" fill="#FCFAF6" opacity="0.26"/>
+           <rect x="392" y="356" width="128" height="76" rx="8" fill="none" stroke="#9C948A" stroke-width="3" opacity="0.5"/><rect x="568" y="356" width="128" height="76" rx="8" fill="none" stroke="#9C948A" stroke-width="3" opacity="0.5"/><rect x="744" y="356" width="128" height="76" rx="8" fill="none" stroke="#9C948A" stroke-width="3" opacity="0.5"/>
+  <rect x="980" y="72" width="112" height="34" rx="6" fill="none" stroke="#F2A93B" stroke-width="2"/>
+  <text x="1036" y="95" text-anchor="middle" font-family="Archivo, Inter, system-ui, sans-serif" font-weight="600" font-size="15" letter-spacing="1.6" fill="#F2A93B">AI TOOLS</text>
+  <line x1="80" y1="552" x2="1120" y2="552" stroke="#302B31" stroke-width="2"/>
+  <g transform="translate(80 572) scale(0.245)"><rect x="26" y="26" width="76" height="76" rx="14" fill="#F2A93B"/><path d="M42 44h44v11H75v27H63V55H53v27H42V55z" fill="#141315"/></g>
+  <text x="128" y="606" font-family="Fraunces" font-weight="700" font-size="27" letter-spacing="-0.5" fill="#FCFAF6">TechTips<tspan fill="#F2A93B">Hub</tspan></text>
+  <text x="1120" y="604" text-anchor="end" font-family="Archivo, Inter, system-ui, sans-serif" font-weight="600" font-size="15" letter-spacing="2.6" fill="#9C948A">WRITING FOR BUILDERS</text>
+</svg>

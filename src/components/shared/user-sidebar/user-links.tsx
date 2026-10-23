@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { HiOutlineUserCircle } from "react-icons/hi2";
 import { MdOutlineArticle } from "react-icons/md";
+import { manageBlogsPath } from "@/lib/blog-routes";
 
 interface ILink {
   id: string;
@@ -20,22 +21,17 @@ export const userLinks: ILink[] = [
   },
   {
     id: "02",
-    label: "Manage Blogs",
-    href: "/settings/manage-blogs",
-    description: "Edit or delete your published posts",
+    label: "My articles",
+    href: manageBlogsPath,
+    description: "Edit or delete your published blogs",
     icon: <MdOutlineArticle size={18} />,
   },
 ];
 
 /**
- * Pages that sit under a nav section without being in it — the article editor
- * lives under "Manage Blogs". They keep the section highlighted but describe
- * themselves in the header and the "On this page" note.
+ * Pages that sit under a nav section without being in it.
+ *
+ * The article editor used to live under this rail; it now opens from
+ * `/me/blogs/<slug>/edit` and describes itself on its own screen.
  */
-export const sectionPages = {
-  editor: {
-    label: "Edit article",
-    description:
-      "Rewrite the piece, swap the cover or retune its category and tags",
-  },
-};
+export const sectionPages: Record<string, never> = {};

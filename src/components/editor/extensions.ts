@@ -13,8 +13,8 @@ import { common, createLowlight } from "lowlight";
 /**
  * Editor extensions shared by the composer and the read-only renderer.
  *
- * Posts are stored as HTML, so the schema here is also the contract for how
- * existing (Quill-era) posts are normalised. Anything this file gets wrong is a
+ * Blogs are stored as HTML, so the schema here is also the contract for how
+ * existing (Quill-era) blogs are normalised. Anything this file gets wrong is a
  * silent edit to content people have already published, which is why the tight
  * list handling below exists at all.
  */
@@ -86,10 +86,10 @@ const InlineCode = Code.extend({
 /**
  * Tight lists.
  *
- * Every existing post was written as a tight list (`<li>text</li>`), and the
+ * Every existing blog was written as a tight list (`<li>text</li>`), and the
  * site styles `<li>` and `<p>` differently. Tiptap's listItem requires a
  * paragraph child, so an unmodified save emits `<li><p>text</p></li>` — +270
- * paragraphs across current posts — and visibly changes every list on the site.
+ * paragraphs across current blogs — and visibly changes every list on the site.
  *
  * The paragraph stays a real `<p>` in the DOM: the caret, native typing and the
  * browser's block handling all depend on real block elements (inline spans put
@@ -99,7 +99,7 @@ const InlineCode = Code.extend({
 
 /**
  * Rewrites saved HTML so list items and single-paragraph quotes stay in the
- * tight form the posts were authored in: `<li>text</li>`, not
+ * tight form the blogs were authored in: `<li>text</li>`, not
  * `<li><p>text</p></li>`.
  *
  * Only a paragraph that is the item's own first child is unwrapped; anything
@@ -118,7 +118,7 @@ export const listItemsTight = (html: string) =>
     );
 
 /** Serialises the composer's HTML into the stored format. */
-export const serializePostHTML = (html: string) => listItemsTight(html);
+export const serializeBlogHTML = (html: string) => listItemsTight(html);
 
 /**
  * Notion-style shortcuts beyond what StarterKit ships: `--- ` → horizontal rule.
@@ -167,11 +167,11 @@ const MarkdownShortcuts = Extension.create({
 /**
  * Headings from the old editor carry `class="ql-align-center"` (Quill's
  * alignment). TextAlign only reads inline `text-align` styles, so without this
- * the alignment is silently dropped when a post is next saved.
+ * the alignment is silently dropped when a blog is next saved.
  *
  * Only the three non-default alignments are recognised: left alignment is the
  * default, and treating `ql-align-left` as an attribute would add
- * `style="text-align: left"` to posts that do not have it today.
+ * `style="text-align: left"` to blogs that do not have it today.
  */
 const AlignWithLegacyClasses = TextAlign.configure({ types: ["heading", "paragraph"] }).extend({
   addGlobalAttributes() {
@@ -204,7 +204,7 @@ const AlignWithLegacyClasses = TextAlign.configure({ types: ["heading", "paragra
  * `<span style="color: var(--tw-prose-bold)">` instead of `<strong>`.
  * The span carries no style the site needs — only the weight — so map it to
  * the bold mark. Without this the text silently loses its emphasis when the
- * post is saved from the new editor.
+ * blog is saved from the new editor.
  */
 const LegacyBoldSpan = Bold.extend({
   parseHTML() {

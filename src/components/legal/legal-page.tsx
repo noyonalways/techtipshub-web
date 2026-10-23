@@ -20,16 +20,17 @@ interface IProps {
 }
 
 const tocLinkClasses =
-  "block border-l border-default/60 py-1.5 pl-4 text-sm leading-snug text-default-600 transition-colors hover:border-primary hover:text-primary";
+  "block border-l border-default/60 py-1.5 pl-4 text-sm leading-snug text-default-600 transition-colors hover:border-primary-600 hover:text-primary-accessible";
 
 /**
  * Shared shell for every legal document: hero, sticky contents rail, prose
  * body and cross-links to the other policies. Server-rendered on purpose —
  * these pages carry no interactivity and should stay cheap and crawlable.
  *
- * The body sits at a comfortable reading measure with the contents pinned to
- * its left, so the text starts where the title starts rather than floating in
- * the middle of the viewport.
+ * The page uses the site's page container, so the hero, the contents rail and
+ * the body all start on the same left edge as the header and the footer. The
+ * body runs to the full column beside the rail rather than being capped at a
+ * narrower measure, which is what left the prose floating away from its title.
  */
 const LegalPage = ({ title, summary, sections, currentHref }: IProps) => {
   const otherPages = legalPages.filter((page) => page.href !== currentHref);
@@ -46,7 +47,7 @@ const LegalPage = ({ title, summary, sections, currentHref }: IProps) => {
               title={title}
               lede={summary}
               meta={
-                <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-default/60 pt-5 text-sm text-default-500">
+                <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-default/60 pt-5 text-sm text-default-600">
                   <span>
                     Last updated{" "}
                     <time
@@ -58,7 +59,7 @@ const LegalPage = ({ title, summary, sections, currentHref }: IProps) => {
                   </span>
                   <a
                     href={`mailto:${legalConfig.contactEmail}`}
-                    className="inline-flex items-center gap-1.5 font-medium text-primary underline-offset-4 hover:underline"
+                    className="inline-flex items-center gap-1.5 font-medium text-primary-accessible underline-offset-4 hover:underline"
                   >
                     <BiEnvelope aria-hidden className="size-4" />
                     Ask a question
@@ -71,7 +72,7 @@ const LegalPage = ({ title, summary, sections, currentHref }: IProps) => {
       </section>
 
       <Container>
-        <div className="grid gap-10 py-12 lg:grid-cols-[15rem_minmax(0,42rem)] lg:gap-16 lg:py-16">
+        <div className="grid gap-10 py-12 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-16 lg:py-16">
           {/* Contents rail */}
           <aside className="lg:sticky lg:top-[calc(var(--header-height)+2rem)] lg:max-h-[calc(100dvh-var(--header-height)-4rem)] lg:self-start lg:overflow-y-auto lg:pr-2">
             <details className="rounded-xl border border-default/60 bg-default-50/60 px-4 py-3 lg:hidden">
@@ -93,7 +94,7 @@ const LegalPage = ({ title, summary, sections, currentHref }: IProps) => {
             </details>
 
             <nav aria-label="On this page" className="hidden lg:block">
-              <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-default-500">
+              <h2 className="tth-label">
                 On this page
               </h2>
               <ol className="mt-3 space-y-0.5">
@@ -107,7 +108,7 @@ const LegalPage = ({ title, summary, sections, currentHref }: IProps) => {
               </ol>
 
               <div className="mt-8 border-t border-default/60 pt-5">
-                <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-default-500">
+                <h2 className="tth-label">
                   All policies
                 </h2>
                 <ul className="mt-3 space-y-2 text-sm text-default-600">
@@ -120,8 +121,8 @@ const LegalPage = ({ title, summary, sections, currentHref }: IProps) => {
                         }
                         className={
                           page.href === currentHref
-                            ? "font-medium text-primary"
-                            : "transition-colors hover:text-primary"
+                            ? "font-medium text-primary-accessible"
+                            : "transition-colors hover:text-primary-accessible"
                         }
                       >
                         {page.label}
@@ -136,7 +137,7 @@ const LegalPage = ({ title, summary, sections, currentHref }: IProps) => {
           {/* Document */}
           <div className="min-w-0">
             <article
-              className="prose prose-neutral max-w-none dark:prose-invert prose-headings:font-semibold prose-headings:tracking-tight prose-h2:mt-12 prose-h2:mb-3 prose-h2:border-t prose-h2:border-default/60 prose-h2:pt-8 prose-h2:text-xl prose-h2:first:mt-0 prose-h2:first:border-t-0 prose-h2:first:pt-0 prose-h3:mt-6 prose-h3:text-base prose-p:leading-relaxed prose-p:text-default-600 prose-li:leading-relaxed prose-li:text-default-600 prose-strong:text-foreground prose-a:font-medium prose-a:text-primary prose-a:underline-offset-4 prose-th:pb-2 prose-th:text-left prose-td:py-2.5 prose-td:align-top prose-table:text-sm prose-code:rounded prose-code:bg-default-100 prose-code:px-1 prose-code:py-0.5 prose-code:font-medium prose-code:text-[0.85em] prose-code:text-foreground prose-code:before:content-none prose-code:after:content-none [&_tbody_tr]:border-default/60 [&_tbody_tr:last-child]:border-0"
+              className="prose prose-neutral max-w-none dark:prose-invert prose-headings:font-semibold prose-headings:tracking-tight prose-h2:mt-12 prose-h2:mb-3 prose-h2:border-t prose-h2:border-default/60 prose-h2:pt-8 prose-h2:text-xl prose-h2:first:mt-0 prose-h2:first:border-t-0 prose-h2:first:pt-0 prose-h3:mt-6 prose-h3:text-base prose-p:leading-relaxed prose-p:text-default-600 prose-li:leading-relaxed prose-li:text-default-600 prose-strong:text-foreground prose-a:font-medium prose-a:text-primary-accessible prose-a:underline-offset-4 prose-th:pb-2 prose-th:text-left prose-td:py-2.5 prose-td:align-top prose-table:text-sm prose-code:rounded prose-code:bg-default-100 prose-code:px-1 prose-code:py-0.5 prose-code:font-medium prose-code:text-[0.85em] prose-code:text-foreground prose-code:before:content-none prose-code:after:content-none [&_tbody_tr]:border-default/60 [&_tbody_tr:last-child]:border-0"
             >
               {sections.map((section) => (
                 <section
@@ -160,7 +161,7 @@ const LegalPage = ({ title, summary, sections, currentHref }: IProps) => {
                 Write to us at{" "}
                 <a
                   href={`mailto:${legalConfig.contactEmail}`}
-                  className="font-medium text-primary underline-offset-4 hover:underline"
+                  className="font-medium text-primary-accessible underline-offset-4 hover:underline"
                 >
                   {legalConfig.contactEmail}
                 </a>{" "}
@@ -181,7 +182,7 @@ const LegalPage = ({ title, summary, sections, currentHref }: IProps) => {
 
             {/* Other policies */}
             <nav aria-label="Other policies" className="mt-10">
-              <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-default-500">
+              <h2 className="tth-label">
                 Other policies
               </h2>
               <ul className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -189,16 +190,16 @@ const LegalPage = ({ title, summary, sections, currentHref }: IProps) => {
                   <li key={page.href}>
                     <Link
                       href={page.href}
-                      className="group flex h-full flex-col rounded-xl border border-default/60 p-4 transition-colors hover:border-primary/40 hover:bg-primary/5"
+                      className="group flex h-full flex-col rounded-xl border border-default/60 p-4 transition-colors hover:border-primary-600/50 hover:bg-primary/5"
                     >
                       <span className="flex items-center justify-between gap-2 text-sm font-semibold">
                         {page.label}
                         <BiLinkExternal
                           aria-hidden
-                          className="size-4 shrink-0 text-default-400 transition-colors group-hover:text-primary"
+                          className="size-4 shrink-0 text-default-600 transition-colors group-hover:text-primary-accessible"
                         />
                       </span>
-                      <span className="mt-1 text-xs leading-relaxed text-default-500">
+                      <span className="mt-1 text-xs leading-relaxed text-default-600">
                         {page.description}
                       </span>
                     </Link>

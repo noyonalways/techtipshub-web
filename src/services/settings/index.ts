@@ -1,7 +1,7 @@
 "use server";
 
 import { cache } from "react";
-import { getLoggedInUserPosts } from "@/services/post";
+import { getLoggedInUserBlogs } from "@/services/blog";
 
 /** Numbers for the settings page's "at a glance" panel. */
 export interface IAccountSummary {
@@ -11,7 +11,7 @@ export interface IAccountSummary {
   newest: { title: string; slug: string; createdAt: string } | null;
 }
 
-interface ILitePost {
+interface ILiteBlog {
   title?: string;
   slug?: string;
   createdAt?: string;
@@ -32,25 +32,25 @@ const SUMMARY_PAGE_SIZE = "500";
  * way a stored counter could.
  */
 export const getAccountSummary = cache(async (): Promise<IAccountSummary> => {
-  const data = await getLoggedInUserPosts({ limit: SUMMARY_PAGE_SIZE }).catch(
+  const data = await getLoggedInUserBlogs({ limit: SUMMARY_PAGE_SIZE }).catch(
     () => null,
   );
 
-  const posts = Array.isArray(data?.data) ? (data.data as ILitePost[]) : [];
+  const blogs = Array.isArray(data?.data) ? (data.data as ILiteBlog[]) : [];
   const total = Number(data?.meta?.total);
 
-  const newest = posts.reduce<ILitePost | null>((latest, post) => {
-    if (!post.createdAt) return latest;
-    if (!latest?.createdAt) return post;
-    return new Date(post.createdAt) > new Date(latest.createdAt) ? post : latest;
+  const newest = blogs.reduce<ILiteBlog | null>((latest, blog) => {
+    if (!blog.createdAt) return latest;
+    if (!latest?.createdAt) return blog;
+    return new Date(blog.createdAt) > new Date(latest.createdAt) ? blog : latest;
   }, null);
 
   return {
     // The server's own total is authoritative when it is present; the loaded
     // rows are the fallback for an older API build.
-    articles: Number.isFinite(total) ? total : posts.length,
-    views: posts.reduce((sum, post) => sum + (post.totalViews ?? 0), 0),
-    comments: posts.reduce((sum, post) => sum + (post.totalComments ?? 0), 0),
+    articles: Number.isFinite(total) ? total : blogs.length,
+    views: blogs.reduce((sum, blog) => sum + (blog.totalViews ?? 0), 0),
+    comments: blogs.reduce((sum, blog) => sum + (blog.totalComments ?? 0), 0),
     newest:
       newest?.title && newest.slug && newest.createdAt
         ? {

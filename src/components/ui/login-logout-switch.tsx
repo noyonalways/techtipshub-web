@@ -12,7 +12,7 @@ const LoginLogoutSwitch = () => {
       {user ? (
         <NavarDropdown />
       ) : (
-        <div className="flex items-center gap-1">
+        <div className="hidden items-center gap-1 sm:flex">
           <NextLink
             className={`${buttonStyles({
               radius: "full",
@@ -21,7 +21,7 @@ const LoginLogoutSwitch = () => {
             })} hidden font-medium duration-200 hover:bg-default-100 active:scale-95 sm:inline-flex`}
             href={`/login`}
           >
-            Log In
+            Log in
           </NextLink>
           <NextLink
             className={`${buttonStyles({
@@ -29,10 +29,10 @@ const LoginLogoutSwitch = () => {
               radius: "full",
               variant: "solid",
               size: "sm",
-            })} font-medium duration-200 active:scale-95`}
+            })} hidden font-medium duration-200 active:scale-95 sm:inline-flex`}
             href={`/signup`}
           >
-            Sign Up
+            Sign up
           </NextLink>
         </div>
       )}
