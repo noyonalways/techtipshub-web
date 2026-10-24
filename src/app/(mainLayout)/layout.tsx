@@ -1,26 +1,21 @@
-import Footer from "@/components/shared/footer";
 import { Navbar } from "@/components/shared/navbar";
-import { getCurrentUser } from "@/services/auth";
+import Footer from "@/components/shared/footer";
 
-interface IProps {
-  children: React.ReactNode;
-}
-
-const MainLayout: React.FC<IProps> = async ({ children }) => {
-  // The footer offers "Following" only to a reader who can open it. A short
-  // signed-in flag, not the user record, so nothing else travels to the client.
-  // A malformed cookie is a signed-out visitor, never a crashed layout.
-  const isSignedIn = await getCurrentUser()
-    .then(Boolean)
-    .catch(() => false);
-
-  return (
-    <>
-      <Navbar />
-      {children}
-      <Footer isSignedIn={isSignedIn} />
-    </>
-  );
-};
+/**
+ * The main site shell.
+ *
+ * It renders no request data: the footer's one signed-in link ("Following") is
+ * added by the browser after hydration, from the session the `UserProvider`
+ * already loads for the navigation bar. Reading the cookie here instead would
+ * make every page under this layout render per request, which costs more than
+ * that one link is worth.
+ */
+const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <>
+    <Navbar />
+    {children}
+    <Footer />
+  </>
+);
 
 export default MainLayout;

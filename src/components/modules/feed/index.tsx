@@ -11,15 +11,24 @@ import { useInView } from "react-intersection-observer";
 
 interface IProps {
   initialBlogs: IBlog[];
+  /** Set by `/categories/<name>`: the filter is in the URL, not a query. */
+  category?: string;
+  /** Set by `/search`: the term is in the URL, not a query. */
+  searchTerm?: string;
 }
 
-const FeedBlogs = ({ initialBlogs }: IProps) => {
+const FeedBlogs = ({ initialBlogs, category, searchTerm }: IProps) => {
   const searchParams = useSearchParams();
 
   const [page, setPage] = useState(2);
   const [blogs, setBlogs] = useState<IBlog[]>(initialBlogs);
   const [hasMore, setHasMore] = useState(true);
   const { ref, inView } = useInView();
+
+  // The page that rendered this list owns the filter; the query string is only
+  // consulted when it did not supply one.
+  const activeSearch = searchTerm || searchParams.get("search") || undefined;
+  const activeCategory = category || searchParams.get("category") || undefined;
 
   // Function to load more blogs
   const loadMoreBlogs = async () => {
@@ -31,10 +40,8 @@ const FeedBlogs = ({ initialBlogs }: IProps) => {
     };
 
     // Add searchTerm and category only if they are truthy
-    const searchTerm = searchParams.get("search");
-    const category = searchParams.get("category");
-    if (searchTerm) params.searchTerm = searchTerm;
-    if (category) params.category = category;
+    if (activeSearch) params.searchTerm = activeSearch;
+    if (activeCategory) params.category = activeCategory;
 
     try {
       const data = await getAllBlogs(params);
@@ -68,11 +75,11 @@ const FeedBlogs = ({ initialBlogs }: IProps) => {
     }
   }, [inView, hasMore]);
 
-  const categoryParam = searchParams.get("category");
-  const searchTerm = searchParams.get("search");
+  const categoryParam = activeCategory;
+  const searchTermParam = activeSearch;
 
-  const heading = searchTerm
-    ? `Results for “${searchTerm}”`
+  const heading = searchTermParam
+    ? `Results for "${searchTermParam}"`
     : categoryParam
       ? categoryParam.replace(/-/g, " ")
       : "Latest";
@@ -82,7 +89,7 @@ const FeedBlogs = ({ initialBlogs }: IProps) => {
       <header className="mb-6 border-b border-default/60 pb-4">
         <h1 className="font-[family-name:var(--type-editorial)] text-3xl font-semibold leading-[1.1] tracking-[-0.01em]">{heading}</h1>
         <p className="mt-1 text-sm text-default-600">
-          {searchTerm || categoryParam
+          {searchTermParam || categoryParam
             ? "Articles matching your filters, newest first."
             : "New and noteworthy writing from the TechTipsHub community."}
         </p>

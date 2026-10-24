@@ -4,6 +4,7 @@ import { Metadata, Viewport } from "next";
 import { fontDisplay, fontSans } from "@/config/fonts";
 import { Providers } from "../providers";
 import { siteConfig } from "@/config/site";
+import { siteOrigin } from "@/lib/seo";
 import AdSense from "@/components/adsense";
 import { GoogleTagManager, GoogleAnalytics } from "@next/third-parties/google";
 
@@ -13,7 +14,7 @@ import { GoogleTagManager, GoogleAnalytics } from "@next/third-parties/google";
  * block: og image, icons, manifest, theme colour.
  */
 export const metadata: Metadata = {
-  metadataBase: new URL(siteConfig.url),
+  metadataBase: new URL(siteOrigin),
   title: {
     default: "TechTipsHub: practical writing for people who build software",
     template: `%s - ${siteConfig.name}`,

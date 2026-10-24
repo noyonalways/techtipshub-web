@@ -3,26 +3,80 @@
 import envConfig from "@/config/env.config";
 import axiosInstance from "@/lib/AxiosInstance";
 import { getAccessToken } from "@/lib/fetch-with-auth";
+import { decodeSlug } from "@/lib/slug";
 import { revalidatePath, updateTag } from "next/cache";
-import { cookies } from "next/headers";
+
+/**
+ * An article was created, edited or removed, so `/sitemap.xml` no longer
+ * describes the site. Revalidating it here keeps the published list current
+ * without waiting for the hourly rebuild.
+ */
+const refreshSitemap = () => {
+  try {
+    revalidatePath("/sitemap.xml");
+  } catch {
+    // Called outside a request scope (a script, a build): the sitemap route
+    // rebuilds on its own timer there.
+  }
+};
+
+/**
+ * Everything an article change makes stale, in one place.
+ *
+ * `updateTag` expires the tag outright, so a publish or edit is reflected on
+ * the next visit rather than after the cached copy's timer. `tags` lists every
+ * reader of the blog data: the feed, the sitemap, the prerendered article
+ * pages, and the author index the build uses.
+ */
+const refreshArticles = () => {
+  updateTag("allBlogs");
+  updateTag("sitemap");
+  refreshSitemap();
+};
+
+const blogListUrl = (params?: Record<string, string | undefined>) => {
+  const url = new URL(`${envConfig.baseApi}/blogs`);
+
+  if (params) {
+    Object.keys(params).forEach((key) => {
+      const value = params[key];
+      if (value !== undefined) {
+        url.searchParams.append(key, value);
+      }
+    });
+  }
+
+  return url;
+};
+
+/**
+ * The blog list as page data: fetched on the server, cached, and tagged
+ * `allBlogs` so a publish, edit or delete refreshes it.
+ *
+ * This is what a page that should be prerendered reads. `getAllBlogs` below is
+ * the live version for the browser's infinite scroll, where a stale page would
+ * be a bug.
+ */
+export const getBlogs = async (
+  params?: Record<string, string | undefined>,
+) => {
+  try {
+    const res = await fetch(blogListUrl(params).toString(), {
+      next: { tags: ["allBlogs"], revalidate: 1800 },
+    });
+
+    if (!res.ok) return undefined;
+    return res.json();
+  } catch (err: any) {
+    return err?.response?.data;
+  }
+};
 
 export const getAllBlogs = async (
   params?: Record<string, string | undefined>,
 ) => {
   try {
-    const url = new URL(`${envConfig.baseApi}/blogs`);
-
-    // Append only defined parameters
-    if (params) {
-      Object.keys(params).forEach((key) => {
-        const value = params[key];
-        if (value !== undefined) {
-          url.searchParams.append(key, value);
-        }
-      });
-    }
-
-    const res = await fetch(url.toString(), {
+    const res = await fetch(blogListUrl(params).toString(), {
       cache: "no-cache",
       next: {
         tags: ["allBlogs"],
@@ -39,6 +93,10 @@ export const getAllBlogs = async (
 export const getFollowingUsersBlogs = async (
   params?: Record<string, string | undefined>,
 ) => {
+  // Read here rather than at module scope: a top-level `next/headers` import
+  // in a service the prerendered article page also uses makes that page look
+  // request-bound. Only this function needs the session.
+  const { cookies } = await import("next/headers");
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("tth_access_token")?.value;
 
@@ -78,6 +136,7 @@ export const createBlog = async (payload: FormData) => {
 
     updateTag("allBlogs");
     revalidatePath("/");
+    refreshArticles();
 
     return res?.data;
   } catch (err: any) {
@@ -90,6 +149,33 @@ export const getBlogBySlug = async (slug: string) => {
     const res = await axiosInstance.get(`/blogs/${slug}`);
 
     return res?.data;
+  } catch (err: any) {
+    return err?.response?.data;
+  }
+};
+
+/**
+ * One article, read through the cache so `/blogs/[slug]` can be prerendered
+ * and served from the CDN instead of querying the API per visit.
+ *
+ * The API answers with the body locked for a guest, so this is the public
+ * version; that is exactly what a cached page should contain.
+ *
+ * The slug arrives raw in `generateStaticParams` but percent-encoded in the
+ * page's `params` (non-ASCII slugs are encoded for the URL), so it has to be
+ * decoded once before it is encoded for the request. Encoding it as-is sent
+ * the API a double-encoded address (`%25E0...`), which 404s every article
+ * whose slug is not plain ASCII.
+ */
+export const getPublishedBlog = async (slug: string) => {
+  try {
+    const res = await fetch(
+      `${envConfig.baseApi}/blogs/${encodeURIComponent(decodeSlug(slug))}`,
+      { next: { tags: ["singleBlog"], revalidate: 1800 } },
+    );
+
+    if (!res.ok) return undefined;
+    return res.json();
   } catch (err: any) {
     return err?.response?.data;
   }
@@ -155,45 +241,15 @@ export const getBlogsByUserId = async (
     }
 
     const res = await fetch(url.toString(), {
-      cache: "no-store",
       next: {
         tags: ["allBlogs"],
+        revalidate: 1800,
       },
     });
 
     return res.json();
   } catch (err: any) {
     throw new Error(err?.message);
-  }
-};
-
-/**
- * Record a read for a blog and get its fresh view total.
- *
- * Called with the reader's token when they are signed in (so they count once
- * per account) and with a pseudonymous `visitorId` for guests. Never throws, so
- * a failed count can't break the article page.
- */
-export const recordBlogView = async (slug: string, visitorId?: string) => {
-  try {
-    const accessToken = (await cookies()).get("tth_access_token")?.value;
-
-    const res = await fetch(
-      `${envConfig.baseApi}/views/${encodeURIComponent(slug)}`,
-      {
-        method: "POST",
-        cache: "no-store",
-        headers: {
-          "Content-Type": "application/json",
-          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-        },
-        body: JSON.stringify(visitorId ? { visitorId } : {}),
-      },
-    );
-
-    return await res.json();
-  } catch (err: any) {
-    return { success: false, error: err?.message };
   }
 };
 
@@ -236,9 +292,9 @@ export const getCommentsByBlogId = async (blogId: string) => {
     const res = await fetch(
       `${envConfig.baseApi}/blogs/${blogId}/comments?limit=100`,
       {
-        cache: "no-store",
         next: {
           tags: ["comments"],
+          revalidate: 300,
         },
       },
     );
@@ -260,6 +316,7 @@ export const deleteBlogByAdminUsingId = async (
     });
 
     updateTag("allBlogs");
+    refreshArticles();
 
     return res.data;
   } catch (err: any) {
@@ -273,6 +330,7 @@ export const deleteBlogByUserUsingId = async (blogId: string) => {
     const res = await axiosInstance.delete(`/blogs/${blogId}`);
 
     updateTag("myBlogs");
+    refreshArticles();
 
     return res.data;
   } catch (err: any) {
@@ -289,6 +347,7 @@ export const updateBlogByUserUsingId = async (
     const res = await axiosInstance.put(`/blogs/${blogId}`, payload);
 
     updateTag("myBlogs");
+    refreshArticles();
 
     return res.data;
   } catch (err: any) {
@@ -302,6 +361,7 @@ export const updateBlogByAdmin = async (blogId: string, payload: FormData) => {
     const res = await axiosInstance.put(`/admin/blogs/${blogId}`, payload);
 
     updateTag("allBlogs");
+    refreshArticles();
 
     return res.data;
   } catch (err: any) {

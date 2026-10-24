@@ -11,9 +11,13 @@ const Categories = ({ categories }: IProps) => {
     <div className="space-y-3 rounded-xl border border-default/50 p-5">
       <h2 className="text-sm font-semibold">Categories</h2>
       <div className="flex flex-wrap gap-2">
-        {categories.map((category) => (
-          <CategoryButton key={category._id} {...category} />
-        ))}
+        {categories.length === 0 ? (
+          <p className="text-sm text-default-600">No categories yet.</p>
+        ) : (
+          categories.map((category) => (
+            <CategoryButton key={category._id} {...category} />
+          ))
+        )}
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { writeBlogPath } from "@/lib/blog-routes";
+import { searchPath } from "@/lib/feed-routes";
 import { useUser } from "@/context/user.provider";
 import { SearchIcon } from "@/components/icons";
 import {
@@ -301,7 +302,7 @@ const CommandPalette = ({ open, onClose }: IProps) => {
             kind: "article",
             label: `All results for “${trimmed}”`,
             detail: "Open the feed with this search",
-            href: `/?search=${encodeURIComponent(trimmed)}`,
+            href: searchPath(trimmed),
           },
         ],
       });
@@ -478,8 +479,8 @@ const CommandPalette = ({ open, onClose }: IProps) => {
                     onClick={() =>
                       go(
                         handle
-                          ? `/?search=${encodeURIComponent(handle)}`
-                          : `/?search=${encodeURIComponent(trimmed)}`,
+                          ? searchPath(handle)
+                          : searchPath(trimmed),
                       )
                     }
                     className="mt-4 text-sm font-medium text-primary-accessible underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70"

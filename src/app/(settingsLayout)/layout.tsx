@@ -1,9 +1,15 @@
 import { Navbar } from "@/components/shared/navbar";
 import UserSidebar from "@/components/shared/user-sidebar";
+import type { Metadata } from "next";
 
 interface IProps {
   children: React.ReactNode;
 }
+
+/** Every screen under `/settings` belongs to one signed-in member. */
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 /**
  * Account settings shell: the site header, a sticky settings rail and the

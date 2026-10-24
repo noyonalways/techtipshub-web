@@ -1,6 +1,7 @@
 import Container from "@/components/ui/container";
 import { Logo } from "@/components/shared/logo";
 import { legalConfig, legalPages } from "@/config/legal";
+import FollowingLink from "./following-link";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { FiArrowRight, FiMail } from "react-icons/fi";
@@ -45,10 +46,13 @@ const LinkGroup = ({
   title,
   id,
   links,
+  extra,
 }: {
   title: string;
   id: string;
   links: { label: string; href: string }[];
+  /** Rendered after the static links, inside the same list. */
+  extra?: ReactNode;
 }) => (
   <nav aria-labelledby={id}>
     <h2 id={id} className="tth-label-sm">
@@ -62,6 +66,7 @@ const LinkGroup = ({
           </Link>
         </li>
       ))}
+      {extra}
     </ul>
   </nav>
 );
@@ -80,21 +85,21 @@ const ContactItem = ({
   </div>
 );
 
-interface IProps {
-  /**
-   * Whether the reader has a session. "Following" is a signed-in page, so a
-   * signed-out footer leaves it out instead of linking to a login bounce.
-   */
-  isSignedIn?: boolean;
-}
+/**
+ * The footer's Read group: the pages that exist for everyone.
+ *
+ * "Following" is the one link that depends on who is reading, so it is the one
+ * link rendered in the browser (see `following-link.tsx`). Keeping the
+ * session out of the footer is what lets every page that shows it be
+ * prerendered instead of rendered per request.
+ */
+const readLinks = [
+  { label: "The feed", href: "/" },
+  { label: "Write here", href: "/features" },
+  { label: "About the publication", href: "/about" },
+];
 
-const Footer = ({ isSignedIn = false }: IProps) => {
-  const readLinks = [
-    { label: "The feed", href: "/" },
-    ...(isSignedIn ? [{ label: "Following", href: "/following" }] : []),
-    { label: "Write here", href: "/features" },
-    { label: "About the publication", href: "/about" },
-  ];
+const Footer = () => {
 
   return (
     <footer className="border-t border-default bg-default-50 print:hidden">
@@ -144,7 +149,12 @@ const Footer = ({ isSignedIn = false }: IProps) => {
           </div>
 
           <div className="py-0 md:py-1">
-            <LinkGroup title="Read" id="footer-read" links={readLinks} />
+            <LinkGroup
+              title="Read"
+              id="footer-read"
+              links={readLinks}
+              extra={<FollowingLink />}
+            />
           </div>
 
           <div className="md:py-1">

@@ -10,11 +10,13 @@ export const metadata: Metadata = {
     "Join TechTipsHub to read every article, share your own tutorials and join the discussion. Creating a free account is all it takes.",
   keywords:
     "TechTipsHub, sign up, register, create account, tech tips, tutorials, tech insights, tech community",
+  robots: { index: false, follow: true },
+  alternates: { canonical: "/signup" },
   openGraph: {
     title: "Sign up",
     description:
       "Create a free TechTipsHub account to read every article, publish your own tutorials and join the discussion.",
-    url: "https://techtipshub.vercel.app/signup",
+    url: "/signup",
   },
 };
 

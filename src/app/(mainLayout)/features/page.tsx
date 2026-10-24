@@ -2,9 +2,8 @@ import { AdSlot } from "@/components/adsense";
 import PageHero from "@/components/editorial/page-hero";
 import ButtonLink from "@/components/ui/button-link";
 import Container from "@/components/ui/container";
-import { getAllCategories } from "@/services/category";
-import { getAllBlogs } from "@/services/blog";
-import type { ICategory } from "@/types";
+import { getBlogs } from "@/services/blog";
+import { siteCategories } from "@/lib/site-settings";
 import { Metadata } from "next";
 import Link from "next/link";
 import { BiChevronRight } from "react-icons/bi";
@@ -56,13 +55,12 @@ const steps = [
 ];
 
 const CommunityPage = async () => {
-  const [blogsResult, categoriesResult] = await Promise.all([
-    getAllBlogs({ limit: "1" }).catch(() => null),
-    getAllCategories().catch(() => null),
+  const [blogsResult, categories] = await Promise.all([
+    getBlogs({ limit: "1" }).catch(() => null),
+    siteCategories(),
   ]);
 
   const articleCount = Number(blogsResult?.meta?.total) || 0;
-  const categories = (categoriesResult?.data as ICategory[]) || [];
 
   return (
     <div>
