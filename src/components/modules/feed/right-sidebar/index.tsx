@@ -1,5 +1,3 @@
-"use client";
-
 import MiniFooter from "@/components/shared/mini-footer";
 import Categories from "./categories";
 import { siteCategories } from "@/lib/site-settings";
