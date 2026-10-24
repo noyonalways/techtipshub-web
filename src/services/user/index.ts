@@ -5,13 +5,19 @@ import axiosInstance from "@/lib/AxiosInstance";
 import { TSocialLink } from "@/types";
 import { updateTag } from "next/cache";
 
-// get user by username
+/**
+ * A member's public profile.
+ *
+ * Cached, because it is the same answer for every visitor: this is what lets
+ * `/users/<username>` and the follower lists be prerendered instead of
+ * rendered per request. Tagged `singleUser` so a profile edit expires it.
+ */
 export const getUserByUsername = async (username: string) => {
   try {
     const res = await fetch(`${envConfig.baseApi}/users/${username}`, {
-      cache: "no-store",
       next: {
         tags: ["singleUser"],
+        revalidate: 43200,
       },
     });
 
@@ -58,11 +64,16 @@ export const unfollowUser = async (userId: string) => {
   }
 };
 
-// get all followers by user id
+/**
+ * A member's follower list.
+ *
+ * Public (the API answers without a session), so it is cached and tagged: the
+ * follower pages can then be prerendered instead of rendering per visitor.
+ */
 export const getFollowersByUserId = async (userId: string) => {
   try {
     const res = await fetch(`${envConfig.baseApi}/users/${userId}/followers`, {
-      cache: "no-store",
+      next: { tags: ["followers"], revalidate: 43200 },
     });
 
     return await res?.json();
@@ -71,11 +82,14 @@ export const getFollowersByUserId = async (userId: string) => {
   }
 };
 
-// get all following by user id
+/**
+ * A member's following list. Public and cached for the same reason as the
+ * follower list above.
+ */
 export const getFollowingByUserId = async (userId: string) => {
   try {
     const res = await fetch(`${envConfig.baseApi}/users/${userId}/following`, {
-      cache: "no-store",
+      next: { tags: ["following"], revalidate: 43200 },
     });
 
     return await res?.json();

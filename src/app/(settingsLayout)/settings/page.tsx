@@ -13,6 +13,8 @@ export const metadata: Metadata = {
   title: "Profile Settings",
   description: "Manage your TechTipsHub profile settings.",
   keywords: "Profile, Settings, TechTipsHub",
+  robots: { index: false, follow: false },
+  alternates: { canonical: "/settings" },
 };
 
 /**

@@ -4,6 +4,7 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Write a post",
   description: "Write and publish a new article on TechTipsHub.",
+  robots: { index: false, follow: false },
 };
 
 /**

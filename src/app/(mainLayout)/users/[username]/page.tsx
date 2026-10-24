@@ -7,6 +7,9 @@ import FollowUnFollowButton from "@/components/ui/follow-unfollow-button";
 import ProfileShareDropdown from "@/components/ui/profile-share-dropdown";
 import { getBlogsByUserId } from "@/services/blog";
 import { getUserByUsername } from "@/services/user";
+import { siteConfig } from "@/config/site";
+import { allBlogsForBuild } from "@/lib/blog-index";
+import { normaliseRouteUsername } from "@/utils/username";
 import { IBlog, IUser } from "@/types";
 import { Metadata } from "next";
 import { BiSupport } from "react-icons/bi";
@@ -18,8 +21,7 @@ type Props = {
   params: Promise<{ username: string }>;
 };
 
-const usernameFromRoute = (routeUsername: string) =>
-  routeUsername.split("40")[1] || routeUsername;
+const usernameFromRoute = normaliseRouteUsername;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { username: routeUsername } = await params;
@@ -33,14 +35,38 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: `${fullName} (@${actualUsername})`,
-    description: `Read articles by ${fullName} on TechTipsHub — tutorials and field notes from the tech community.`,
+    description: `Read articles by ${fullName} on TechTipsHub - tutorials and field notes from the tech community.`,
+    alternates: { canonical: `/users/${actualUsername}` },
     openGraph: {
       title: `${fullName} (@${actualUsername})`,
       description: `Read articles by ${fullName} on TechTipsHub.`,
-      url: `/users/@${actualUsername}`,
-      images: profilePicture ? [{ url: profilePicture }] : [],
+      url: `/users/${actualUsername}`,
+      images: profilePicture
+        ? [{ url: profilePicture, alt: fullName }]
+        : [{ url: "/brand/og-image.png", width: 1200, height: 630, alt: siteConfig.name }],
     },
   };
+}
+
+export const revalidate = 43200; // Revalidate every 12 hours (43200 seconds)
+
+/**
+ * Prerender the profiles the sitemap lists: one per publishing author.
+ *
+ * Members without a published article have no public list to discover them
+ * from either, so they render on first request and still benefit from the
+ * cached responses behind them.
+ */
+export async function generateStaticParams() {
+  const { rows } = await allBlogsForBuild();
+  const seen = new Set<string>();
+
+  for (const row of rows) {
+    const username = row.author?.username;
+    if (username) seen.add(username);
+  }
+
+  return [...seen].map((username) => ({ username }));
 }
 
 const GetUserByIdPage = async ({ params }: Props) => {

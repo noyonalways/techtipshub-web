@@ -8,8 +8,10 @@ export const metadata: Metadata = {
   title: "Login",
   description:
     "Log in to TechTipsHub to access personalized content and manage your account. Stay updated with the latest tech insights.",
+  robots: { index: false, follow: true },
+  alternates: { canonical: "/login" },
   openGraph: {
-    url: "https://techtipshub.vercel.app/login",
+    url: "/login",
     title: "Login",
     description:
       "Access your TechTipsHub account for personalized content and latest updates.",

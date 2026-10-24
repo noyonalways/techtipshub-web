@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "Choose a new password",
   description: "Set a new password for your TechTipsHub account.",
   robots: { index: false, follow: false },
+  alternates: { canonical: "/reset-password" },
 };
 
 const points = [

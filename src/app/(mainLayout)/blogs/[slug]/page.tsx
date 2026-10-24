@@ -13,15 +13,12 @@ import ReadingProgress from "@/components/modules/blog/reading-progress";
 import { splitAfterIntro } from "@/components/modules/blog/split-article-intro";
 import Container from "@/components/ui/container";
 import { siteConfig } from "@/config/site";
-import { getAccessToken } from "@/lib/fetch-with-auth";
-import {
-  getAllBlogs,
-  getBlogBySlug,
-  getCommentsByBlogId,
-} from "@/services/blog";
+import { excerpt } from "@/lib/seo";
+import { decodeSlug } from "@/lib/slug";
+import { getCommentsByBlogId, getPublishedBlog } from "@/services/blog";
+import { blogForBuild, blogStaticParams } from "@/lib/blog-index";
 import { IBlog } from "@/types";
 import { IComment } from "@/types/comment.type";
-import { jwtTokenDecode } from "@/utils";
 import type { Metadata } from "next";
 import Image from "next/image";
 
@@ -31,24 +28,57 @@ type Props = {
 
 export const revalidate = 43200; // Revalidate every 12 hours (43200 seconds)
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-  const data = await getBlogBySlug(slug);
-  const { title, content, coverImage } = (data?.data as IBlog) ?? {};
+/**
+ * Expiry is driven by the fetch cache, not by a page-level tag: the article
+ * body and comments carry the `singleBlog` / `allBlogs` / `comments` tags, and
+ * the blog services expire them on create, edit and delete. A page-level
+ * `export const tags` is not a segment config here - it makes the route look
+ * dynamic and every article stops being prerendered.
+ */
 
-  const description = content ? content.substring(0, 150) + "..." : undefined;
-  const blogUrl = `${siteConfig.url}/blogs/${slug}`;
+/**
+ * The article's own row from the build index.
+ *
+ * `generateStaticParams` already fetched every article once for the whole
+ * build, so metadata costs a map lookup instead of a second request per page.
+ * A slug published after the last build has no row: the page renders on first
+ * request and the article services fill it in from the API.
+ */
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug: routeSlug } = await params;
+  const slug = decodeSlug(routeSlug);
+  // The build index has every article; one published after the last build is
+  // read once from the cached endpoint instead.
+  const indexed = await blogForBuild(slug);
+  const blog = indexed ?? (await getPublishedBlog(slug))?.data;
+  const { title, content, coverImage, tags, author, createdAt, updatedAt } =
+    blog ?? {};
+
+  const description = content ? excerpt(content, 160) : undefined;
+  const blogUrl = `/blogs/${slug}`;
   // Blogs without an upload fall back to the brand cover, so a shared link
   // still shows the house mark rather than no image at all.
   const ogImage = coverImage
     ? [{ url: coverImage, alt: title }]
     : [{ url: "/brand/og-image.png", width: 1200, height: 630, alt: siteConfig.name }];
+  const published = createdAt ? new Date(createdAt) : undefined;
+  const modified = updatedAt ? new Date(updatedAt) : published;
+
+  if (!blog) {
+    // A deleted or mistyped slug should drop out of the index, not be
+    // remembered as a thin page.
+    return {
+      title: "Article not found",
+      robots: { index: false, follow: false },
+    };
+  }
 
   return {
     title: title,
     description: description,
     alternates: { canonical: blogUrl },
-    keywords: `${title}, TechTipsHub, blog post, technology, tutorial`,
+    keywords: [...(tags ?? []), siteConfig.name, "blog post", "tutorial"],
+    authors: author?.fullName ? [{ name: author.fullName, url: `/users/${author.username}` }] : undefined,
     openGraph: {
       title: title,
       description: description,
@@ -56,6 +86,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       images: ogImage,
       siteName: siteConfig.name,
       type: "article",
+      publishedTime: published?.toISOString(),
+      modifiedTime: modified?.toISOString(),
+      authors: author?.fullName ? [author.fullName] : undefined,
+      tags: tags,
     },
     twitter: {
       card: "summary_large_image",
@@ -66,22 +100,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+/**
+ * Prerender every published article at build time.
+ *
+ * Paginated past the API's page cap and fetched once for the whole build (see
+ * `lib/blog-index`), so a site with a thousand posts still produces a thousand
+ * static files instead of stopping at the first hundred.
+ */
 export async function generateStaticParams() {
-  try {
-    const response = await getAllBlogs({ limit: "100" });
-    const blogs = response?.data as IBlog[];
-
-    if (!blogs || !Array.isArray(blogs)) {
-      return [];
-    }
-
-    return blogs.map((blog) => ({
-      slug: blog.slug,
-    }));
-  } catch (error) {
-    console.error("Error generating static params for blogs:", error);
-    return [];
-  }
+  return blogStaticParams();
 }
 
 const readingMinutes = (html?: string) => {
@@ -96,43 +123,8 @@ const DynamicBlogPage = async ({
   params: Promise<{ slug: string }>;
 }) => {
   const { slug: routeSlug } = await params;
-  const data = await getBlogBySlug(routeSlug);
-  const {
-    _id,
-    coverImage,
-    title,
-    author,
-    createdAt,
-    content,
-    isLocked,
-    tags,
-    totalViews,
-    totalComments,
-    category,
-  } = (data?.data as IBlog) ?? {};
-
-  let comments: IComment[] = [];
-  if (data?.success) {
-    const res = await getCommentsByBlogId(_id);
-    comments = ((res?.data as IComment[]) ?? []).filter(
-      (comment) => !comment.isDeleted,
-    );
-  }
-
-  const minutes = readingMinutes(content);
-  const loginHref = `/login?redirect=blogs/${routeSlug}`;
-
-  // The author panel hides its Follow control on the reader's own article, and
-  // the whole page is cached, so this has to be read per request rather than
-  // baked into the rendered HTML.
-  let viewerId: string | undefined;
-  try {
-    const token = await getAccessToken();
-    if (token) viewerId = (jwtTokenDecode(token) as { _id?: string })?._id;
-  } catch {
-    viewerId = undefined;
-  }
-  const isOwnArticle = Boolean(viewerId && author?._id === viewerId);
+  const slug = decodeSlug(routeSlug);
+  const data = await getPublishedBlog(slug);
 
   if (!data?.success) {
     return (
@@ -140,12 +132,41 @@ const DynamicBlogPage = async ({
         <Container>
           <ArticleState
             kind={data?.statusCode === 404 ? "notFound" : "auth"}
-            loginHref={loginHref}
+            loginHref={`/login?redirect=${encodeURIComponent(`blogs/${routeSlug}`)}`}
           />
         </Container>
       </section>
     );
   }
+
+  const {
+    _id,
+    coverImage,
+    title,
+    author,
+    createdAt,
+    updatedAt,
+    content,
+    isLocked,
+    tags,
+    totalViews,
+    totalComments,
+    category,
+  } = (data.data as IBlog) ?? {};
+
+  const res = await getCommentsByBlogId(_id);
+  const comments = ((res?.data as IComment[]) ?? []).filter(
+    (comment) => !comment.isDeleted,
+  );
+
+  const minutes = readingMinutes(content);
+  const loginHref = `/login?redirect=${encodeURIComponent(`blogs/${routeSlug}`)}`;
+
+  // The author panel hides its Follow control on the reader's own article.
+  // That is decided in the browser by `FollowUnFollowButton`, from the session
+  // it already holds: reading the cookie here would turn every article into a
+  // per-request render, which is what kept these pages out of the static cache.
+  const isOwnArticle = false;
 
   // The in-article unit goes between the opening paragraph and the rest. A
   // body with no safe paragraph break renders whole, with the ad after it.
@@ -158,8 +179,43 @@ const DynamicBlogPage = async ({
       <Container>
         <article
           id="article-body"
+          itemScope
+          itemType="https://schema.org/BlogPosting"
           className="mx-auto max-w-read scroll-mt-20 pt-4 print:max-w-xl print:pt-0"
         >
+          {/* Structured data: who wrote it, when, and what it is about. Search
+              results and readers both get the byline from one place. */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "BlogPosting",
+                headline: title,
+                description: excerpt(content, 160),
+                image: coverImage ? [coverImage] : undefined,
+                datePublished: createdAt,
+                dateModified: updatedAt ?? createdAt,
+                author: author?.fullName
+                  ? {
+                      "@type": "Person",
+                      name: author.fullName,
+                      url: `${siteConfig.url}/users/${author.username}`,
+                    }
+                  : undefined,
+                publisher: {
+                  "@type": "Organization",
+                  name: siteConfig.name,
+                  logo: {
+                    "@type": "ImageObject",
+                    url: `${siteConfig.url}/brand/icon-512.png`,
+                  },
+                },
+                mainEntityOfPage: `${siteConfig.url}/blogs/${routeSlug}`,
+                keywords: tags?.join(", "),
+              }),
+            }}
+          />
           <div id="article-start" className="scroll-mt-24">
             <ArticleHeader
               slug={routeSlug}

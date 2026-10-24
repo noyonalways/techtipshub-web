@@ -1,9 +1,0 @@
-# *
-User-agent: *
-Disallow: /admin
-
-# Host
-Host: https://techtipshub.vercel.app
-
-# Sitemaps
-Sitemap: https://techtipshub.vercel.app/sitemap.xml

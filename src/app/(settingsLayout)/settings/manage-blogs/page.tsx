@@ -5,6 +5,8 @@ export const metadata: Metadata = {
   title: "Manage Blogs",
   description: "Manage all your blogs in one place with TechTipsHub.",
   keywords: "Manage Blogs, TechTipsHub, Blogging",
+  robots: { index: false, follow: false },
+  alternates: { canonical: "/settings/manage-blogs" },
 };
 
 interface IProps {

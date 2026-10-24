@@ -7,8 +7,10 @@ export const metadata: Metadata = {
   title: "Reset Password",
   description:
     "Reset the password for your TechTipsHub account. We will email you a secure link.",
+  robots: { index: false, follow: true },
+  alternates: { canonical: "/forget-password" },
   openGraph: {
-    url: "https://techtipshub.vercel.app/forget-password",
+    url: "/forget-password",
     title: "Reset Password",
     description: "Recover access to your TechTipsHub account.",
   },

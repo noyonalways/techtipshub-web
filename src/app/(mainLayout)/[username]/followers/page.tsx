@@ -1,5 +1,7 @@
 import PeopleList from "@/components/modules/profile/people-list";
 import { getFollowersByUserId, getUserByUsername } from "@/services/user";
+import { allBlogsForBuild } from "@/lib/blog-index";
+import { normaliseRouteUsername } from "@/utils/username";
 import { IUFollower, IUser } from "@/types";
 import { Metadata } from "next";
 
@@ -7,18 +9,45 @@ interface IProps {
   params: Promise<{ username: string }>;
 }
 
+export const revalidate = 43200; // Revalidate every 12 hours (43200 seconds)
+
+/**
+ * The authors who have a prerendered profile page (`users/[username]`), so the
+ * reader's follower lists are generated alongside them.
+ */
+const authorUsernames = async () => {
+  const { rows } = await allBlogsForBuild();
+  const seen = new Set<string>();
+
+  for (const row of rows) {
+    const username = row.author?.username;
+    if (username) seen.add(username);
+  }
+
+  return [...seen];
+};
+
+export async function generateStaticParams() {
+  const usernames = await authorUsernames();
+  // The short form is the one the app links to.
+  return usernames.map((username) => ({ username: `@${username}` }));
+}
+
 export async function generateMetadata({ params }: IProps): Promise<Metadata> {
   const { username: routeUsername } = await params;
-  const username = routeUsername.split("40")[1];
+  const username = normaliseRouteUsername(routeUsername);
   return {
     title: `People following @${username}`,
     alternates: { canonical: `/@${username}/followers` },
+    // A directory of names with no content of its own; the profile is the page
+    // worth ranking.
+    robots: { index: false, follow: true },
   };
 }
 
 const Followers = async ({ params }: IProps) => {
   const { username: routeUsername } = await params;
-  const data = await getUserByUsername(routeUsername.split("40")[1]);
+  const data = await getUserByUsername(normaliseRouteUsername(routeUsername));
 
   const { username, _id, totalFollowing, totalFollowers } =
     (data?.data as IUser) ?? {};

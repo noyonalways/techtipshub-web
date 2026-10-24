@@ -2,6 +2,7 @@ import Container from "@/components/ui/container";
 import FollowUnFollowButton from "@/components/ui/follow-unfollow-button";
 import { getUserByUsername } from "@/services/user";
 import { IUser } from "@/types";
+import { normaliseRouteUsername } from "@/utils/username";
 import { Avatar } from "@heroui/avatar";
 import Link from "next/link";
 import { PiCalendarDotsLight } from "react-icons/pi";
@@ -12,8 +13,11 @@ interface IProps {
 }
 
 const FollowersFollowingLayout = async ({ params, children }: IProps) => {
-  const { username: rawUsername } = await params;
-  const data = await getUserByUsername(rawUsername.split("40")[1]);
+  // The segment is `@name` (or its percent-encoded form); the API wants the
+  // bare username.
+  const data = await getUserByUsername(
+    normaliseRouteUsername((await params).username),
+  );
 
   const { _id, profilePicture, fullName, username, designation, createdAt } =
     (data?.data as IUser) ?? {};

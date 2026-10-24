@@ -4,6 +4,7 @@ import ButtonLink from "@/components/ui/button-link";
 import DownVoteButton from "@/components/ui/downvote-button";
 import FollowUnFollowButton from "@/components/ui/follow-unfollow-button";
 import PrintBlogButton from "@/components/ui/print-blog-button";
+import { searchPath } from "@/lib/feed-routes";
 import UpVoteButton from "@/components/ui/upvote-button";
 import type { IBlog } from "@/types";
 import type { IUser } from "@/types/user.type";
@@ -101,7 +102,7 @@ export const ArticleTags = ({ tags }: { tags?: string[] }) => {
       {tags.map((tag) => (
         <Link
           key={tag}
-          href={`/?search=${encodeURIComponent(tag)}`}
+          href={searchPath(tag)}
           // A chip stays visually small per DESIGN.md; the `::before` gives it a
           // 44px tall touch area that overlaps the row's 44px line box.
           className="relative inline-flex max-w-full cursor-pointer items-center truncate rounded-full border border-default/60 px-2.5 py-0.5 text-xs text-default-700 transition-colors before:absolute before:inset-x-0 before:-inset-y-2 before:content-[''] hover:border-default-300 hover:bg-default-100 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
