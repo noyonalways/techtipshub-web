@@ -225,8 +225,12 @@ const DynamicBlogPage = async ({
 
           <ArticleAuthor author={author} isOwnArticle={isOwnArticle} />
 
+          {/* Multiplex is a recommendation grid: it belongs where the reader
+              has finished and is choosing what to read next, not mid-article.
+              It replaces the old display unit here; two ad blocks back to
+              back in the same spot tend to perform worse than one. */}
           <div className="mt-14 print:hidden">
-            <AdSlot variant="display" placement="article-before-comments" />
+            <AdSlot variant="multiplex" placement="article-after-story" />
           </div>
 
           <div className="mt-14">
