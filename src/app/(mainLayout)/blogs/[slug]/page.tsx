@@ -1,4 +1,4 @@
-import { AdSlot } from "@/components/adsense";
+import { AdSlot, MemberAdSlot } from "@/components/adsense";
 import ArticleHeader from "@/components/modules/blog/article-header";
 import ArticleState from "@/components/modules/blog/article-state";
 import {
@@ -11,14 +11,16 @@ import BlogComments from "@/components/modules/blog/blog-comments";
 import LockedArticle from "@/components/modules/blog/locked-article";
 import ReadingProgress from "@/components/modules/blog/reading-progress";
 import { splitAfterIntro } from "@/components/modules/blog/split-article-intro";
+import ArticleAccess from "@/components/modules/blog/article-access";
 import Container from "@/components/ui/container";
 import { siteConfig } from "@/config/site";
+import { articlePreviewPath } from "@/lib/article-access";
+import { articlePreviewHtml } from "@/lib/article-preview";
 import { excerpt } from "@/lib/seo";
 import { decodeSlug } from "@/lib/slug";
-import { getCommentsByBlogId, getPublishedBlog } from "@/services/blog";
+import { getArticlePage } from "@/services/blog/article-page";
+import type { IBlog } from "@/types";
 import { blogForBuild, blogStaticParams } from "@/lib/blog-index";
-import { IBlog } from "@/types";
-import { IComment } from "@/types/comment.type";
 import type { Metadata } from "next";
 import Image from "next/image";
 
@@ -26,14 +28,12 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
-export const revalidate = 43200; // Revalidate every 12 hours (43200 seconds)
-
 /**
- * Expiry is driven by the fetch cache, not by a page-level tag: the article
- * body and comments carry the `singleBlog` / `allBlogs` / `comments` tags, and
- * the blog services expire them on create, edit and delete. A page-level
- * `export const tags` is not a segment config here - it makes the route look
- * dynamic and every article stops being prerendered.
+ * Expiry is driven by the data layer, not by a page-level tag: the article and
+ * comments carry the `articleData` tag, and the blog services expire it when an
+ * article or a comment changes. A page-level `export const tags` is not a
+ * segment config here - it makes the route look dynamic and every article stops
+ * being prerendered.
  */
 
 /**
@@ -41,21 +41,23 @@ export const revalidate = 43200; // Revalidate every 12 hours (43200 seconds)
  *
  * `generateStaticParams` already fetched every article once for the whole
  * build, so metadata costs a map lookup instead of a second request per page.
- * A slug published after the last build has no row: the page renders on first
- * request and the article services fill it in from the API.
+ * A slug published after the last build has no row: the page reads it from the
+ * service instead, which fetches the current version and binds the page to it.
  */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug: routeSlug } = await params;
   const slug = decodeSlug(routeSlug);
-  // The build index has every article; one published after the last build is
-  // read once from the cached endpoint instead.
-  const indexed = await blogForBuild(slug);
-  const blog = indexed ?? (await getPublishedBlog(slug))?.data;
+  // The build index has every article; a slug published after the last build
+  // is rendered by the page itself, so its metadata comes from that render.
+  const blog = (await blogForBuild(slug)) as unknown as IBlog | undefined;
   const { title, content, coverImage, tags, author, createdAt, updatedAt } =
     blog ?? {};
 
   const description = content ? excerpt(content, 160) : undefined;
-  const blogUrl = `/blogs/${slug}`;
+  // The canonical address is the preview variant: it is the one search engines
+  // and link unfurls can read without a session. The page itself still lives at
+  // the plain address and is what members are served.
+  const canonical = articlePreviewPath(slug);
   // Blogs without an upload fall back to the brand cover, so a shared link
   // still shows the house mark rather than no image at all.
   const ogImage = coverImage
@@ -76,13 +78,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: title,
     description: description,
-    alternates: { canonical: blogUrl },
+    alternates: { canonical },
     keywords: [...(tags ?? []), siteConfig.name, "blog post", "tutorial"],
     authors: author?.fullName ? [{ name: author.fullName, url: `/users/${author.username}` }] : undefined,
     openGraph: {
       title: title,
       description: description,
-      url: blogUrl,
+      url: canonical,
       images: ogImage,
       siteName: siteConfig.name,
       type: "article",
@@ -103,9 +105,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 /**
  * Prerender every published article at build time.
  *
- * Paginated past the API's page cap and fetched once for the whole build (see
- * `lib/blog-index`), so a site with a thousand posts still produces a thousand
- * static files instead of stopping at the first hundred.
+ * The stored `params` carry the article's `updatedAt` as of the build, which is
+ * how the page knows whether it still holds the current version.
  */
 export async function generateStaticParams() {
   return blogStaticParams();
@@ -117,21 +118,27 @@ const readingMinutes = (html?: string) => {
   return Math.max(1, Math.round(words / 220));
 };
 
-const DynamicBlogPage = async ({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) => {
-  const { slug: routeSlug } = await params;
-  const slug = decodeSlug(routeSlug);
-  const data = await getPublishedBlog(slug);
+const DynamicBlogPage = async ({ params }: Props) => {
+  // `updatedAt` is what the build stored in `params` — the version this page
+  // was rendered with. A route that was not prerendered stores none.
+  const { slug: routeSlug, updatedAt: builtAsOf } = (await params) as {
+    slug: string;
+    updatedAt?: string;
+  };
 
-  if (!data?.success) {
+  const slug = decodeSlug(routeSlug);
+
+  // The plain address is what members are served, and what a preview link is
+  // redirected from (see `proxy.ts`): a crawler, or anyone without a session,
+  // ends up on the preview variant.
+  const page = await getArticlePage(slug, builtAsOf);
+
+  if (!page.blog) {
     return (
       <section className="pb-16">
         <Container>
           <ArticleState
-            kind={data?.statusCode === 404 ? "notFound" : "auth"}
+            kind="notFound"
             loginHref={`/login?redirect=${encodeURIComponent(`blogs/${routeSlug}`)}`}
           />
         </Container>
@@ -147,17 +154,12 @@ const DynamicBlogPage = async ({
     createdAt,
     updatedAt,
     content,
-    isLocked,
     tags,
     totalViews,
     totalComments,
     category,
-  } = (data.data as IBlog) ?? {};
-
-  const res = await getCommentsByBlogId(_id);
-  const comments = ((res?.data as IComment[]) ?? []).filter(
-    (comment) => !comment.isDeleted,
-  );
+  } = page.blog;
+  const comments = page.comments;
 
   const minutes = readingMinutes(content);
   const loginHref = `/login?redirect=${encodeURIComponent(`blogs/${routeSlug}`)}`;
@@ -168,10 +170,72 @@ const DynamicBlogPage = async ({
   // per-request render, which is what kept these pages out of the static cache.
   const isOwnArticle = false;
 
+  // What a visitor without a session is given server-side: the introduction,
+  // cut where the member reading experience cuts the body for its ad. This is
+  // the only version of the body a crawler is shown.
+  const previewBody = articlePreviewHtml(content);
+
   // The in-article unit goes between the opening paragraph and the rest. A
   // body with no safe paragraph break renders whole, with the ad after it.
   // Both halves keep their own class so the body's type rules stay continuous.
-  const introSplit = isLocked ? null : splitAfterIntro(content);
+  const introSplit = splitAfterIntro(content);
+
+  // Headlines for search engines, link unfurls and anything that does not run
+  // the reader check: the server-rendered preview, whole body never. This is
+  // also what a visitor sees while their session is being checked.
+  const previewColumn = (
+    <>
+      <div
+        className="tth-article mt-10 print:mt-0"
+        dangerouslySetInnerHTML={{ __html: previewBody }}
+      />
+      <LockedArticle loginHref={loginHref} />
+    </>
+  );
+
+  // The body for members. Ads sit inside it and only load once the reader is
+  // confirmed, so a cached copy watched by a guest requests nothing.
+  const memberColumn = introSplit ? (
+    <>
+      <div
+        className="tth-article mt-10 print:mt-0"
+        dangerouslySetInnerHTML={{ __html: introSplit[0] }}
+      />
+      <MemberAdSlot
+        variant="inArticle"
+        placement="article-after-intro"
+        className="mt-10 print:hidden"
+      />
+      <div
+        className="tth-article tth-article-continued"
+        dangerouslySetInnerHTML={{ __html: introSplit[1] }}
+      />
+    </>
+  ) : (
+    <>
+      <div
+        className="tth-article mt-10 print:mt-0"
+        dangerouslySetInnerHTML={{ __html: content ?? "" }}
+      />
+      <MemberAdSlot
+        variant="inArticle"
+        placement="article-after-intro"
+        className="mt-10 print:hidden"
+      />
+    </>
+  );
+
+  // The two columns are always in the document; CSS picks one from
+  // `data-article-view`, which the per-request reader answer writes (see the
+  // article access rules in `globals.css`). Neither the page nor its caching
+  // depends on who is asking.
+  const readableColumn = (
+    <div data-article-access>
+      <ArticleAccess slug={slug} />
+      <div data-article-for="guest">{previewColumn}</div>
+      <div data-article-for="member">{memberColumn}</div>
+    </div>
+  );
 
   return (
     <section className="pb-16">
@@ -211,7 +275,7 @@ const DynamicBlogPage = async ({
                     url: `${siteConfig.url}/brand/icon-512.png`,
                   },
                 },
-                mainEntityOfPage: `${siteConfig.url}/blogs/${routeSlug}`,
+                mainEntityOfPage: `${siteConfig.url}${articlePreviewPath(slug)}`,
                 keywords: tags?.join(", "),
               }),
             }}
@@ -223,7 +287,7 @@ const DynamicBlogPage = async ({
               author={author}
               category={category}
               createdAt={createdAt}
-              minutes={isLocked ? null : minutes}
+              minutes={minutes}
               views={totalViews ?? 0}
             />
           </div>
@@ -243,39 +307,9 @@ const DynamicBlogPage = async ({
             </figure>
           )}
 
-          {isLocked ? (
-            <LockedArticle loginHref={loginHref} />
-          ) : introSplit ? (
-            <>
-              <div
-                className="tth-article mt-10 print:mt-0"
-                dangerouslySetInnerHTML={{ __html: introSplit[0] }}
-              />
-              <AdSlot
-                variant="inArticle"
-                placement="article-after-intro"
-                className="mt-10 print:hidden"
-              />
-              <div
-                className="tth-article tth-article-continued"
-                dangerouslySetInnerHTML={{ __html: introSplit[1] }}
-              />
-            </>
-          ) : (
-            <>
-              <div
-                className="tth-article mt-10 print:mt-0"
-                dangerouslySetInnerHTML={{ __html: content ?? "" }}
-              />
-              <AdSlot
-                variant="inArticle"
-                placement="article-after-intro"
-                className="mt-10 print:hidden"
-              />
-            </>
-          )}
+          {readableColumn}
 
-          <ArticleEndMatter blog={data.data as IBlog} />
+          <ArticleEndMatter blog={page.blog} />
 
           <ArticleTags tags={tags} />
 
@@ -283,8 +317,8 @@ const DynamicBlogPage = async ({
 
           {/* Multiplex is a recommendation grid: it belongs where the reader
               has finished and is choosing what to read next, not mid-article.
-              It replaces the old display unit here; two ad blocks back to
-              back in the same spot tend to perform worse than one. */}
+              It replaces the old display unit here; two ad blocks back to back
+              in the same spot tend to perform worse than one. */}
           <div className="mt-14 print:hidden">
             <AdSlot variant="multiplex" placement="article-after-story" />
           </div>

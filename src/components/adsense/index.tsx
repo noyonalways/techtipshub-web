@@ -22,4 +22,5 @@ const AdSense = ({ pubId }: AdSenseProps) => {
 
 export default AdSense;
 export { default as AdSlot } from "./adsense-slot";
+export { default as MemberAdSlot } from "./member-ad-slot";
 export type { AdSlotProps } from "./adsense-slot";

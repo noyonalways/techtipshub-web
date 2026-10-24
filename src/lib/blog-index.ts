@@ -18,7 +18,7 @@ const PAGE_SIZE = 100;
 
 type BlogListRow = Pick<
   IBlog,
-  "slug" | "title" | "content" | "updatedAt" | "createdAt" | "tags"
+  "_id" | "slug" | "title" | "content" | "updatedAt" | "createdAt" | "tags"
 > & {
   coverImage?: string;
   author?: { fullName?: string; username?: string };
@@ -90,7 +90,15 @@ export const allBlogsForBuild = () => {
   return index;
 };
 
-/** Prerender inputs for `/blogs/[slug]`. */
+/**
+ * Prerender inputs for `/blogs/[slug]`.
+ *
+ * `updatedAt` rides along with the slug and is stored in the page's `params`.
+ * It is the version of the article the page was built from, and the page hands
+ * it back when it renders: a request that still carries the build's version is
+ * served as a plain static page, and one whose version has changed is what
+ * triggers a fresh read (see `services/blog/article-page`).
+ */
 export const blogStaticParams = async () => {
   const { rows } = await allBlogsForBuild();
   return rows.map((row) => ({ slug: row.slug }));
@@ -100,4 +108,19 @@ export const blogStaticParams = async () => {
 export const blogForBuild = async (slug: string) => {
   const { bySlug } = await allBlogsForBuild();
   return bySlug.get(slug);
+};
+
+/**
+ * Whether the build already knows this exact version of an article.
+ *
+ * The build index is filled from the article list, which carries the body and
+ * `updatedAt`. The `updatedAt` a page is handed is the one the list saw at the
+ * last build, so a match means nothing has changed since — the indexed row has
+ * the same title, body and timestamps the per-request fetch would return, and
+ * the page can be rendered as an ordinary static page. A mismatch, or a slug
+ * the build never saw, means the article changed and the page fetches it.
+ */
+export const isIndexedAsOf = async (slug: string, updatedAt?: string) => {
+  const row = await blogForBuild(slug);
+  return Boolean(row && updatedAt && row.updatedAt === updatedAt);
 };
