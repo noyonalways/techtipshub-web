@@ -305,6 +305,8 @@ export const deleteBlogByUserUsingId = async (blogId: string) => {
     const res = await axiosInstance.delete(`/blogs/${blogId}`);
 
     updateTag("myBlogs");
+    // The article was on the feed, the profile and the sitemap too, so this
+    // expires every list that can still point at it.
     refreshArticles();
 
     return res.data;
