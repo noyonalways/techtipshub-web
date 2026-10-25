@@ -1,3 +1,709 @@
+@import "tailwindcss";
+@config "../../tailwind.config.js";
+@plugin "@tailwindcss/typography";
+
+/*
+ * HeroUI v2 theme for Tailwind v4.
+ * `heroui-plugin.cjs` adapts HeroUI's theme plugin for the `@plugin`
+ * directive. It reads the theme from tailwind.config.js via `@config`,
+ * so keep `themes: {}` there as the single source of truth.
+ */
+@plugin "./heroui-plugin.cjs";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Theme tokens that the HeroUI JS plugin does not emit for Tailwind v4.
+ * Without these, `text-default-500`, `bg-default-50`, `primary-500`, etc.
+ * would not be generated as utilities.
+ *
+ * HeroUI stores every `--heroui-*` colour as raw HSL channels, e.g.
+ * `--heroui-default-200: 240 5.26% 26.08%`, because its own classes consume
+ * them as `hsl(var(--heroui-default-200))`. They must be wrapped the same way
+ * here: mapping one into `@theme` bare makes Tailwind emit
+ * `border-color: var(--color-default-200)`, which resolves to the invalid
+ * colour `240 5.26% 26.08%`. The declaration is then dropped and the border
+ * falls back to `currentColor`, producing the washed-out border that shows up
+ * in both themes.
+ */
+@theme {
+  --color-default-50: hsl(var(--heroui-default-50));
+  --color-default-100: hsl(var(--heroui-default-100));
+  --color-default-200: hsl(var(--heroui-default-200));
+  --color-default-300: hsl(var(--heroui-default-300));
+  --color-default-400: hsl(var(--heroui-default-400));
+  --color-default-500: hsl(var(--heroui-default-500));
+  --color-default-600: hsl(var(--heroui-default-600));
+  --color-default-700: hsl(var(--heroui-default-700));
+  --color-default-800: hsl(var(--heroui-default-800));
+  --color-default-900: hsl(var(--heroui-default-900));
+  --color-default: hsl(var(--heroui-default));
+
+  --color-background: hsl(var(--heroui-background));
+  --color-foreground: hsl(var(--heroui-foreground));
+  --color-content-1: hsl(var(--heroui-content1));
+  --color-content-2: hsl(var(--heroui-content2));
+  --color-content-3: hsl(var(--heroui-content3));
+  --color-content-4: hsl(var(--heroui-content4));
+
+  --color-primary-50: hsl(var(--heroui-primary-50));
+  --color-primary-100: hsl(var(--heroui-primary-100));
+  --color-primary-200: hsl(var(--heroui-primary-200));
+  --color-primary-300: hsl(var(--heroui-primary-300));
+  --color-primary-400: hsl(var(--heroui-primary-400));
+  --color-primary-500: hsl(var(--heroui-primary-500));
+  --color-primary: hsl(var(--heroui-primary));
+
+  --color-secondary-50: hsl(var(--heroui-secondary-50));
+  --color-secondary-100: hsl(var(--heroui-secondary-100));
+  --color-secondary-200: hsl(var(--heroui-secondary-200));
+  --color-secondary-300: hsl(var(--heroui-secondary-300));
+  --color-secondary-400: hsl(var(--heroui-secondary-400));
+  --color-secondary-500: hsl(var(--heroui-secondary-500));
+  --color-secondary: hsl(var(--heroui-secondary));
+
+  --color-success-50: hsl(var(--heroui-success-50));
+  --color-success-100: hsl(var(--heroui-success-100));
+  --color-success-200: hsl(var(--heroui-success-200));
+  --color-success-300: hsl(var(--heroui-success-300));
+  --color-success-400: hsl(var(--heroui-success-400));
+  --color-success-500: hsl(var(--heroui-success-500));
+  --color-success: hsl(var(--heroui-success));
+
+  --color-warning-50: hsl(var(--heroui-warning-50));
+  --color-warning-100: hsl(var(--heroui-warning-100));
+  --color-warning-200: hsl(var(--heroui-warning-200));
+  --color-warning-300: hsl(var(--heroui-warning-300));
+  --color-warning-400: hsl(var(--heroui-warning-400));
+  --color-warning-500: hsl(var(--heroui-warning-500));
+  --color-warning: hsl(var(--heroui-warning));
+
+  --color-danger-50: hsl(var(--heroui-danger-50));
+  --color-danger-100: hsl(var(--heroui-danger-100));
+  --color-danger-200: hsl(var(--heroui-danger-200));
+  --color-danger-300: hsl(var(--heroui-danger-300));
+  --color-danger-400: hsl(var(--heroui-danger-400));
+  --color-danger-500: hsl(var(--heroui-danger-500));
+  --color-danger: hsl(var(--heroui-danger));
+
+  /* next/font puts its family names on `--font-sans` and `--font-fraunces`
+     through the `<body>` variable classes. Declaring the token here keeps
+     Tailwind as its only owner, so no other generated token can shadow it. */
+  --font-sans: "Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
+
+  /* Display face for headlines, the wordmark and pull quotes. Read through
+     `font-[family-name:var(--type-editorial)]`, so it stays a plain variable
+     and never becomes a `--font-*` token that would also restyle every serif
+     fallback. Both tokens point at the literal family names next/font
+     registers on `<body>`: referencing its `--font-fraunces` /
+     `--font-sans` variables from inside a custom property resolves to nothing
+     in Chromium, which silently dropped the hero headline back to Inter. */
+  --type-editorial: "Fraunces", "Fraunces Fallback", Georgia, "Times New Roman", serif;
+
+  /* HeroUI converts the hex theme values in tailwind.config.js into the
+     `--heroui-*` channel variables, but resolves `foreground: <hex>` only into
+     `--heroui-primary-foreground` and leaves `--heroui-primary` behind. So
+     `text-primary-foreground` is correct (dark ink on amber), while
+     `text-primary` inherited `.text-primary { color: var(--color-primary) }`
+     from Tailwind's own palette, which is a Tailwind *blue*. Pointing the
+     utility at the same source the rest of the theme uses is the one-line fix,
+     and it means light and dark each get their own amber instead of a single
+     hard-coded hex. */
+  --color-primary: hsl(var(--heroui-primary));
+  --color-primary-foreground: hsl(var(--heroui-primary-foreground));
+
+  /* Single source of truth for the sticky header height: the 4rem bar plus
+     its 1px bottom border, which is the box the rails offset themselves by. */
+  --header-height: calc(4rem + 1px);
+
+  /* Page widths. Every shell on the site measures from here, so the header,
+     the rails, the reading column and the footer all share one axis:
+     `max-w-page` for any full page (header, footer, feed, editorial, legal,
+     settings), `max-w-read` for a column of prose or an article screen. A page
+     can cap itself narrower than `max-w-page`, never wider. */
+  --container-page: 80rem;
+  --container-read: 48rem;
+}
+
+* {
+  scrollbar-width: thin;
+}
+
+/* Everything below sits in `@layer base` on purpose.
+   CSS inside `@layer` always loses to CSS outside it. Left unwrapped, these
+   rules formed an unlayered sheet that outranked every Tailwind utility,
+   including HeroUI's own font reset, so `--font-editorial` and any utility
+   that shared a property with a rule here was silently overridden. Wrapping
+   keeps them low-priority defaults, which is what they are. Utility classes
+   marked `.tth-*` are single classes and win against these by source order. */
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+}
+
+/* Section labels: sentence case, 13px, medium weight, muted.
+   The rule lives here so labels across the site cannot drift apart; call
+   sites only add layout (`tth-label mt-2`). Copy passed to a label is written
+   as a sentence ("What you get"), never shouted in caps. */
+@layer components {
+  .tth-label {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0;
+    color: var(--color-default-600);
+  }
+
+  /* Same job where a label sits inside a dense table header. */
+  .tth-label-sm {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    color: var(--color-default-600);
+  }
+
+  /* A raised reading surface: the author panel at the end of an article, and
+     anywhere else one block needs to separate itself from the column without
+     becoming a nested card-of-cards. Warm `content1` fill, slate hairline,
+     10px media radius, no shadow (DESIGN.md: rules over boxes, shadow marks
+     elevation only). */
+  .tth-panel {
+    background-color: var(--color-content-1);
+    border: 1px solid var(--color-default-100);
+    border-radius: 10px;
+  }
+
+  /* Amber as *text*. One utility, two themes: amber 800 on paper reaches
+     7.5:1 and amber 400 on charcoal reaches 9.3:1. Each theme is declared
+     once; an earlier version repeated `.dark .text-primary-accessible` in
+     both blocks, so one rule silently won and future edits would have been
+     lost. */
+  .text-primary-accessible {
+    color: hsl(var(--heroui-primary-800));
+  }
+
+  .dark .text-primary-accessible,
+  .dark .group:hover .text-primary-accessible,
+  .dark .group:focus-visible .text-primary-accessible {
+    color: hsl(var(--heroui-primary-400));
+  }
+}
+
+/* Paragraphs inherit their container's colour by default. The old
+   unconditional `p { color: gray-500 }` override made every paragraph on the
+   site grey — including article body copy inside `prose` — so readable ink and
+   muted secondary text are now chosen per component. Legacy screens that
+   relied on the grey can opt in with `.tth-muted-prose`. */
+.tth-muted-prose p {
+  color: var(--color-gray-500);
+}
+
+.dark .tth-muted-prose p {
+  color: var(--color-gray-400);
+}
+
+/* Sticky rails beside the feed.
+   Two things fight a viewport-pinned column here:
+
+   1. Tailwind cannot express `calc(100vh - var(--header-height))` as an
+      arbitrary value reliably.
+   2. The AdSense script stamps `height: auto !important` onto the page's
+      layout ancestors on first render, so a parent-relative `100%`/`auto`
+      chain cannot be trusted to stay viewport-bound.
+
+   The column therefore sizes itself from the viewport directly. Anything
+   taller than the viewport, such as a full sidebar or an ad whose frame
+   grows after it fills, still scrolls inside that box rather than being cut
+   off, but the scrollbar is hidden: a thin track down the edge of a quiet
+   rail reads as debris, and the wheel, trackpad and keyboard still reach the
+   content. `min-height` repeats `height` so the box cannot be shrunk below
+   the viewport by the flex row that holds it. */
+.tth-rail {
+  position: sticky;
+  top: var(--header-height);
+  align-self: flex-start;
+  max-height: calc(100dvh - var(--header-height));
+}
+
+.tth-rail > .tth-rail-inner {
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - var(--header-height));
+  min-height: calc(100dvh - var(--header-height));
+  max-height: calc(100dvh - var(--header-height));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.tth-rail > .tth-rail-inner::-webkit-scrollbar {
+  display: none;
+}
+
+/* A rail advert is a full-height block, never a squeezed one. Its wrapper used
+   to cap itself below the card's height and clip the overflow, which cut the
+   bottom off the unit as soon as the rail ran short. It now takes the height
+   its card needs; if the column is too short for everything, `.tth-rail-inner`
+   scrolls instead of cropping the advert. The clipping stays on the wrapper so
+   a creative that overflows its own frame cannot spill over the rail. */
+.tth-rail-ad {
+  flex: 0 0 auto;
+  overflow: hidden;
+}
+
+/* Blog editor (Tiptap). Replaced the react-quill block; post HTML is
+   unchanged.
+   The content area reuses Tailwind Typography so what authors see in the
+   composer matches the published article, which renders inside `prose`. */
+.tth-editor-content {
+  cursor: text;
+}
+
+.tth-editor-content .tth-prose {
+  min-height: 22rem;
+  padding: 1rem 1.25rem;
+  outline: none;
+  /* Writing comfort: the composer should not read like small print. */
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+
+.tth-editor-content .tth-prose > p {
+  margin: 0.5em 0;
+  color: inherit;
+}
+
+@media (min-width: 64rem) {
+  .tth-editor-content .tth-prose {
+    padding: 1.5rem 2rem;
+  }
+}
+
+.tth-editor-content .tth-prose.tth-prose-edit > * + *,
+.tth-editor-content .tth-prose > * + * {
+  margin-top: 0.75em;
+}
+
+/* Placeholder for an empty document and for the block the caret is in.
+   The editor ships with Placeholder; these style it. */
+.tth-editor-content .is-editor-empty::before,
+.tth-editor-content p.is-empty::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: var(--color-default-400);
+}
+
+/* The "/" that opened the command menu. */
+.tth-slash-query {
+  color: var(--color-default-400);
+}
+
+/* Code blocks: keep long lines readable without breaking the layout. */
+.tth-editor-content pre {
+  overflow-x: auto;
+  tab-size: 2;
+}
+
+.tth-editor-content pre code {
+  background: transparent;
+  padding: 0;
+  font-size: 0.875em;
+}
+
+.tth-editor-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+}
+
+/* --------------------------------------------------------------------------
+   Full-page composer surface (/me/blogs/new and the editor).
+
+   The page supplies the column, so the editor has no card of its own: no
+   border, no background, generous vertical space, and type sized for writing
+   rather than for reading small controls. `.tth-writing-surface` sits on the
+   writing column itself, see `WritingPane` in editor-shell.tsx.
+   -------------------------------------------------------------------------- */
+.tth-writing-surface .tth-editor-content .tth-prose {
+  min-height: 50vh;
+  padding: 1.25rem 0 2rem;
+  font-size: 1.125rem;
+  line-height: 1.8;
+}
+
+.tth-writing-surface .tth-editor-content .tth-prose:focus {
+  outline: none;
+}
+
+.tth-writing-surface .tth-editor-content .tth-prose > * + * {
+  margin-top: 0.9em;
+}
+
+.tth-writing-surface .tth-editor-content h1 {
+  font-size: 1.75rem;
+  line-height: 1.25;
+  font-weight: 650;
+  margin-top: 1.6em;
+}
+
+.tth-writing-surface .tth-editor-content h2 {
+  font-size: 1.4rem;
+  line-height: 1.3;
+  font-weight: 650;
+  margin-top: 1.5em;
+}
+
+.tth-writing-surface .tth-editor-content h3 {
+  font-size: 1.2rem;
+  font-weight: 650;
+  margin-top: 1.4em;
+}
+
+.tth-writing-surface .tth-editor-content .tth-prose > :first-child {
+  margin-top: 0;
+}
+
+/* The composer has no card border, so an error is shown by the page, not here. */
+.tth-editor-invalid .tth-prose {
+  box-shadow: inset 2px 0 0 var(--color-danger);
+  padding-left: 1rem !important;
+  border-radius: 2px;
+}
+
+/* On the composer the toolbar is compact: no divider, tight controls, and it
+   scrolls sideways on phones rather than wrapping onto several rows. */
+.tth-toolbar {
+  row-gap: 0.25rem;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tth-toolbar::-webkit-scrollbar {
+  display: none;
+}
+
+.tth-toolbar > * {
+  flex: 0 0 auto;
+}
+
+/* --------------------------------------------------------------------------
+   Legal documents (/privacy, /terms, /cookie, …).
+
+   A four-column data table is unreadable when squeezed into a phone viewport,
+   so tables keep a readable minimum width and scroll inside their own
+   container instead of crushing the cells. The visible scrollbar tells the
+   reader there is more to the right.
+   -------------------------------------------------------------------------- */
+.legal-table-scroll {
+  overflow-x: auto;
+}
+
+.legal-table-scroll table {
+  min-width: 40rem;
+}
+
+.legal-table-scroll::-webkit-scrollbar {
+  height: 0.375rem;
+}
+
+.legal-table-scroll::-webkit-scrollbar-track {
+  background: var(--color-default-100);
+  border-radius: 9999px;
+}
+
+.legal-table-scroll::-webkit-scrollbar-thumb {
+  background: var(--color-default-300);
+  border-radius: 9999px;
+}
+
+/* --------------------------------------------------------------------------
+   Published article body (`.tth-article`, /blogs/[slug]).
+
+   A deliberate reading style instead of Tailwind Typography utilities: the
+   body is 17px Inter on ~1.75 line height, headings are Fraunces like the
+   title so one display voice runs from headline to subsection, and there is
+   clearly more air above a heading than below it. Space between blocks sits
+   below the site's section rhythm on purpose, so paragraphs read as one
+   column rather than a stack of blocks. `.tth-article-continued` is the half
+   after the in-article ad slot and adds no top margin, so the ad is what
+   separates the two.
+   -------------------------------------------------------------------------- */
+.tth-article {
+  color: var(--color-foreground);
+  font-size: 1rem;
+  line-height: 1.7;
+  overflow-wrap: break-word;
+  text-wrap: pretty;
+}
+
+@media (min-width: 40rem) {
+  .tth-article {
+    font-size: 1.0625rem;
+    line-height: 1.75;
+  }
+}
+
+/* Adjacent margins collapse, so each block only owns its top space. A code
+   block stays close to the line that introduces it. */
+.tth-article > * + * {
+  margin-top: 1.15em;
+}
+
+.tth-article > p + pre {
+  margin-top: 0.6em;
+}
+
+.tth-article h1,
+.tth-article h2,
+.tth-article h3,
+.tth-article h4 {
+  font-family: var(--type-editorial);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.22;
+  color: var(--color-foreground);
+  text-wrap: balance;
+}
+
+.tth-article h1 {
+  font-size: 1.6rem;
+  margin-top: 2.1em;
+}
+
+.tth-article h2 {
+  font-size: 1.4rem;
+  margin-top: 2.2em;
+  margin-bottom: 0.45em;
+}
+
+.tth-article h3 {
+  font-size: 1.2rem;
+  margin-top: 1.9em;
+  margin-bottom: 0.35em;
+}
+
+.tth-article h4 {
+  font-size: 1.05rem;
+  margin-top: 1.6em;
+  margin-bottom: 0.25em;
+}
+
+/* The body starts under its own picture, so the first block never carries a
+   heading's top margin. */
+.tth-article > :first-child {
+  margin-top: 0;
+}
+
+.tth-article a {
+  color: hsl(var(--heroui-primary-800));
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color 120ms ease;
+}
+
+.dark .tth-article a {
+  color: hsl(var(--heroui-primary-400));
+}
+
+.tth-article a:hover {
+  color: var(--color-foreground);
+}
+
+.tth-article a:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.tth-article strong,
+.tth-article b {
+  font-weight: 650;
+  color: var(--color-foreground);
+}
+
+.tth-article ul,
+.tth-article ol {
+  padding-left: 1.35em;
+}
+
+.tth-article ul {
+  list-style: disc;
+}
+
+.tth-article ol {
+  list-style: decimal;
+}
+
+.tth-article li {
+  padding-left: 0.2em;
+}
+
+.tth-article li + li {
+  margin-top: 0.35em;
+}
+
+.tth-article li > ul,
+.tth-article li > ol {
+  margin-top: 0.35em;
+}
+
+.tth-article li::marker {
+  color: var(--color-default-500);
+}
+
+/* A quote is a change of voice, not a card: one amber hairline on the left. */
+.tth-article blockquote {
+  border-left: 2px solid var(--color-primary);
+  padding: 0.1em 0 0.1em 1.1em;
+  color: var(--color-default-700);
+  font-size: 1.05em;
+  line-height: 1.6;
+}
+
+.tth-article blockquote p + p {
+  margin-top: 0.8em;
+}
+
+.tth-article blockquote cite,
+.tth-article blockquote footer {
+  display: block;
+  margin-top: 0.6em;
+  font-size: 0.8125rem;
+  font-style: normal;
+  color: var(--color-default-600);
+}
+
+/* The composer uses Fira Code through `--font-mono` on <body>; the literal
+   name is the fallback for pages that do not mount that variable. */
+.tth-article code {
+  font-family: "Fira Code", var(--font-mono), ui-monospace, SFMono-Regular,
+    Menlo, monospace;
+  font-size: 0.875em;
+  background-color: var(--color-content-2);
+  border: 1px solid color-mix(in srgb, var(--color-default-300) 60%, transparent);
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+  overflow-wrap: break-word;
+}
+
+/* Long lines scroll inside the block; the page itself never does. */
+.tth-article pre {
+  max-width: 100%;
+  overflow-x: auto;
+  background-color: var(--color-content-2);
+  border: 1px solid color-mix(in srgb, var(--color-default-300) 70%, transparent);
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  font-size: 0.8125rem;
+  line-height: 1.65;
+  tab-size: 2;
+}
+
+@media (min-width: 40rem) {
+  .tth-article pre {
+    font-size: 0.875rem;
+  }
+}
+
+.tth-article pre code {
+  background: none;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  font-size: inherit;
+  white-space: pre;
+  overflow-wrap: normal;
+}
+
+/* Media: 10px radius (the media scale), a hairline, never wider than the column. */
+.tth-article img,
+.tth-article video,
+.tth-article iframe {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--color-default-300) 70%, transparent);
+}
+
+.tth-article figure {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.tth-article figure img {
+  width: 100%;
+}
+
+.tth-article figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-default-600);
+}
+
+.tth-article table {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.tth-article th,
+.tth-article td {
+  border-bottom: 1px solid var(--color-default-200);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.tth-article th {
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--color-foreground);
+}
+
+.tth-article hr {
+  border: 0;
+  border-top: 1px solid var(--color-default-300);
+  margin: 2.25rem 0;
+}
+
+.tth-article pre::-webkit-scrollbar,
+.tth-article table::-webkit-scrollbar {
+  height: 0.375rem;
+}
+
+.tth-article pre::-webkit-scrollbar-thumb,
+.tth-article table::-webkit-scrollbar-thumb {
+  background: var(--color-default-300);
+  border-radius: 9999px;
+}
+
+/* Centred article column (`/blogs/[slug]`).
+ *
+ * The page is centred so the column sits in the middle of the viewport, but
+ * the prose itself stays left-aligned: centred paragraphs are hard to read
+ * past a couple of lines. Only the header is centred. */
+.tth-article {
+  text-align: left;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tth-article a {
+    transition: none;
+  }
+}
+
 /* --------------------------------------------------------------------------
    Who may read the article body (/blogs/[slug]).
 
