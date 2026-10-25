@@ -3,6 +3,7 @@
 import envConfig from "@/config/env.config";
 import { readReaderSession, logAfterResponse } from "@/lib/reader-session";
 import { decodeSlug } from "@/lib/slug";
+import { after } from "next/server";
 
 export interface ArticleAccessResult {
   /** Whether this request carries a session. */
@@ -52,9 +53,12 @@ const recordView = async (slug: string, accessToken?: string) => {
  * request's session cookie, and returns the answer. The page around it is not
  * re-rendered; only the small client component that calls this changes.
  *
- * The view is recorded here too, because this is the one place that knows both
- * who is reading and that they actually have the page open. Crawlers are not
- * counted.
+ * The answer is the cookie read and nothing else. It used to wait on recording
+ * the view, which is a round trip to the API: the browser showed the members
+ * prompt for that whole time, after every cold load, to a reader who was
+ * allowed in. Counting is not part of deciding what to show, so it is handed to
+ * `after` and runs once the answer has been sent. Crawlers are still not
+ * counted — they never reach the recording at all.
  */
 export const resolveArticleAccess = async (
   slug: string,
@@ -65,7 +69,10 @@ export const resolveArticleAccess = async (
     return { member: session.member, canRead: false };
   }
 
-  await recordView(slug, session.accessToken);
+  const canRead = session.member;
+  const accessToken = session.accessToken;
 
-  return { member: session.member, canRead: session.member };
+  after(() => recordView(slug, accessToken));
+
+  return { member: session.member, canRead };
 };

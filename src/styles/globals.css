@@ -734,3 +734,12 @@
 [data-article-access][data-article-view="member"] [data-article-for="member"] {
   display: block;
 }
+
+/* The answer is on its way, so neither column is right yet and neither is
+   shown. Without this the members prompt is painted for the length of the
+   round trip and then swapped for the body. The attribute is only ever set by
+   `ArticleAccess`, in the browser, so a crawler or a browser that never runs it
+   keeps the prompt above — search engines read the article at `?view=preview`. */
+[data-article-access][data-article-waiting] [data-article-for] {
+  display: none;
+}

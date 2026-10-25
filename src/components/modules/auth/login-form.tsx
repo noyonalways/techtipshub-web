@@ -10,7 +10,7 @@ import { TLogin } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@heroui/react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 import { PiEyeLight, PiEyeSlashLight } from "react-icons/pi";
@@ -20,7 +20,6 @@ const label =
 
 const LoginForm = () => {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const [isPassword, setIsPassword] = useState(true);
 
   const { setIsLoading: setUserLoading } = useUser();
@@ -38,9 +37,16 @@ const LoginForm = () => {
       setUserLoading(false);
       // Only same-site paths are followed, so a crafted `?redirect=` cannot
       // send a freshly signed-in member somewhere else.
-      router.push(safeRedirectPath(redirect));
+      //
+      // A full load, not `router.push`. The article they were sent back to was
+      // rendered before they had a session, and a client-side navigation reuses
+      // that document and asks the server who is reading only once hydrated —
+      // seconds of the members prompt over an article they are now allowed to
+      // read. Requesting it after the session exists means the header, the
+      // article and its body are all correct on the first paint.
+      window.location.replace(safeRedirectPath(redirect));
     }
-  }, [isPending, data, redirect, router, setUserLoading]);
+  }, [isPending, data, redirect, setUserLoading]);
 
   // The API returns a message for wrong credentials; surface it rather than
   // leaving the form looking like nothing happened.
