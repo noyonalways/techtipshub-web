@@ -3,7 +3,7 @@
 import envConfig from "@/config/env.config";
 import axiosInstance from "@/lib/AxiosInstance";
 import { getAccessToken } from "@/lib/fetch-with-auth";
-import { decodeSlug } from "@/lib/slug";
+import { forgetRenderedArticles } from "@/lib/article-renders";
 import { revalidatePath, updateTag } from "next/cache";
 
 /**
@@ -25,12 +25,20 @@ const refreshSitemap = () => {
  *
  * `updateTag` expires the tag outright, so a publish or edit is reflected on
  * the next visit rather than after the cached copy's timer. `tags` lists every
- * reader of the blog data: the feed, the sitemap, the prerendered article
- * pages, and the author index the build uses.
+ * reader of the blog data: the feed, the sitemap, the per-version article data,
+ * and the author index the build uses.
+ *
+ * `forgetRenderedArticles` is the other half: an article page is prerendered
+ * with the article's `updatedAt` baked into its `params`, and holds on to it
+ * within the render cache. Forgetting it is what tells each page its body is
+ * out of date, so the next visit reads the article again instead of serving
+ * the old body until the revalidation timer runs out.
  */
 const refreshArticles = () => {
   updateTag("allBlogs");
   updateTag("sitemap");
+  updateTag("articleData");
+  forgetRenderedArticles();
   refreshSitemap();
 };
 
@@ -154,33 +162,6 @@ export const getBlogBySlug = async (slug: string) => {
   }
 };
 
-/**
- * One article, read through the cache so `/blogs/[slug]` can be prerendered
- * and served from the CDN instead of querying the API per visit.
- *
- * The API answers with the body locked for a guest, so this is the public
- * version; that is exactly what a cached page should contain.
- *
- * The slug arrives raw in `generateStaticParams` but percent-encoded in the
- * page's `params` (non-ASCII slugs are encoded for the URL), so it has to be
- * decoded once before it is encoded for the request. Encoding it as-is sent
- * the API a double-encoded address (`%25E0...`), which 404s every article
- * whose slug is not plain ASCII.
- */
-export const getPublishedBlog = async (slug: string) => {
-  try {
-    const res = await fetch(
-      `${envConfig.baseApi}/blogs/${encodeURIComponent(decodeSlug(slug))}`,
-      { next: { tags: ["singleBlog"], revalidate: 1800 } },
-    );
-
-    if (!res.ok) return undefined;
-    return res.json();
-  } catch (err: any) {
-    return err?.response?.data;
-  }
-};
-
 export const getLoggedInUserBlogs = async (
   params?: Record<string, string | undefined>,
 ) => {
@@ -264,6 +245,8 @@ export const voteOnBlog = async (
     );
 
     updateTag("singleBlog");
+    // The page shows the vote totals.
+    updateTag("articleData");
 
     return res.data;
   } catch (err: any) {
@@ -271,35 +254,27 @@ export const voteOnBlog = async (
   }
 };
 
-// comment on blog
+/**
+ * Comments and votes are part of the article page, but they do not change the
+ * article's `updatedAt`, so the page cache has to be told about them by hand.
+ * Comments have an entry of their own (`comments`); the page also counts them
+ * and shows the vote totals, so the article data goes with it.
+ */
+const refreshArticleComments = () => {
+  updateTag("comments");
+  updateTag("articleData");
+};
+
+// add a comment to a blog
 export const commentOnBlog = async (blogId: string, payload: FormData) => {
   try {
     const res = await axiosInstance.post(`/blogs/${blogId}/comments`, payload);
 
-    updateTag("comments");
+    refreshArticleComments();
     // The article's comment total is shown next to the counter, so refresh it.
     updateTag("singleBlog");
 
     return await res?.data;
-  } catch (err: any) {
-    return err?.response?.data;
-  }
-};
-
-// get all comments by blog id
-export const getCommentsByBlogId = async (blogId: string) => {
-  try {
-    const res = await fetch(
-      `${envConfig.baseApi}/blogs/${blogId}/comments?limit=100`,
-      {
-        next: {
-          tags: ["comments"],
-          revalidate: 300,
-        },
-      },
-    );
-
-    return res?.json();
   } catch (err: any) {
     return err?.response?.data;
   }
@@ -374,7 +349,7 @@ export const deleteCommentByUser = async (commentId: string) => {
   try {
     const res = await axiosInstance.delete(`/comments/${commentId}`);
 
-    updateTag("comments");
+    refreshArticleComments();
 
     return res.data;
   } catch (err: any) {
@@ -387,7 +362,7 @@ export const deleteCommentAsAdmin = async (commentId: string) => {
   try {
     const res = await axiosInstance.delete(`/admin/comments/${commentId}`);
 
-    updateTag("comments");
+    refreshArticleComments();
 
     return res.data;
   } catch (err: any) {
@@ -403,7 +378,7 @@ export const updateCommentByUser = async (
   try {
     const res = await axiosInstance.put(`/comments/${commentId}`, payload);
 
-    updateTag("comments");
+    refreshArticleComments();
 
     return res.data;
   } catch (err: any) {

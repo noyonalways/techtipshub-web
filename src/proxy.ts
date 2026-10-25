@@ -5,6 +5,20 @@ import { jwtDecode } from "jwt-decode";
 const ACCESS_TOKEN_COOKIE = "tth_access_token";
 const REFRESH_TOKEN_COOKIE = "tth_refresh_token";
 
+/**
+ * User agents that never run the browser (see `ArticleAccess`).
+ *
+ * They are sent to the article's preview variant, which is the server-rendered
+ * copy with real article text and the canonical URL. Handing them the plain
+ * address would show a page whose body waits on a reader check they cannot
+ * run.
+ */
+const ARTICLE_PATH = /^\/blogs\/[^/]+$/;
+const PREVIEW_PARAM = "view";
+const PREVIEW_VALUE = "preview";
+const CRAWLER_PATTERN =
+  /bot\b|bot\/|crawl|spider|slurp|\bba[iy]du\b|yandex|duckduck|facebookexternalhit|facebot|twitterbot|linkedinbot|embedly|pinterest|telegrambot|applebot|ia_archiver|google-?other|chrome-lighthouse|headlesschrome|phantomjs/i;
+
 // Renew a little before expiry so a request never races it.
 const RENEW_BEFORE_SECONDS = 60;
 
@@ -158,6 +172,25 @@ export async function proxy(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = legacyExact;
     return NextResponse.redirect(url, 308);
+  }
+
+  // 1b. An article, to a crawler or link unfurl: point it at the preview
+  // variant, which carries the article text server-side and is the canonical
+  // address in the page metadata. Action requests are left alone: they are not
+  // page reads, and rewriting them would put the preview variant in the answer.
+  const isArticle = ARTICLE_PATH.test(pathname.replace(/\/$/, ""));
+  const userAgent = request.headers.get("user-agent") ?? "";
+  const isAction = request.headers.has("next-action");
+  if (
+    isArticle &&
+    !isAction &&
+    request.method === "GET" &&
+    CRAWLER_PATTERN.test(userAgent) &&
+    request.nextUrl.searchParams.get(PREVIEW_PARAM) !== PREVIEW_VALUE
+  ) {
+    const url = request.nextUrl.clone();
+    url.searchParams.set(PREVIEW_PARAM, PREVIEW_VALUE);
+    return NextResponse.rewrite(url);
   }
 
   // 2. A live access token needs no work, beyond the admin role check.
